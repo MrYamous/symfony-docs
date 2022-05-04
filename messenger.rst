@@ -1666,6 +1666,20 @@ The transport has a number of options:
 ``exchange[type]`` (default: ``fanout``)
     Type of exchange
 
+``exchange[bindings]``
+    The source exchanges to bind this exchange to, keyed by the name.
+    Binding direction: source exchange -> this exchange
+
+``exchange[bindings][binding_keys]``
+    The binding/routing keys to be used for the binding
+
+``exchange[bindings][binding_arguments]``
+    Additional binding arguments
+
+.. versionadded:: 7.4
+
+    The ``exchange[bindings]`` option was introduced in Symfony 7.4.
+
 .. versionadded:: 7.3
 
     Empty string support for ``exchange[name]`` was introduced in Symfony 7.3.
