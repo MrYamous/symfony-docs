@@ -942,18 +942,17 @@ The priority parameter expects an integer value. Routes with higher priority
 are sorted before routes with lower priority. The default value when it is not
 defined is ``0``.
 
-Parameter Conversion
-~~~~~~~~~~~~~~~~~~~~
+Automatically Fetching Objects (EntityValueResolver)
+----------------------------------------------------
 
 A common routing need is to convert the value stored in some parameter (e.g. an
 integer acting as the user ID) into another value (e.g. the object that
-represents the user). This feature is called a "param converter".
+represents the user). To achieve this we can use the ``EntityValueResolver``.
 
-To add support for "param converters" we need SensioFrameworkExtraBundle:
+.. versionadded:: 6.2
 
-.. code-block:: terminal
-
-    $ composer require sensio/framework-extra-bundle
+    Entity Value Resolver was introduced in Symfony 6.2. Prior to this the feature
+    was known as "Param Converter".
 
 Now, keep the previous route configuration, but change the arguments of the
 controller action. Instead of ``string $slug``, add ``BlogPost $post``::
@@ -980,12 +979,12 @@ controller action. Instead of ``string $slug``, add ``BlogPost $post``::
     }
 
 If your controller arguments include type-hints for objects (``BlogPost`` in
-this case), the "param converter" makes a database request to find the object
+this case), the ``EntityValueResolver`` makes a database request to find the object
 using the request parameters (``slug`` in this case). If no object is found,
 Symfony generates a 404 response automatically.
 
-Read the `full param converter documentation`_ to learn about the converters
-provided by Symfony and how to configure them.
+Read more about :ref:`Automatically Fetching Objects <_doctrine-entity-value-resolver>` to learn about the ``EntityValueResolver``
+and how to configute it.
 
 Special Parameters
 ~~~~~~~~~~~~~~~~~~
@@ -2672,5 +2671,4 @@ Learn more about Routing
 
 .. _`PHP regular expressions`: https://www.php.net/manual/en/book.pcre.php
 .. _`PCRE Unicode properties`: https://www.php.net/manual/en/regexp.reference.unicode.php
-.. _`full param converter documentation`: https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html
 .. _`FOSJsRoutingBundle`: https://github.com/FriendsOfSymfony/FOSJsRoutingBundle
