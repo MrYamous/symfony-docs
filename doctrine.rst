@@ -1035,6 +1035,39 @@ In addition, you can query directly with SQL if you need to::
 With SQL, you will get back raw data, not objects (unless you use the `NativeQuery`_
 functionality).
 
+Using Enums
+-----------
+
+PHP 8.1 added native Enumerations, which can be used to define a custom type
+and its possible values. Those can be used in association with Doctrine in
+order to define a limited set of values availables for an entity property.
+
+First step is to create an enum::
+
+    // src/Enum/Suit.php
+    namespace App\Enum;
+
+    enum Suit: string {
+        case Hearts = 'H';
+        case Diamonds = 'D';
+        case Clubs = 'C';
+        case Spades = 'S';
+    }
+
+.. note::
+
+    Only backed enums can be used with properties as Doctrine use the scalar
+    equivalent of each value for storing.
+
+When the enum is created, you can use the ``enumType`` parameter of
+``#[ORM\Column]`` attribute::
+
+    // src/Entity/Card.php
+    namespace App\Entity;
+
+    #[Column(enumType: Suit::class)]
+    public Suit $suit;
+
 Configuration
 -------------
 
