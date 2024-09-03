@@ -707,6 +707,7 @@ yourself::
 Fetch Automatically
 ~~~~~~~~~~~~~~~~~~~
 
+
 If your route wildcards match properties on your entity, then the resolver
 will automatically fetch them::
 
@@ -726,14 +727,8 @@ will automatically fetch them::
     {
     }
 
-Automatic fetching works in these situations:
-
-* If ``{id}`` is in your route, then this is used to fetch by
-  primary key via the ``find()`` method.
-
-* The resolver will attempt to do a ``findOneBy()`` fetch by using
-  *all* of the wildcards in your route that are actually properties
-  on your entity (non-properties are ignored).
+Automatic fetching works if ``{id}`` is in your route, then this is used to
+fetch by primary key via the ``find()`` method.
 
 The ``{slug:product}`` syntax maps the route parameter named ``slug`` to the
 controller argument named ``$product``. It also hints the resolver to look up
