@@ -121,8 +121,8 @@ This is how you can use these flags::
 
     $expressionLanguage = new ExpressionLanguage();
 
-    // this returns true because the unknown variables and functions are ignored
-    var_dump($expressionLanguage->lint('unknown_var + unknown_function()', Parser::IGNORE_UNKNOWN_VARIABLES | Parser::IGNORE_UNKNOWN_FUNCTIONS));
+    // this doesn't throw anything because the unknown variables and functions are ignored
+    $expressionLanguage->lint('unknown_var + unknown_function()', Parser::IGNORE_UNKNOWN_VARIABLES | Parser::IGNORE_UNKNOWN_FUNCTIONS);
 
 .. versionadded:: 7.1
 
