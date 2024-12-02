@@ -1138,7 +1138,7 @@ Retry with a specific delay
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes you may want to override retry delay form the retry strategy. You can achieve this
-using by providing it in the exception, using the ``getRetryDelay()`` method from any 
+using by providing it in the exception, using the ``getRetryDelay()`` method from any
 exception extending :class:`Symfony\\Component\\Messenger\\Exception\\RecoverableExceptionInterface`.
 
 .. versionadded:: 7.2
