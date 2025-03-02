@@ -52,7 +52,7 @@ which makes creating a voter even easier::
 .. versionadded:: 7.3
     
     The vote parameter in the :method:`Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::voteOnAttribute` method
-    voteOnAttribute method was introduced in Symfony 7.3.
+    was introduced in Symfony 7.3.
 
 .. _how-to-use-the-voter-in-a-controller:
 
@@ -206,7 +206,12 @@ would look like this::
         private function canEdit(Post $post, User $user): bool
         {
             // this assumes that the Post object has a `getOwner()` method
-            return $user === $post->getOwner();
+            if ($user === $post->getOwner()) {
+                return true;
+            }
+
+            $vote->reasons[] = 'You are not the owner of the Post.';
+            return false;
         }
     }
 
