@@ -51,7 +51,7 @@ which makes creating a voter even easier::
 
 .. versionadded:: 7.3
     
-    The vote parameter in the :method:`Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::voteOnAttribute` method
+    The `$vote` parameter in the :method:`Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::voteOnAttribute` method
     was introduced in Symfony 7.3.
 
 .. _how-to-use-the-voter-in-a-controller:
@@ -211,6 +211,7 @@ would look like this::
             }
 
             $vote->reasons[] = 'You are not the owner of the Post.';
+
             return false;
         }
     }
