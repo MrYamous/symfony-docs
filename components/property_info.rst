@@ -168,7 +168,7 @@ for a property::
     /*
         Example Result
         --------------
-        class Symfony\Component\PropertyInfo\Type (6) {
+        class Symfony\Component\TypeInfo\Type (6) {
             private $builtinType          => string(6) "string"
             private $nullable             => bool(false)
             private $class                => NULL
