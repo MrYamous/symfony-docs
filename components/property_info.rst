@@ -182,8 +182,8 @@ See :ref:`components-property-info-type` for info about the ``Type`` class.
 
 .. deprecated:: 7.3
 
-    The :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getTypes` is
-    deprecated since Symfony 7.3. Use the method :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getType`
+    The :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getTypes` method is
+    deprecated since Symfony 7.3. Use the :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getType` method
     instead.
 
 Documentation Block
@@ -571,7 +571,7 @@ on the constructor arguments::
     use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 
     $constructorExtractor = new ConstructorExtractor([new ReflectionExtractor()]);
-    $constructorExtractor->getType(Foo::class, 'bar')[0]->getBuiltinType(); // returns 'string'
+    (string) $constructorExtractor->getType(Foo::class, 'bar')[0]; // returns 'string'
 
 .. _`components-property-information-extractors-creation`:
 
