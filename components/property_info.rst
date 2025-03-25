@@ -117,7 +117,7 @@ The :class:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor`
 class exposes public methods to extract several types of information:
 
 * :ref:`List of properties <property-info-list>`: :method:`Symfony\\Component\\PropertyInfo\\PropertyListExtractorInterface::getProperties`
-* :ref:`Property type <property-info-type>`: :method:`Symfony\\Component\\PropertyInfo\\PropertyTypeExtractorInterface::getTypes`
+* :ref:`Property type <property-info-type>`: :method:`Symfony\\Component\\PropertyInfo\\PropertyTypeExtractorInterface::getType`
   (including typed properties)
 * :ref:`Property description <property-info-description>`: :method:`Symfony\\Component\\PropertyInfo\\PropertyDescriptionExtractorInterface::getShortDescription` and :method:`Symfony\\Component\\PropertyInfo\\PropertyDescriptionExtractorInterface::getLongDescription`
 * :ref:`Property access details <property-info-access>`: :method:`Symfony\\Component\\PropertyInfo\\PropertyAccessExtractorInterface::isReadable` and  :method:`Symfony\\Component\\PropertyInfo\\PropertyAccessExtractorInterface::isWritable`
@@ -164,24 +164,27 @@ Extractors that implement :class:`Symfony\\Component\\PropertyInfo\\PropertyType
 provide :ref:`extensive data type information <components-property-info-type>`
 for a property::
 
-    $types = $propertyInfo->getTypes($class, $property);
+    $types = $propertyInfo->getType($class, $property);
     /*
         Example Result
         --------------
-        array(1) {
-            [0] =>
-                class Symfony\Component\PropertyInfo\Type (6) {
-                private $builtinType          => string(6) "string"
-                private $nullable             => bool(false)
-                private $class                => NULL
-                private $collection           => bool(false)
-                private $collectionKeyType    => NULL
-                private $collectionValueType  => NULL
-            }
+        class Symfony\Component\PropertyInfo\Type (6) {
+            private $builtinType          => string(6) "string"
+            private $nullable             => bool(false)
+            private $class                => NULL
+            private $collection           => bool(false)
+            private $collectionKeyType    => NULL
+            private $collectionValueType  => NULL
         }
     */
 
 See :ref:`components-property-info-type` for info about the ``Type`` class.
+
+.. deprecated:: 7.3
+
+    The :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getTypes` is
+    deprecated since Symfony 7.3. Use the method :method:`Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getType`
+    instead.
 
 Documentation Block
 ~~~~~~~~~~~~~~~~~~~
@@ -281,18 +284,17 @@ Type Objects
 
 Compared to the other extractors, type information extractors provide much
 more information than can be represented as simple scalar values. Because
-of this, type extractors return an array of :class:`Symfony\\Component\\PropertyInfo\\Type`
+of this, type extractors return an array of :class:`Symfony\\Component\\TypeInfo\\Type`
 objects for each type that the property supports.
 
 For example, if a property supports both ``integer`` and ``string`` (via
 the ``@return int|string`` annotation),
-:method:`PropertyInfoExtractor::getTypes() <Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getTypes>`
-will return an array containing **two** instances of the :class:`Symfony\\Component\\PropertyInfo\\Type`
-class.
+:method:`PropertyInfoExtractor::getType() <Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getType>`
+will return an instance of the :class:`Symfony\\Component\\TypeInfo\\Type` class.
 
 .. note::
 
-    Most extractors will return only one :class:`Symfony\\Component\\PropertyInfo\\Type`
+    Most extractors will return only one :class:`Symfony\\Component\\TypeInfo\\Type`
     instance. The :class:`Symfony\\Component\\PropertyInfo\\Extractor\\PhpDocExtractor`
     is currently the only extractor that returns multiple instances in the array.
 
@@ -303,18 +305,18 @@ Each object will provide 6 attributes, available in the 6 methods:
 ``Type::getBuiltInType()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::getBuiltinType() <Symfony\\Component\\PropertyInfo\\Type::getBuiltinType>`
+The :method:`Type::getBuiltinType() <Symfony\\Component\\TypeInfo\\Type::getBuiltinType>`
 method returns the built-in PHP data type, which can be one of these
 string values: ``array``, ``bool``, ``callable``, ``float``, ``int``,
 ``iterable``, ``null``, ``object``, ``resource`` or ``string``.
 
-Constants inside the :class:`Symfony\\Component\\PropertyInfo\\Type`
+Constants inside the :class:`Symfony\\Component\\TypeInfo\\Type`
 class, in the form ``Type::BUILTIN_TYPE_*``, are provided for convenience.
 
 ``Type::isNullable()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::isNullable() <Symfony\\Component\\PropertyInfo\\Type::isNullable>`
+The :method:`Type::isNullable() <Symfony\\Component\\TypeInfo\\Type::isNullable>`
 method will return a boolean value indicating whether the property parameter
 can be set to ``null``.
 
@@ -322,13 +324,13 @@ can be set to ``null``.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the :ref:`built-in PHP data type <components-property-info-type-builtin>`
-is ``object``, the :method:`Type::getClassName() <Symfony\\Component\\PropertyInfo\\Type::getClassName>`
+is ``object``, the :method:`Type::getClassName() <Symfony\\Component\\TypeInfo\\Type::getClassName>`
 method will return the fully-qualified class or interface name accepted.
 
 ``Type::isCollection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::isCollection() <Symfony\\Component\\PropertyInfo\\Type::isCollection>`
+The :method:`Type::isCollection() <Symfony\\Component\\TypeInfo\\Type::isCollection>`
 method will return a boolean value indicating if the property parameter is
 a collection - a non-scalar value capable of containing other values. Currently
 this returns ``true`` if:
@@ -346,8 +348,8 @@ this returns ``true`` if:
 
 If the property is a collection, additional type objects may be returned
 for both the key and value types of the collection (if the information is
-available), via the :method:`Type::getCollectionKeyTypes() <Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyTypes>`
-and :method:`Type::getCollectionValueTypes() <Symfony\\Component\\PropertyInfo\\Type::getCollectionValueTypes>`
+available), via the :method:`Type::getCollectionKeyTypes() <Symfony\\Component\\TypeInfo\\Type::getCollectionKeyTypes>`
+and :method:`Type::getCollectionValueTypes() <Symfony\\Component\\TypeInfo\\Type::getCollectionValueTypes>`
 methods.
 
 .. note::
@@ -390,7 +392,7 @@ return and scalar types::
     $reflectionExtractor->getProperties($class);
 
     // Type information.
-    $reflectionExtractor->getTypes($class, $property);
+    $reflectionExtractor->getType($class, $property);
 
     // Access information.
     $reflectionExtractor->isReadable($class, $property);
@@ -429,7 +431,7 @@ library is present::
     $phpDocExtractor = new PhpDocExtractor();
 
     // Type information.
-    $phpDocExtractor->getTypes($class, $property);
+    $phpDocExtractor->getType($class, $property);
     // Description information.
     $phpDocExtractor->getShortDescription($class, $property);
     $phpDocExtractor->getLongDescription($class, $property);
@@ -471,7 +473,7 @@ information from annotations of properties and methods, such as ``@var``,
     $phpStanExtractor = new PhpStanExtractor();
 
     // Type information.
-    $phpStanExtractor->getTypesFromConstructor(Foo::class, 'bar');
+    $phpStanExtractor->getTypeFromConstructor(Foo::class, 'bar');
     // Description information.
     $phpStanExtractor->getShortDescription($class, 'bar');
     $phpStanExtractor->getLongDescription($class, 'bar');
@@ -481,6 +483,12 @@ information from annotations of properties and methods, such as ``@var``,
     The :method:`Symfony\\Component\\PropertyInfo\\Extractor\\PhpStanExtractor::getShortDescription`
     and :method:`Symfony\\Component\\PropertyInfo\\Extractor\\PhpStanExtractor::getLongDescription`
     methods were introduced in Symfony 7.3.
+
+.. deprecated:: 7.3
+
+    The :method:`Symfony\\Component\\PropertyInfo\\ConstructorArgumentTypeExtractorInterface::getTypesFromConstructor` is
+    deprecated since Symfony 7.3. Use the method :method:`Symfony\\Component\\PropertyInfo\\ConstructorArgumentTypeExtractorInterface::getTypeFromConstructor`
+    instead.
 
 SerializerExtractor
 ~~~~~~~~~~~~~~~~~~~
@@ -536,7 +544,7 @@ with the ``property_info`` service in the Symfony Framework::
     // List information.
     $doctrineExtractor->getProperties($class);
     // Type information.
-    $doctrineExtractor->getTypes($class, $property);
+    $doctrineExtractor->getType($class, $property);
 
 .. _components-property-information-constructor-extractor:
 
@@ -563,7 +571,7 @@ on the constructor arguments::
     use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 
     $constructorExtractor = new ConstructorExtractor([new ReflectionExtractor()]);
-    $constructorExtractor->getTypes(Foo::class, 'bar')[0]->getBuiltinType(); // returns 'string'
+    $constructorExtractor->getType(Foo::class, 'bar')[0]->getBuiltinType(); // returns 'string'
 
 .. _`components-property-information-extractors-creation`:
 
