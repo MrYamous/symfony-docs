@@ -1391,6 +1391,12 @@ normalizers (in order of priority):
     `RFC 3339`_ format. Use ``DateTimeNormalizer::FORMAT_KEY`` and
     ``DateTimeNormalizer::TIMEZONE_KEY`` to change the format.
 
+    To always create :phpclass:`DateTime` and :phpclass:`DateTimeImmutable`
+    with the timezone specified in the context, set the
+    ``DateTimeNormalizer::FORCE_TIMEZONE_KEY`` context option to
+    ``true``. This will force the timezone of the context and ignores any
+    timezone from the input.
+
     To convert the objects to integers or floats, set the serializer
     context option ``DateTimeNormalizer::CAST_KEY`` to ``int`` or
     ``float``.
@@ -1398,6 +1404,10 @@ normalizers (in order of priority):
     .. versionadded:: 7.1
 
         The ``DateTimeNormalizer::CAST_KEY`` context option was introduced in Symfony 7.1.
+
+    .. versionadded:: 7.4
+
+        The ``DateTimeNormalizer::FORCE_TIMEZONE_KEY`` context option was introduced in Symfony 7.4.
 
 :class:`Symfony\\Component\\Serializer\\Normalizer\\ConstraintViolationListNormalizer`
     This normalizer converts objects that implement
