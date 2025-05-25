@@ -27,7 +27,7 @@ This component gives you a :class:`Symfony\\Component\\TypeInfo\\Type` object th
 represents the PHP type of anything you built or asked to resolve.
 
 There are two ways to use this component. First one is to create a type manually thanks
-to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as following::
+to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as follows::
 
     use Symfony\Component\TypeInfo\Type;
 
@@ -37,7 +37,7 @@ to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as following::
     Type::list(Type::bool());
     Type::intersection(Type::object(\Stringable::class), Type::object(\Iterator::class));
 
-Many others methods are available and can be found
+Many other methods are available and can be found
 in :class:`Symfony\\Component\\TypeInfo\\TypeFactoryTrait`.
 
 You can also use a generic method that detects the type automatically::
@@ -74,6 +74,8 @@ that need a simple way to describe a class or anything with a type::
     // Then resolve types for any subject
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'id')); // returns an "int" Type instance
     $typeResolver->resolve('bool'); // returns a "bool" Type instance
+    $typeResolver->resolve('array{id: int, name?: string}'); // returns an array shape type instance where 'id' is required and 'name' is optional
+
 
     // Types can be instantiated thanks to static factories
     $type = Type::list(Type::nullable(Type::bool()));
@@ -90,7 +92,55 @@ that need a simple way to describe a class or anything with a type::
 
 Each of these calls will return you a ``Type`` instance that corresponds to the
 static method used. You can also resolve types from a string (as shown in the
-``bool`` parameter of the previous example)
+``bool`` parameter of the previous example).
+
+
+The TypeInfo component provides a new array shape type to define exact array structures with specific key-value type relationships.
+
+.. versionadded:: 7.3
+
+    The array shape type was introduced in Symfony 7.3.
+
+Array shape types support:
+
+* Required and optional keys
+* Nested array shapes
+* Sealed and unsealed shapes (allowing or rejecting extra entries)
+
+Array shapes can be sealed or unsealed:
+
+- ``array{0: int}`` is sealed: it does not accept extra entries.
+- ``array{0: int, ...}`` is unsealed: it accepts extra entries.
+- You can also define the type of extra keys and values: ``array{0: int, ...<string, bool>}``.
+
+This information is stored on the ``ArrayShapeType`` via its ``extraKeyType`` and ``extraValueType`` and validated by the ``accepts()`` method.
+
+Array shapes support associative array definitions::
+
+    use Symfony\Component\TypeInfo\Type;
+
+    // Simple array shape
+    $type = Type::arrayShape([
+        'name' => Type::string(),
+        'age' => Type::int()
+    ]);
+
+    // With optional keys (denoted by "?" suffix)
+    $type = Type::arrayShape([
+        'required_id' => Type::int(),
+        'optional_name' => ['type' => Type::string(), 'optional' => true],
+    ]);
+
+    // Unsealed: allow extra entries not defined above (sealed = false)
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false);
+
+    // Unsealed with typed extra keys and values (extraKeyType=string, extraValueType=bool)
+    // Equivalent to: array{id: int, ...<string, bool>}
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false, Type::string(), Type::bool());
 
 PHPDoc Parsing
 ~~~~~~~~~~~~~~
