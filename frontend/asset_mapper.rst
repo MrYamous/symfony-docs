@@ -476,10 +476,14 @@ the page as ``link`` tags in the order they were imported.
 .. note::
 
     Importing a CSS file is *not* something that is natively supported by
-    JavaScript modules. AssetMapper makes this work by adding a special importmap
-    entry for each CSS file. These special entries are valid, but do nothing.
+    JavaScript modules. AssetMapper makes this work by adding an empty importmap
+    entry for each CSS file, e.g. ``"/assets/app.css": "data:application/javascript,",``.
+    These special entries are valid, but do nothing.
     AssetMapper adds a ``<link>`` tag for each CSS file, but when JavaScript
     executes the ``import`` statement, nothing additional happens.
+    When using a **Content-Security-Policy** with ``script-src 'self'``, this
+    will trigger an error because of the ``data:`` URL. You can either just
+    ignore the error, or lower the rule to ``script-src 'strict-dynamic'``.
 
 .. _asset-mapper-3rd-party-css:
 
