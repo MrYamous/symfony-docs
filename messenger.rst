@@ -1995,6 +1995,8 @@ The transport has a number of options:
     :class:`Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\MessageGroupAwareInterface`,
     the middleware will automatically set the ``Message group ID`` of the stamp.
 
+    ``Message deduplication ID`` defaults to a hash of the SQS message's headers and body.
+
     You can learn more about middlewares in
     :ref:`the dedicated section <messenger_middleware>`.
 
