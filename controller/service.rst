@@ -146,15 +146,17 @@ a service like: ``App\Controller\HelloController::index``:
     .. code-block:: php
 
         // config/routes.php
-        use App\Controller\HelloController;
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            $routes->add('hello', '/hello')
-                ->controller([HelloController::class, 'index'])
-                ->methods(['GET'])
-            ;
-        };
+        use App\Controller\HelloController;
+
+        return Routes::config([
+            'hello' => [
+                'path' => '/hello',
+                'controller' => [HelloController::class, 'index'],
+                'methods' => ['GET'],
+            ],
+        ]);
 
 .. _controller-service-invoke:
 
@@ -193,12 +195,17 @@ which is a common practice when following the `ADR pattern`_
 
     .. code-block:: php
 
+        // config/routes.php
+        namespace Symfony\Component\Routing\Loader\Configurator;
+
         use App\Controller\HelloController;
 
-        // app/config/routing.php
-        $collection->add('hello', new Route('/hello', [
-            '_controller' => HelloController::class,
-        ]));
+        return Routes::config([
+            'hello' => [
+                'path' => '/hello/{name}',
+                'controller' => [HelloController::class, 'index'],
+            ],
+        ]);
 
 Alternatives to base Controller Methods
 ---------------------------------------

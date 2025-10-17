@@ -74,38 +74,40 @@ this behavior by using the ``lock`` key like:
     .. code-block:: php
 
         // config/packages/lock.php
-        use Symfony\Config\FrameworkConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->lock()
-                ->resource('default', ['flock'])
-                ->resource('default', ['flock:///path/to/file'])
-                ->resource('default', ['semaphore'])
-                ->resource('default', ['memcached://m1.docker'])
-                ->resource('default', ['memcached://m1.docker', 'memcached://m2.docker'])
-                ->resource('default', ['redis://r1.docker'])
-                ->resource('default', ['redis://r1.docker', 'redis://r2.docker'])
-                ->resource('default', ['zookeeper://z1.docker'])
-                ->resource('default', ['zookeeper://z1.docker,z2.docker'])
-                ->resource('default', ['zookeeper://localhost01,localhost02:2181'])
-                ->resource('default', ['sqlite:///%kernel.project_dir%/var/lock.db'])
-                ->resource('default', ['mysql:host=127.0.0.1;dbname=app'])
-                ->resource('default', ['pgsql:host=127.0.0.1;dbname=app'])
-                ->resource('default', ['pgsql+advisory:host=127.0.0.1;dbname=app'])
-                ->resource('default', ['sqlsrv:server=127.0.0.1;Database=app'])
-                ->resource('default', ['oci:host=127.0.0.1;dbname=app'])
-                ->resource('default', ['mongodb://127.0.0.1/app?collection=lock'])
-                ->resource('default', ['dynamodb://127.0.0.1/lock'])
-                ->resource('default', [env('LOCK_DSN')])
+        return App::config([
+            'framework' => [
+                'lock' => null,
+                'lock' => 'flock',
+                'lock' => 'flock:///path/to/file',
+                'lock' => 'semaphore',
+                'lock' => 'memcached://m1.docker',
+                'lock' => 'memcached://m1.docker,memcached://m2.docker',
+                'lock' => 'redis://r1.docker',
+                'lock' => 'redis://r1.docker,redis://r2.docker',
+                'lock' => 'rediss://r1.docker?ssl[verify_peer]=1&ssl[cafile]=...',
+                'lock' => 'zookeeper://z1.docker',
+                'lock' => 'zookeeper://z1.docker,z2.docker',
+                'lock' => 'zookeeper://localhost01,localhost02:2181',
+                'lock' => 'sqlite:///%kernel.project_dir%/var/lock.db',
+                'lock' => 'mysql:host=127.0.0.1;dbname=app',
+                'lock' => 'pgsql:host=127.0.0.1;dbname=app',
+                'lock' => 'pgsql+advisory:host=127.0.0.1;dbname=app',
+                'lock' => 'sqlsrv:server=127.0.0.1;Database=app',
+                'lock' => 'oci:host=127.0.0.1;dbname=app',
+                'lock' => 'mongodb://127.0.0.1/app?collection=lock',
+                'lock' => 'dynamodb://127.0.0.1/lock',
+                'lock' => env('LOCK_DSN'),
                 // using an existing service
-                ->resource('default', ['snc_redis.default'])
-
+                'lock' => 'snc_redis.default',
                 // named locks
-                ->resource('invoice', ['semaphore', 'redis://r2.docker'])
-                ->resource('report', ['semaphore'])
-            ;
-        };
+                'lock' => [
+                    'invoice' => ['semaphore', 'redis://r2.docker'],
+                    'report' => 'semaphore',
+                ],
+            ],
+        ]);
 
 Locking a Resource
 ------------------
@@ -198,14 +200,16 @@ provides :ref:`named lock <reference-lock-resources-name>`:
     .. code-block:: php
 
         // config/packages/lock.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->lock()
-                ->resource('invoice', ['semaphore', 'redis://r2.docker'])
-                ->resource('report', ['semaphore']);
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'lock' => [
+                    'invoice' => ['semaphore', 'redis://r2.docker'],
+                    'report' => 'semaphore',
+                ],
+            ],
+        ]);
 
 After having configured one or more named locks, you have two ways of injecting
 them in any service or controller:

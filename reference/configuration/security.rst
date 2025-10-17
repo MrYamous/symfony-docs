@@ -111,20 +111,24 @@ application:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            // 'main' is the name of the firewall (can be chosen freely)
-            $security->firewall('main')
-                // 'pattern' is a regular expression matched against the incoming
-                // request URL. If there's a match, authentication is triggered
-                ->pattern('^/admin')
-                // the rest of options depend on the authentication mechanism
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+
+                // 'main' is the name of the firewall (can be chosen freely)
+                'firewalls' => [
+                    'main' => [
+                        // 'pattern' is a regular expression matched against the incoming
+                        // request URL. If there's a match, authentication is triggered
+                        'pattern' => '^/admin',
+                        // the rest of options depend on the authentication mechanism
+                        // ...
+                    ],
+                ],
+            ],
+        ]);
 
 .. seealso::
 
@@ -348,21 +352,28 @@ user logs out:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-
-        return static function (SecurityConfig $securityConfig): void {
-            // ...
-
-            $securityConfig->firewall('main')
-                ->logout()
-                    ->deleteCookie('cookie1-name')
-                    ->deleteCookie('cookie2-name')
-                        ->path('/')
-                    ->deleteCookie('cookie3-name')
-                        ->path(null)
-                        ->domain('example.com');
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'logout' => [
+                            'delete_cookies' => [
+                                'cookie1-name' => null,
+                                'cookie2-name' => [
+                                    'path' => '/',
+                                ],
+                                'cookie3-name' => [
+                                    'path' => null,
+                                    'domain' => 'example.com',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 clear_site_data
 ...............
@@ -395,16 +406,19 @@ It's also possible to use ``*`` as a wildcard for all directives:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-
-        return static function (SecurityConfig $securityConfig): void {
-            // ...
-
-            $securityConfig->firewall('main')
-                ->logout()
-                    ->clearSiteData(['cookies', 'storage']);
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'logout' => [
+                            'clear_site_data' => ['cookies', 'storage'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 invalidate_session
 ..................
@@ -525,17 +539,22 @@ The security configuration should be:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->lazy(true);
-            $mainFirewall->jsonLogin()
-                ->checkPath('/login')
-                ->usernamePath('security.credentials.login')
-                ->passwordPath('security.credentials.password')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'lazy' => true,
+                        'json_login' => [
+                            'check_path' => '/login',
+                            'username_path' => 'security.credentials.login',
+                            'password_path' => 'security.credentials.password',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 password_path
 .............
@@ -626,17 +645,22 @@ X.509 Authentication
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->x509()
-                ->provider('your_user_provider')
-                ->user('SSL_CLIENT_S_DN_Email')
-                ->credentials('SSL_CLIENT_S_DN')
-                ->userIdentifier('emailAddress')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'x509' => [
+                            'provider' => 'your_user_provider',
+                            'user' => 'SSL_CLIENT_S_DN_Email',
+                            'credentials' => 'SSL_CLIENT_S_DN',
+                            'user_identifier' => 'emailAddress',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 user
 ....
@@ -691,15 +715,20 @@ Remote User Authentication
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->remoteUser()
-                ->provider('your_user_provider')
-                ->user('REMOTE_USER')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'remote_user' => [
+                            'provider' => 'your_user_provider',
+                            'user' => 'REMOTE_USER',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 provider
 ........
@@ -750,19 +779,20 @@ multiple firewalls, the "context" could actually be shared:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('somename')
-                // ...
-                ->context('my_context')
-            ;
-
-            $security->firewall('othername')
-                // ...
-                ->context('my_context')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'somename' => [
+                        'context' => 'my_context',
+                    ],
+                    'othername' => [
+                        'context' => 'my_context',
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -795,13 +825,17 @@ the session must not be used when authenticating users:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->stateless(true);
-            // ...
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'stateless' => true,
+                    ],
+                ],
+            ],
+        ]);
 
 .. _reference-security-lazy:
 
@@ -828,13 +862,17 @@ session only if the application actually accesses the User object, (e.g. calling
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->lazy(true);
-            // ...
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'lazy' => true,
+                    ],
+                ],
+            ],
+        ]);
 
 User Checkers
 ~~~~~~~~~~~~~
@@ -866,13 +904,17 @@ Firewalls can configure a list of required badges that must be present on the au
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->requiredBadges(['CsrfTokenBadge', 'My\Badge']);
-            // ...
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'required_badges' => ['CsrfTokenBadge', 'My\Badge'],
+                    ],
+                ],
+            ],
+        ]);
 
 providers
 ---------

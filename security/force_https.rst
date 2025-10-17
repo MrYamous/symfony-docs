@@ -28,29 +28,19 @@ access control:
         .. code-block:: php
 
             // config/packages/security.php
-            use Symfony\Config\SecurityConfig;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (SecurityConfig $security): void {
-                // ....
-
-                $security->accessControl()
-                    ->path('^/secure')
-                    ->roles(['ROLE_ADMIN'])
-                    ->requiresChannel('https')
-                ;
-
-                $security->accessControl()
-                    ->path('^/login')
-                    ->roles(['PUBLIC_ACCESS'])
-                    ->requiresChannel('https')
-                ;
-
-                $security->accessControl()
-                    ->path('^/')
-                    ->roles(['PUBLIC_ACCESS'])
-                    ->requiresChannel('https')
-                ;
-            };
+            return App::config([
+                'security' => [
+                    // ....
+                    'access_control' => [
+                        ['path' => '^/secure', 'roles' => ['ROLE_ADMIN'], 'requires_channel' => 'https'],
+                        ['path' => '^/login', 'roles' => ['PUBLIC_ACCESS'], 'requires_channel' => 'https'],
+                        // catch all other URLs
+                        ['path' => '^/', 'roles' => ['PUBLIC_ACCESS'], 'requires_channel' => 'https'],
+                    ],
+                ],
+            ]);
 
 To make life easier while developing, you can also use an environment variable,
 like ``requires_channel: '%env(REQUIRED_SCHEME)%'``. In your ``.env`` file, set

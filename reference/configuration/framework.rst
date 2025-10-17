@@ -43,13 +43,15 @@ This option allows you to prepend a base path to the URLs generated for assets:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->basePath('/images');
-        };
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    'base_path' => '/images',
+                ],
+            ],
+        ]);
 
 With this configuration, a call to ``asset('logo.png')`` will generate
 ``/images/logo.png`` instead of ``/logo.png``.
@@ -75,18 +77,20 @@ collection each time it generates an asset's path:
             # ...
             assets:
                 base_urls:
-                    - 'http://cdn.example.com/'
+                    - 'https://cdn.example.com/'
 
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->baseUrls(['http://cdn.example.com/']);
-        };
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    'base_urls' => ['https://cdn.example.com/'],
+                ],
+            ],
+        ]);
 
 .. _reference-assets-json-manifest-path:
 .. _reference-templating-json-manifest-path:
@@ -136,26 +140,30 @@ package:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                // this manifest is applied to every asset (including packages)
-                ->jsonManifestPath('%kernel.project_dir%/public/build/manifest.json');
-
-            // you can use absolute URLs too and Symfony will download them automatically
-            // 'json_manifest_path' => 'https://cdn.example.com/manifest.json',
-            $framework->assets()->package('foo_package')
-                // this package uses its own manifest (the default file is ignored)
-                ->jsonManifestPath('%kernel.project_dir%/public/build/a_different_manifest.json')
-                // Throws an exception when an asset is not found in the manifest
-                ->setStrictMode('%kernel.debug%');
-
-            $framework->assets()->package('bar_package')
-                // this package uses the global manifest (the default file is used)
-                ->basePath('/images');
-        };
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    // this manifest is applied to every asset (including packages)
+                    'json_manifest_path' => '%kernel.project_dir%/public/build/manifest.json',
+                    // you can use absolute URLs too and Symfony will download them automatically
+                    // 'json_manifest_path' => 'https://cdn.example.com/manifest.json',
+                    'packages' => [
+                        'foo_package' => [
+                            // this package uses its own manifest (the default file is ignored)
+                            'json_manifest_path' => '%kernel.project_dir%/public/build/a_different_manifest.json',
+                            // Throws an exception when an asset is not found in the manifest
+                            'strict_mode' => param('kernel.debug'),
+                        ],
+                        'bar_package' => [
+                            // this package uses the global manifest (the default file is used)
+                            'base_path' => '/images',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -230,19 +238,25 @@ You can group assets into packages, to specify different base URLs for them:
             assets:
                 packages:
                     avatars:
-                        base_urls: 'http://static_cdn.example.com/avatars'
+                        base_urls: 'https://static_cdn.example.com/avatars'
 
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->package('avatars')
-                    ->baseUrls(['http://static_cdn.example.com/avatars']);
-        };
+        return App::config([
+            'framework' => [
+                // ...
+                'assets' => [
+                    'packages' => [
+                        'avatars' => [
+                            'base_urls' => ['https://static_cdn.example.com/avatars'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Now you can use the ``avatars`` package in your templates:
 
@@ -306,13 +320,15 @@ Now, activate the ``version`` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->version('v2');
-        };
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    'version' => 'v2',
+                ],
+            ],
+        ]);
 
 Now, the same asset will be rendered as ``/images/logo.png?v2`` If you use
 this feature, you **must** manually increment the ``version`` value
@@ -406,25 +422,30 @@ individually for each asset package:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->versionStrategy('app.asset.my_versioning_strategy');
-
-            $framework->assets()->package('foo_package')
-                // this package removes any versioning (its assets won't be versioned)
-                ->version(null);
-
-            $framework->assets()->package('bar_package')
-                // this package uses its own strategy (the default strategy is ignored)
-                ->versionStrategy('app.asset.another_version_strategy');
-
-            $framework->assets()->package('baz_package')
-                // this package inherits the default strategy
-                ->basePath('/images');
-        };
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    // this strategy is applied to every asset (including packages)
+                    'version_strategy' => 'app.asset.my_versioning_strategy',
+                    'packages' => [
+                        'foo_package' => [
+                            // this package removes any versioning (its assets won't be versioned)
+                            'version' => null,
+                        ],
+                        'bar_package' => [
+                            // this package uses its own strategy (the default strategy is ignored)
+                            'version_strategy' => 'app.asset.another_version_strategy',
+                        ],
+                        'baz_package' => [
+                            // this package inherits the default strategy
+                            'base_path' => '/images',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -536,14 +557,20 @@ To configure a Redis cache pool with a default lifetime of 1 hour, do the follow
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->cache()
-                ->pool('cache.mycache')
-                    ->adapters(['cache.adapter.redis'])
-                    ->defaultLifetime(3600);
-        };
+        return App::config([
+            'framework' => [
+                'cache' => [
+                    'pools' => [
+                        'cache.mycache' => [
+                            'adapter' => 'cache.adapter.redis',
+                            'default_lifetime' => 3600,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 adapter
 """""""
@@ -682,12 +709,13 @@ can also :ref:`disable CSRF protection on individual forms <form-csrf-customizat
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
-        return static function (FrameworkConfig $framework): void {
-            $framework->csrfProtection()
-                ->enabled(true)
-            ;
-        };
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'csrf_protection' => true,
+            ],
+        ]);
 
 If you're using forms, but want to avoid starting your session (e.g. using
 forms in an API-only website), ``csrf_protection`` will need to be set to
@@ -760,11 +788,13 @@ performance a bit:
     .. code-block:: php
 
         // config/packages/translation.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->enabledLocales(['en', 'es']);
-        };
+        return App::config([
+            'framework' => [
+                'enabled_locales' => ['en', 'es'],
+            ],
+        ]);
 
 An added bonus of defining the enabled locales is that they are automatically
 added as a requirement of the :ref:`special _locale parameter <routing-locale-parameter>`.
@@ -844,11 +874,15 @@ You can also set ``esi`` to ``true`` to enable it:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->esi()->enabled(true);
-        };
+        return App::config([
+            'framework' => [
+                'esi' => [
+                    'enabled' => true,
+                ],
+            ],
+        ]);
 
 .. _framework_exceptions:
 
@@ -875,16 +909,21 @@ and HTTP status code applied to the exceptions that match the given exception cl
     .. code-block:: php
 
         // config/packages/exceptions.php
-        use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->exception(BadRequestHttpException::class)
-                ->logLevel('debug')
-                ->statusCode(422)
-                ->logChannel('custom_channel')
-            ;
-        };
+        use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
+        return App::config([
+            'framework' => [
+                'exceptions' => [
+                    BadRequestHttpException::class => [
+                        'log_level' => 'debug',
+                        'status_code' => 422,
+                        'log_channel' => 'custom_channel',
+                    ],
+                ],
+            ],
+        ]);
 
 The order in which you configure exceptions is important because Symfony will
 use the configuration of the first exception that matches ``instanceof``:
@@ -1184,14 +1223,16 @@ This service can be configured using ``framework.http_client.default_options``:
     .. code-block:: php
 
         // config/packages/framework.php
-        $container->loadFromExtension('framework', [
-            'http_client' => [
-                'max_host_connections' => 10,
-                'default_options' => [
-                    'headers' => [
-                        'X-Powered-By' => 'ACME App',
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'max_host_connections' => 10,
+                    'default_options' => [
+                        'headers' => ['X-Powered-By' => 'ACME App'],
+                        'max_redirects' => 7,
                     ],
-                    'max_redirects' => 7,
                 ],
             ],
         ]);
@@ -1199,9 +1240,7 @@ This service can be configured using ``framework.http_client.default_options``:
     .. code-block:: php-standalone
 
         $client = HttpClient::create([
-            'headers' => [
-                'X-Powered-By' => 'ACME App',
-            ],
+            'headers' => ['X-Powered-By' => 'ACME App'],
             'max_redirects' => 7,
         ], 10);
 
@@ -1228,12 +1267,16 @@ these options and can define a few others:
     .. code-block:: php
 
         // config/packages/framework.php
-        $container->loadFromExtension('framework', [
-            'http_client' => [
-                'scoped_clients' => [
-                    'my_api.client' => [
-                        'auth_bearer' => 'secret_bearer_token',
-                        // ...
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        'my_api.client' => [
+                            'auth_bearer' => 'secret_bearer_token',
+                            // ...
+                        ],
                     ],
                 ],
             ],
@@ -1865,11 +1908,13 @@ doubling them to prevent Symfony from interpreting them as container parameters)
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->ide('myide://open?url=file://%%f&line=%%l');
-        };
+        return App::config([
+            'framework' => [
+                'ide' => 'myide://open?url=file://%%f&line=%%l',
+            ],
+        ]);
 
 Since every developer uses a different IDE, the recommended way to enable this
 feature is to configure it on a system level. First, you can define this option
@@ -1960,12 +2005,17 @@ the name as key and DSN or service id as value:
     .. code-block:: php
 
         // config/packages/lock.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->lock()
-                ->resource('default', [env('LOCK_DSN')]);
-        };
+        return App::config([
+            'framework' => [
+                'lock' => [
+                    'resource' => [
+                        'default' => [env('LOCK_DSN')],
+                    ],
+                ],
+            ],
+        ]);
 
 .. seealso::
 
@@ -2020,19 +2070,16 @@ the `SMTP session`_. This value overrides any other recipient set in the code.
         // config/packages/mailer.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->extension('framework', [
+        return App::config([
+            'framework' => [
                 'mailer' => [
                     'dsn' => 'smtp://localhost:25',
                     'envelope' => [
-                        'recipients' => [
-                            'admin@symfony.com',
-                            'lead@symfony.com',
-                        ],
+                        'recipients' => ['admin@symfony.com', 'lead@symfony.com'],
                     ],
                 ],
-            ]);
-        };
+            ],
+        ]);
 
 sender
 """"""
@@ -2132,14 +2179,32 @@ This option also accepts a map of PHP errors to log levels:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Psr\Log\LogLevel;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->phpErrors()->log(\E_DEPRECATED, LogLevel::ERROR);
-            $framework->phpErrors()->log(\E_USER_DEPRECATED, LogLevel::ERROR);
-            // ...
-        };
+        use Psr\Log\LogLevel;
+
+        return App::config([
+            'framework' => [
+                'php_errors' => [
+                    'log' => [
+                        \E_DEPRECATED => LogLevel::ERROR,
+                        \E_USER_DEPRECATED => LogLevel::ERROR,
+                        \E_NOTICE => LogLevel::ERROR,
+                        \E_USER_NOTICE => LogLevel::ERROR,
+                        \E_STRICT => LogLevel::ERROR,
+                        \E_WARNING => LogLevel::ERROR,
+                        \E_USER_WARNING => LogLevel::ERROR,
+                        \E_COMPILE_WARNING => LogLevel::ERROR,
+                        \E_CORE_WARNING => LogLevel::ERROR,
+                        \E_USER_ERROR => LogLevel::CRITICAL,
+                        \E_COMPILE_ERROR => LogLevel::CRITICAL,
+                        \E_PARSE => LogLevel::CRITICAL,
+                        \E_ERROR => LogLevel::CRITICAL,
+                        \E_CORE_ERROR => LogLevel::CRITICAL,
+                    ],
+                ],
+            ],
+        ]);
 
 throw
 .....
@@ -2355,12 +2420,17 @@ To configure a ``jsonp`` format:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->request()
-                ->format('jsonp', 'application/javascript');
-        };
+        return App::config([
+            'framework' => [
+                'request' => [
+                    'formats' => [
+                        'jsonp' => 'application/javascript',
+                    ],
+                ],
+            ],
+        ]);
 
 router
 ~~~~~~
@@ -2545,13 +2615,13 @@ the name as key and DSN or service id as value:
     .. code-block:: php
 
         // config/packages/semaphore.php
-        use Symfony\Config\FrameworkConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->semaphore()
-                ->resource('default', [env('SEMAPHORE_DSN')]);
-        };
+        return App::config([
+            'framework' => [
+                'semaphore' => env('SEMAPHORE_DSN'),
+            ],
+        ]);
 
 .. _reference-semaphore-resources-name:
 
@@ -2676,8 +2746,14 @@ Unlike the other session options, ``cache_limiter`` is set as a regular
     .. code-block:: php
 
         // config/services.php
-        $container->setParameter('session.storage.options', [
-            'cache_limiter' => 0,
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'parameters' => [
+                'session.storage.options' => [
+                    'cache_limiter' => 0,
+                ],
+            ],
         ]);
 
 Be aware that if you configure it, you'll have to set other session-related options
@@ -2783,12 +2859,15 @@ Whether to enable the session support in the framework.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                ->enabled(true);
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    'enabled' => true,
+                ],
+            ],
+        ]);
 
 gc_divisor
 ..........
@@ -2854,19 +2933,19 @@ and also to configure the session handler with a DSN:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-
-            $framework->session()
-                // a few possible examples
-                ->handlerId('redis://localhost')
-                ->handlerId(env('REDIS_URL'))
-                ->handlerId(env('DATABASE_URL'))
-                ->handlerId('file://%kernel.project_dir%/var/sessions');
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    // a few possible examples
+                    'handler_id' => 'redis://localhost',
+                    'handler_id' => env('REDIS_URL'),
+                    'handler_id' => env('DATABASE_URL'),
+                    'handler_id' => 'file://%kernel.project_dir%/var/sessions',
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -2931,12 +3010,15 @@ If ``null``, ``php.ini``'s `session.save_path`_ directive will be relied on:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                ->savePath(null);
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    'save_path' => null,
+                ],
+            ],
+        ]);
 
 .. _storage_id:
 
@@ -3142,11 +3224,13 @@ the application won't respond and the user will receive a 400 response.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->trustedHosts(['^example\.com$', '^example\.org$']);
-        };
+        return App::config([
+            'framework' => [
+                'trusted_hosts' => ['^example\.com$', '^example\.org$'],
+            ],
+        ]);
 
 Hosts can also be configured to respond to any subdomain, via
 ``^(.+\.)?example\.com$`` for instance.
@@ -3203,16 +3287,21 @@ Defines the Doctrine entities that will be introspected to add
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->validation()
-                ->autoMapping()
-                    ->paths([
-                        'App\\Entity\\' => [],
-                        'Foo\\' => ['Foo\\Some\\Entity', 'Foo\\Another\\Entity'],
-                    ]);
-        };
+        use App\Entity\AnotherEntity;
+        use App\Entity\SomeEntity;
+
+        return App::config([
+            'framework' => [
+                'auto_mapping' => [
+                    // an empty array means that all entities that belong to that
+                    // namespace will add automatic validation
+                    'App\\Entity\\' => [],
+                    'Foo\\' => [SomeEntity::class, AnotherEntity::class],
+                ],
+            ],
+        ]);
 
 .. _reference-validation-disable_translation:
 
@@ -3286,13 +3375,17 @@ the component will look for additional validation files:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->validation()
-                ->mapping()
-                    ->paths(['%kernel.project_dir%/config/validation/']);
-        };
+        return App::config([
+            'framework' => [
+                'validation' => [
+                    'mapping' => [
+                        'paths' => ['%kernel.project_dir%/config/validation/'],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _reference-validation-not-compromised-password:
 
@@ -3380,14 +3473,17 @@ A list of workflows to be created by the framework extension:
     .. code-block:: php
 
         // config/packages/workflow.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->workflows()
-                ->workflows('my_workflow')
-                    // ...
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'my_workflow' => [
+                        // ...
+                    ],
+                ],
+            ],
+        ]);
 
 .. seealso::
 

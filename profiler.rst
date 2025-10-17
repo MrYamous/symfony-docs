@@ -159,16 +159,25 @@ create an alias pointing to the existing ``profiler`` service:
 
     .. code-block:: yaml
 
-        # config/services_dev.yaml
-        services:
-            Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'
+        # config/services.yaml
+        when@dev:
+            services:
+                Symfony\Component\HttpKernel\Profiler\Profiler: '@profiler'
 
     .. code-block:: php
 
-        // config/services_dev.php
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\HttpKernel\Profiler\Profiler;
 
-        $container->setAlias(Profiler::class, 'profiler');
+        return App::config([
+            'when@dev' => 'services' => [
+                Profiler::class => [
+                    'alias' => 'profiler',
+                ],
+            ],
+        ]);
 
 .. _enabling-the-profiler-conditionally:
 
@@ -181,11 +190,28 @@ parameter is included in the URL):
 
 .. code-block:: yaml
 
-    # config/packages/dev/web_profiler.yaml
+    # config/packages/web_profiler.yaml
+    when@dev:
         framework:
             profiler:
                 collect: false
                 collect_parameter: 'profile'
+
+.. code-block:: php
+
+    // config/packages/web_profiler.php
+    namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+    return App::config([
+        'when@dev' => [
+            'framework' => [
+                'profiler' => [
+                    'collect' => false,
+                    'collect_parameter' => 'profile',
+                ],
+            ],
+        ],
+    ]);
 
 This configuration disables the profiler by default (``collect: false``) to
 improve the application performance; but enables it for requests that include a
@@ -219,12 +245,15 @@ toolbar to be refreshed after each AJAX request by enabling ``ajax_replace`` in 
     .. code-block:: php
 
         // config/packages/web_profiler.php
-        use Symfony\Config\WebProfilerConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (WebProfilerConfig $profiler): void {
-            $profiler->toolbar()
-                ->ajaxReplace(true);
-        };
+        return App::config([
+            'web_profiler' => [
+                'toolbar' => [
+                    'ajax_replace' => true,
+                ],
+            ],
+        ]);
 
 If you need a more sophisticated solution, you can set the
 ``Symfony-Debug-Toolbar-Replace`` header to a value of ``'1'`` in the response
@@ -538,18 +567,24 @@ you'll need to configure the data collector explicitly:
 
         use App\DataCollector\RequestCollector;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(RequestCollector::class)
-                ->tag('data_collector', [
-                    'id' => RequestCollector::class,
-                    // optional template (it has more priority than the value returned by getTemplate())
-                    'template' => 'data_collector/template.html.twig',
-                    // optional priority (positive or negative integer; default = 0)
-                    // 'priority' => 300,
-                ]);
-        };
+        return App::config([
+            'services' => [
+                RequestCollector::class => [
+                    'tags' => [
+                        [
+                            'data_collector' => [
+                                // must match the value returned by the getName() method
+                                'id' => RequestCollector::class,
+                                // optional template (it has more priority than the value returned by getTemplate())
+                                'template' => 'data_collector/template.html.twig',
+                                // optional priority (positive or negative integer; default = 0)
+                                // 'priority' => 300,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _`Single-page applications`: https://en.wikipedia.org/wiki/Single-page_application
 .. _`Blackfire`: https://blackfire.io/docs/introduction?utm_source=symfony&utm_medium=symfonycom_docs&utm_campaign=profiler

@@ -320,15 +320,17 @@ instance to disallow extra fields while deserializing:
     .. code-block:: php
 
         // config/packages/serializer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->serializer()
-                ->defaultContext([
-                    'allow_extra_attributes' => false,
-                ])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'default_context' => [
+                        'allow_extra_attributes' => false,
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -1211,13 +1213,15 @@ setting the ``name_converter`` setting to
     .. code-block:: php
 
         // config/packages/serializer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->serializer()
-                ->nameConverter('serializer.name_converter.camel_case_to_snake_case')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -1254,13 +1258,15 @@ setting the ``name_converter`` setting to
     .. code-block:: php
 
         // config/packages/serializer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->serializer()
-                ->nameConverter('serializer.name_converter.snake_case_to_camel_case')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'name_converter' => 'serializer.name_converter.snake_case_to_camel_case',
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -1451,17 +1457,17 @@ like:
 
         use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
-        return function(ContainerConfigurator $container) {
-            // ...
-
-            // if you're using autoconfigure, the tag will be automatically applied
-            $services->set(CustomNormalizer::class)
-                // register the normalizer with a high priority (called earlier)
-                ->tag('serializer.normalizer', [
-                    'priority' => 500,
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // if you're using autoconfigure, the tag will be automatically applied
+                CustomNormalizer::class => [
+                    'tags' => [
+                        // register the normalizer with a high priority (called earlier)
+                        ['serializer.normalizer' => ['priority' => 500]],
+                    ],
+                ],
+            ],
+        ]);
 
 :class:`Symfony\\Component\\Serializer\\Normalizer\\CustomNormalizer`
     This normalizer calls a method on the PHP object when normalizing. The
@@ -1536,23 +1542,27 @@ the ``named_serializers`` option:
     .. code-block:: php
 
         // config/packages/serializer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->serializer()
-                ->namedSerializer('api_client1')
-                    ->nameConverter('serializer.name_converter.camel_case_to_snake_case')
-                    ->defaultContext([
-                        'enable_max_depth' => true,
-                    ])
-            ;
-            $framework->serializer()
-                ->namedSerializer('api_client2')
-                    ->defaultContext([
-                        'enable_max_depth' => false,
-                    ])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'named_serializers' => [
+                        'api_client1' => [
+                            'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
+                            'default_context' => [
+                                'enable_max_depth' => true,
+                            ],
+                        ],
+                        'api_client2' => [
+                            'default_context' => [
+                                'enable_max_depth' => false,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 You can inject these different serializer instances
 using :ref:`named aliases <autowiring-multiple-implementations-same-type>`::
@@ -1605,18 +1615,22 @@ or :ref:`serializer.encoder <reference-dic-tags-serializer-encoder>` tags:
 
         use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
-        return function(ContainerConfigurator $container) {
-            // ...
-
-            $services->set(CustomNormalizer::class)
-                // add this normalizer only to a specific named serializer
-                ->tag('serializer.normalizer', ['serializer' => 'api_client1'])
-                // add this normalizer to several named serializers
-                ->tag('serializer.normalizer', ['serializer' => ['api_client1', 'api_client2']])
-                // add this normalizer to all serializers, including the default one
-                ->tag('serializer.normalizer', ['serializer' => '*'])
-            ;
-        };
+        return App::config([
+            'services' => [
+                CustomNormalizer::class => [
+                    // prevent this normalizer from being automatically added to the default serializer
+                    'autoconfigure' => false,
+                    'tags' => [
+                        // add this normalizer only to a specific named serializer
+                        ['serializer.normalizer' => ['serializer' => 'api_client1']],
+                        // add this normalizer to several named serializers
+                        ['serializer.normalizer' => ['serializer' => ['api_client1', 'api_client2']]],
+                        // add this normalizer to all serializers, including the default one
+                        ['serializer.normalizer' => ['serializer' => '*']],
+                    ],
+                ],
+            ],
+        ]);
 
 When the ``serializer`` attribute is not set, the service is registered only with
 the default serializer.
@@ -1648,15 +1662,20 @@ named serializer by setting the ``include_built_in_normalizers`` and
     .. code-block:: php
 
         // config/packages/serializer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->serializer()
-                ->namedSerializer('api_client1')
-                    ->includeBuiltInNormalizers(false)
-                    ->includeBuiltInEncoders(true)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'named_serializers' => [
+                        'api_client1' => [
+                            'include_built_in_normalizers' => false,
+                            'include_built_in_encoders' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Debugging the Serializer
 ------------------------

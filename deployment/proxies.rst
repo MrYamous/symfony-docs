@@ -47,20 +47,20 @@ using the following configuration options:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework
+        return App::config([
+            'framework' => [
                 // the IP address (or range) of your proxy
-                ->trustedProxies('192.0.0.1,10.0.0.0/8')
+                'trusted_proxies' => ['192.0.0.1,10.0.0.0/8', 'private_ranges'],
                 // shortcut for private IP address ranges of your proxy
-                ->trustedProxies('private_ranges')
-                // trust *all* "X-Forwarded-*" headers (the ! prefix means to not trust those headers)
-                ->trustedHeaders(['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix'])
+                'trusted_proxies' => 'private_ranges',
+                // trust *all* "X-Forwarded-*" headers
+                'trusted_headers' => ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix'],
                 // or, if your proxy instead uses the "Forwarded" header
-                ->trustedHeaders(['forwarded'])
-            ;
-        };
+                'trusted_headers' => ['forwarded'],
+            ],
+        ]);
 
 .. danger::
 

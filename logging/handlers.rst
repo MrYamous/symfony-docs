@@ -31,22 +31,28 @@ To use it, declare it as a service:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Monolog\Level;
         use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
 
-        $container->register(ElasticsearchLogstashHandler::class);
+        return App::config([
+            'services' => [
+                ElasticsearchLogstashHandler::class => null,
 
-        // optionally, configure the handler using the constructor arguments (shown values are default)
-        $container->register(ElasticsearchLogstashHandler::class)
-            ->setArguments([
-                '$endpoint' => "http://127.0.0.1:9200",
-                '$index' => "monolog",
-                '$client' => null,
-                '$level' => Level::Debug,
-                '$bubble' => true,
-                '$elasticsearchVersion' => '1.0.0',
-            ])
-        ;
+                // optionally, configure the handler using the constructor arguments (shown values are default)
+                ElasticsearchLogstashHandler::class => [
+                    'arguments' => [
+                        '$endpoint' => "http://127.0.0.1:9200",
+                        '$index' => "monolog",
+                        '$client' => null,
+                        '$level' => Level::Debug,
+                        '$bubble' => true,
+                        '$elasticsearchVersion' => '1.0.0',
+                    ],
+                ],
+            ],
+        ]);
 
 Then reference it in the Monolog configuration.
 
@@ -67,15 +73,20 @@ each log, an HTTP request will be made to push the log to Elasticsearch:
     .. code-block:: php
 
         // config/packages/prod/monolog.php
-        use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
-        use Symfony\Config\MonologConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog): void {
-            $monolog->handler('es')
-                ->type('service')
-                ->id(ElasticsearchLogstashHandler::class)
-            ;
-        };
+        use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
+
+        return App::config([
+            'monolog' => [
+                'handlers' => [
+                    'es' => [
+                        'type' => 'service',
+                        'id' => ElasticsearchLogstashHandler::class,
+                    ],
+                ],
+            ],
+        ]);
 
 In a production environment, it's highly recommended to wrap this handler in a
 handler with buffering capabilities (like the `FingersCrossedHandler`_ or
@@ -100,19 +111,24 @@ even better performance and fault tolerance, a proper `ELK stack`_ is recommende
     .. code-block:: php
 
         // config/packages/prod/monolog.php
-        use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
-        use Symfony\Config\MonologConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog): void {
-            $monolog->handler('main')
-                ->type('fingers_crossed')
-                ->handler('es')
-            ;
-            $monolog->handler('es')
-                ->type('service')
-                ->id(ElasticsearchLogstashHandler::class)
-            ;
-        };
+        use Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler;
+
+        return App::config([
+            'monolog' => [
+                'handlers' => [
+                    'main' => [
+                        'type' => 'fingers_crossed',
+                        'handler' => 'es',
+                    ],
+                    'es' => [
+                        'type' => 'service',
+                        'id' => ElasticsearchLogstashHandler::class,
+                    ],
+                ],
+            ],
+        ]);
 
 .. _`BufferHandler`: https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/BufferHandler.php
 .. _`ELK stack`: https://www.elastic.co/what-is/elk-stack

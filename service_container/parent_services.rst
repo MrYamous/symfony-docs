@@ -87,24 +87,24 @@ avoid duplicated service definitions:
         use App\Repository\DoctrinePostRepository;
         use App\Repository\DoctrineUserRepository;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(BaseDoctrineRepository::class)
-                ->abstract()
-                ->args([service('doctrine.orm.entity_manager')])
-                ->call('setLogger', [service('logger')])
-            ;
-
-            $services->set(DoctrineUserRepository::class)
-                // extend the App\Repository\BaseDoctrineRepository service
-                ->parent(BaseDoctrineRepository::class)
-            ;
-
-            $services->set(DoctrinePostRepository::class)
-                ->parent(BaseDoctrineRepository::class)
-            ;
-        };
+        return App::config([
+            'services' => [
+                BaseDoctrineRepository::class => [
+                    'abstract' => true,
+                    'arguments' => [service('doctrine.orm.entity_manager')],
+                    'calls' => [
+                        'setLogger' => [service('logger')],
+                    ],
+                ],
+                DoctrineUserRepository::class => [
+                    // extend the App\Repository\BaseDoctrineRepository service
+                    'parent' => BaseDoctrineRepository::class,
+                ],
+                DoctrinePostRepository::class => [
+                    'parent' => BaseDoctrineRepository::class,
+                ],
+            ],
+        ]);
 
 In this context, having a ``parent`` service implies that the arguments
 and method calls of the parent service should be used for the child services.
@@ -161,30 +161,23 @@ the child class:
         use App\Repository\BaseDoctrineRepository;
         use App\Repository\DoctrinePostRepository;
         use App\Repository\DoctrineUserRepository;
-        // ...
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(BaseDoctrineRepository::class)
-                // ...
-            ;
-
-            $services->set(DoctrineUserRepository::class)
-                ->parent(BaseDoctrineRepository::class)
-
-                // overrides the private setting of the parent service
-                ->public()
-
-                // appends the '@app.username_checker' argument to the parent
-                // argument list
-                ->args([service('app.username_checker')])
-            ;
-
-            $services->set(DoctrinePostRepository::class)
-                ->parent(BaseDoctrineRepository::class)
-
-                # overrides the first argument
-                ->arg(0, service('doctrine.custom_entity_manager'))
-            ;
-        };
+        return App::config([
+            'services' => [
+                DoctrineUserRepository::class => [
+                    'parent' => BaseDoctrineRepository::class,
+                    // overrides the private setting of the parent service
+                    'public' => true,
+                    // appends the 'app.username_checker' service to the parent
+                    // argument list
+                    'arguments' => [service('app.username_checker')],
+                ],
+                DoctrinePostRepository::class => [
+                    'parent' => BaseDoctrineRepository::class,
+                    // overrides the first argument (using the special index_N key)
+                    'arguments' => [
+                        'index_0' => service('doctrine.custom_entity_manager'),
+                    ],
+                ],
+            ],
+        ]);

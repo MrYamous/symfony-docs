@@ -26,23 +26,31 @@ In Symfony, you can register your custom DQL functions as follows:
     .. code-block:: php
 
         // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\DQL\DatetimeFunction;
         use App\DQL\NumericFunction;
         use App\DQL\SecondStringFunction;
         use App\DQL\StringFunction;
-        use Symfony\Config\DoctrineConfig;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $defaultDql = $doctrine->orm()
-                ->entityManager('default')
-                    // ...
-                    ->dql();
-
-            $defaultDql->stringFunction('test_string', StringFunction::class);
-            $defaultDql->stringFunction('second_string', SecondStringFunction::class);
-            $defaultDql->numericFunction('test_numeric', NumericFunction::class);
-            $defaultDql->datetimeFunction('test_datetime', DatetimeFunction::class);
-        };
+        return App::config([
+            'doctrine' => [
+                'orm' => [
+                    'dql' => [
+                        'string_functions' => [
+                            'test_string' => StringFunction::class,
+                            'second_string' => SecondStringFunction::class,
+                        ],
+                        'numeric_functions' => [
+                            'test_numeric' => NumericFunction::class,
+                        ],
+                        'datetime_functions' => [
+                            'test_datetime' => DatetimeFunction::class,
+                            ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -68,17 +76,26 @@ In Symfony, you can register your custom DQL functions as follows:
         .. code-block:: php
 
             // config/packages/doctrine.php
-            use App\DQL\DatetimeFunction;
-            use Symfony\Config\DoctrineConfig;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (DoctrineConfig $doctrine): void {
-                $doctrine->orm()
-                    // ...
-                    ->entityManager('example_manager')
-                        // place your functions here
-                        ->dql()
-                            ->datetimeFunction('test_datetime', DatetimeFunction::class);
-            };
+            use App\DQL\DatetimeFunction;
+
+            return App::config([
+                'doctrine' => [
+                    'orm' => [
+                        'entity_managers' => [
+                            'example_manager' => [
+                                // Place your functions here
+                                'dql' => [
+                                    'datetime_functions' => [
+                                        'test_datetime' => DatetimeFunction::class,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
 
 .. warning::
 

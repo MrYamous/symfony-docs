@@ -66,16 +66,20 @@ component routing:
     .. code-block:: php
 
         // config/packages/framework.php
-        use App\Webhook\MailerWebhookParser;
-        use Symfony\Config\FrameworkConfig;
-        return static function (FrameworkConfig $frameworkConfig): void {
-            $webhookConfig = $frameworkConfig->webhook();
-            $webhookConfig
-                ->routing('mailer_mailgun')
-                ->service('mailer.webhook.request_parser.mailgun')
-                ->secret('%env(MAILER_MAILGUN_SECRET)%')
-            ;
-        };
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'webhook' => [
+                    'routing' => [
+                        'mailer_mailgun' => [
+                            'service' => 'mailer.webhook.request_parser.mailgun',
+                            'secret' => env('MAILER_MAILGUN_SECRET'),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 In this example, we are using ``mailer_mailgun`` as the webhook routing name.
 The routing name must be unique as this is what connects the provider with your

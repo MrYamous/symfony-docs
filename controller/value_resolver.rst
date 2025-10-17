@@ -369,13 +369,16 @@ but you can set it yourself to change its ``priority`` or ``name`` attributes.
 
         use App\ValueResolver\BookingIdValueResolver;
 
-        return static function (ContainerConfigurator $containerConfigurator): void {
-            $services = $containerConfigurator->services();
-
-            $services->set(BookingIdValueResolver::class)
-                ->tag('controller.argument_value_resolver', ['name' => 'booking_id', 'priority' => 150])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // ...
+                BookingIdValueResolver::class => [
+                    'tags' => [
+                        ['controller.argument_value_resolver' => ['name' => 'booking_id', 'priority' => 150]],
+                    ],
+                ],
+            ],
+        ]);
 
 While adding a priority is optional, it's recommended to add one to make sure
 the expected value is injected. The built-in ``RequestAttributeValueResolver``,

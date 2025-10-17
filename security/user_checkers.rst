@@ -86,17 +86,22 @@ is the service id of your user checker:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\UserChecker;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
-                ->pattern('^/')
-                ->userChecker(UserChecker::class)
+        use App\Security\UserChecker;
+
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'pattern' => '^/',
+                        'user_checker' => UserChecker::class,
+                        // ...
+                    ],
+                ],
+            ],
+        ]);
 
 Using Multiple User Checkers
 ----------------------------
@@ -137,16 +142,21 @@ order in which user checkers are called::
         use App\Security\AccountEnabledUserChecker;
         use App\Security\APIAccessAllowedUserChecker;
 
-        return function(ContainerConfigurator $containerConfigurator) {
-            $services = $containerConfigurator->services();
-
-            $services->set(AccountEnabledUserChecker::class)
-                ->tag('security.user_checker.api', ['priority' => 10])
-                ->tag('security.user_checker.main', ['priority' => 10]);
-
-            $services->set(APIAccessAllowedUserChecker::class)
-                ->tag('security.user_checker.api', ['priority' => 5]);
-        };
+        return App::config([
+            'services' => [
+                AccountEnabledUserChecker::class => [
+                    'tags' => [
+                        ['security.user_checker.api' => ['priority' => 10]],
+                        ['security.user_checker.main' => ['priority' => 10]],
+                    ],
+                ],
+                APIAccessAllowedUserChecker::class => [
+                    'tags' => [
+                        ['security.user_checker.api' => ['priority' => 5]],
+                    ],
+                ],
+            ],
+        ]);
 
 Once your checker services are tagged, next you will need configure your firewalls to use the
 ``security.user_checker.chain.<firewall>`` service::
@@ -172,19 +182,22 @@ Once your checker services are tagged, next you will need configure your firewal
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('api')
-                ->pattern('^/api')
-                ->userChecker('security.user_checker.chain.api')
+        return App::config([
+            'security' => [
                 // ...
-            ;
-
-            $security->firewall('main')
-                ->pattern('^/')
-                ->userChecker('security.user_checker.chain.main')
-                // ...
-            ;
-        };
+                'firewalls' => [
+                    'api' => [
+                        'pattern' => '^/api',
+                        'user_checker' => 'security.user_checker.chain.api',
+                        // ...
+                    ],
+                ],
+                'main' => [
+                    'pattern' => '^/',
+                    'user_checker' => 'security.user_checker.chain.main',
+                    // ...
+                ],
+            ],
+        ]);

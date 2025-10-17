@@ -51,12 +51,15 @@ service container configuration:
 
         use App\Mail\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->args(service('mailer'));
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'arguments' => [
+                        service('mailer'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -132,12 +135,19 @@ In order to use this type of injection, don't forget to configure it:
     .. code-block:: php
 
         // config/services.php
-        use App\Mail\NewsletterManager;
-        use Symfony\Component\DependencyInjection\Reference;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-        $container->register('app.newsletter_manager', NewsletterManager::class)
-            ->addMethodCall('withMailer', [new Reference('mailer')], true);
+        use App\Mail\NewsletterManager;
+
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'calls' => [
+                        ['withMailer', [service('mailer')], true],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -215,12 +225,15 @@ that accepts the dependency::
 
         use App\Mail\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->call('setMailer', [service('mailer')]);
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'calls' => [
+                        ['setMailer', [service('mailer')]],
+                    ],
+                ],
+            ],
+        ]);
 
 This time the advantages are:
 
@@ -279,12 +292,15 @@ Another possibility is setting public fields of the class directly::
 
         use App\Mail\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set('app.newsletter_manager', NewsletterManager::class)
-                ->property('mailer', service('mailer'));
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'properties' => [
+                        'mailer' => service('mailer'),
+                    ],
+                ],
+            ],
+        ]);
 
 There are mainly only disadvantages to using property injection. It is similar
 to setter injection but with this additional important problem:

@@ -33,23 +33,25 @@ You can configure this using the ``entry_point`` setting:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Security\SocialConnectAuthenticator;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            $security->enableAuthenticatorManager(true);
-            // ....
-
-            // allow authentication using a form or HTTP basic
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall
-                ->formLogin()
-                ->customAuthenticators([SocialConnectAuthenticator::class])
-
-                // configure the form authentication as the entry point for unauthenticated users
-                ->entryPoint('form_login');
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        // allow authentication using a form or a custom authenticator
+                        'form_login' => null,
+                        'custom_authenticators' => [
+                            SocialConnectAuthenticator::class,
+                        ],
+                        // configure the form authentication as the entry point for unauthenticated users
+                        'entry_point' => 'form_login',
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -94,24 +96,28 @@ split the configuration into two separate firewalls:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Security\ApiTokenAuthenticator;
-        use App\Security\LoginFormAuthenticator;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            $apiFirewall = $security->firewall('api');
-            $apiFirewall
-                ->pattern('^/api')
-                ->customAuthenticators([ApiTokenAuthenticator::class])
-            ;
-
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall
-                ->lazy(true)
-                ->formLogin();
-
-            $accessControl = $security->accessControl();
-            $accessControl->path('^/login')->roles(['PUBLIC_ACCESS']);
-            $accessControl->path('^/api')->roles(['ROLE_API_USER']);
-            $accessControl->path('^/')->roles(['ROLE_USER']);
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'api' => [
+                        'pattern' => '^/api',
+                        'custom_authenticators' => [
+                            ApiTokenAuthenticator::class,
+                        ],
+                    ],
+                    'main' => [
+                        'lazy' => true,
+                        'form_login' => null,
+                    ],
+                ],
+                'access_control' => [
+                    ['path' => '^/login', 'roles' => 'PUBLIC_ACCESS'],
+                    ['path' => '^/api', 'roles' => 'ROLE_API_USER'],
+                    ['path' => '^/', 'roles' => 'ROLE_USER'],
+                ],
+            ],
+        ]);

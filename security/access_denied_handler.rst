@@ -67,15 +67,19 @@ Now, configure this service ID as the entry point for the firewall:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\AuthenticationEntryPoint;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                // ....
-                ->entryPoint(AuthenticationEntryPoint::class)
-            ;
-        };
+        use App\Security\AuthenticationEntryPoint;
+
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'entry_point' => AuthenticationEntryPoint::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Customize the Forbidden Response
 --------------------------------
@@ -124,15 +128,19 @@ configure it under your firewall:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\AccessDeniedHandler;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                // ....
-                ->accessDeniedHandler(AccessDeniedHandler::class)
-            ;
-        };
+        use App\Security\AccessDeniedHandler;
+
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'access_denied_handler' => AccessDeniedHandler::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Customizing All Access Denied Responses
 ---------------------------------------

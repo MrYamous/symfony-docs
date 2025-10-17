@@ -57,13 +57,15 @@ create its object:
         use App\Email\NewsletterManager;
         use App\Email\NewsletterManagerStaticFactory;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                // the first argument is the class and the second argument is the static method
-                ->factory([NewsletterManagerStaticFactory::class, 'createNewsletterManager']);
-        };
+        return App::config([
+            'services' => [
+                // ...
+                NewsletterManager::class => [
+                    // the first argument is the class and the second argument is the static method
+                    'factory' => [NewsletterManagerStaticFactory::class, 'createNewsletterManager'],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -122,13 +124,16 @@ You can omit the class on the factory declaration:
 
         use App\Email\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            // Note that we are not using service()
-            $services->set(NewsletterManager::class)
-                ->factory([null, 'create']);
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'factory' => [null, 'create'],
+                    'arguments' => [
+                        '$sender' => 'fabien@symfony.com',
+                    ],
+                ],
+            ],
+        ]);
 
 It is also possible to use the ``constructor`` option, instead of passing ``null``
 as the factory class:
@@ -175,12 +180,16 @@ as the factory class:
 
         use App\Email\NewsletterManager;
 
-        return function(ContainerConfigurator $containerConfigurator) {
-            $services = $containerConfigurator->services();
-
-            $services->set(NewsletterManager::class)
-                ->constructor('create');
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'constructor' => 'create',
+                    'arguments' => [
+                        '$sender' => 'fabien@symfony.com',
+                    ],
+                ],
+            ],
+        ]);
 
 Non-Static Factories
 --------------------
@@ -213,17 +222,18 @@ Configuration of the service container then looks like this:
         use App\Email\NewsletterManager;
         use App\Email\NewsletterManagerFactory;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
+        return App::config([
+            'services' => [
+                // first, create a service for the factory
+                NewsletterManagerFactory::class => null,
 
-            // first, create a service for the factory
-            $services->set(NewsletterManagerFactory::class);
-
-            // second, use the factory service as the first argument of the 'factory'
-            // method and the factory method as the second argument
-            $services->set(NewsletterManager::class)
-                ->factory([service(NewsletterManagerFactory::class), 'createNewsletterManager']);
-        };
+                // second, use the factory service as the first argument of the 'factory'
+                // option and the factory method as the second argument
+                NewsletterManager::class => [
+                    'factory' => [service(NewsletterManagerFactory::class), 'createNewsletterManager'],
+                ],
+            ],
+        ]);
 
 .. _factories-invokable:
 
@@ -269,15 +279,16 @@ method name:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\Email\InvokableNewsletterManagerFactory;
         use App\Email\NewsletterManager;
-        use App\Email\NewsletterManagerFactory;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->factory(service(InvokableNewsletterManagerFactory::class));
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'factory' => service(InvokableNewsletterManagerFactory::class),
+                ],
+            ],
+        ]);
 
 Using Expressions in Service Factories
 --------------------------------------
@@ -297,8 +308,8 @@ e.g. change the service based on a parameter:
                 # "@=" indicates that this is an expression
                 factory: '@=parameter("kernel.debug") ? service("tracable_newsletter") : service("newsletter")'
 
-            # you can use the arg() function to retrieve an argument from the definition
             App\Email\NewsletterManagerInterface:
+                # you can use the arg() function to retrieve an argument from the definition
                 factory: '@=arg(0).createNewsletterManager() ?: service("default_newsletter_manager")'
                 arguments:
                     - '@App\Email\NewsletterManagerFactory'
@@ -311,22 +322,21 @@ e.g. change the service based on a parameter:
         use App\Email\NewsletterManagerFactory;
         use App\Email\NewsletterManagerInterface;
 
-        return function(ContainerConfigurator $containerConfigurator) {
-            $services = $containerConfigurator->services();
-
-            $services->set(NewsletterManagerInterface::class)
-                // use the "tracable_newsletter" service when debug is enabled, "newsletter" otherwise.
-                ->factory(expr("parameter('kernel.debug') ? service('tracable_newsletter') : service('newsletter')"))
-            ;
-
-            // you can use the arg() function to retrieve an argument from the definition
-            $services->set(NewsletterManagerInterface::class)
-                ->factory(expr("arg(0).createNewsletterManager() ?: service('default_newsletter_manager')"))
-                ->args([
-                    service(NewsletterManagerFactory::class),
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                NewsletterManagerInterface::class => [
+                    // use the "tracable_newsletter" service when debug is enabled, "newsletter" otherwise.
+                    'factory' => expr("parameter('kernel.debug') ? service('tracable_newsletter') : service('newsletter')"),
+                ],
+                NewsletterManagerInterface::class => [
+                    // you can use the arg() function to retrieve an argument from the definition
+                    'factory' => expr("arg(0).createNewsletterManager() ?: service('default_newsletter_manager')"),
+                    'arguments' => [
+                        service(NewsletterManagerFactory::class),
+                    ],
+                ],
+            ],
+        ]);
 
 .. _factories-passing-arguments-factory-method:
 
@@ -362,13 +372,13 @@ previous examples takes the ``templating`` service as an argument:
         use App\Email\NewsletterManager;
         use App\Email\NewsletterManagerFactory;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->factory([service(NewsletterManagerFactory::class), 'createNewsletterManager'])
-                ->args([service('templating')])
-            ;
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'factory' => [service(NewsletterManagerFactory::class), 'createNewsletterManager'],
+                    'arguments' => [service('templating')],
+                ],
+            ],
+        ]);
 
 .. _`factory design pattern`: https://en.wikipedia.org/wiki/Factory_(object-oriented_programming)

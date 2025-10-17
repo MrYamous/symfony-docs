@@ -48,18 +48,30 @@ the user provider uses :doc:`Doctrine </doctrine>` to retrieve them.
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\User;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            $security->provider('app_user_provider')
-                ->entity()
-                    ->class(User::class)
-                    ->property('email')
-            ;
-        };
+                'providers' => [
+                    'users' => [
+                        'entity' => [
+                            // the class of the entity that represents users
+                            'class' => User::class,
+                            // the property to query by - e.g. email, username, etc
+                            'property' => 'email',
+
+                            // optional: if you're using multiple Doctrine entity
+                            // managers, this option defines which one to use
+                            // 'manager_name' => 'customer',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _authenticating-someone-with-a-custom-entity-provider:
 
@@ -117,17 +129,23 @@ To finish this, remove the ``property`` key from the user provider in
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\User;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            $security->provider('app_user_provider')
-                ->entity()
-                    ->class(User::class)
-            ;
-        };
+                'providers' => [
+                    'users' => [
+                        'entity' => [
+                            'class' => User::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Now, whenever Symfony uses the user provider, the ``loadUserByIdentifier()``
 method on your ``UserRepository`` will be called.
@@ -166,25 +184,24 @@ After setting up hashing, you can configure all the user information in
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\User;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $memoryProvider = $security->provider('app_user_provider')->memory();
-            $memoryProvider
-                ->user('john_admin')
-                    ->password('$2y$13$jxGxc ... IuqDju')
-                    ->roles(['ROLE_ADMIN'])
-            ;
-
-            $memoryProvider
-                ->user('jane_admin')
-                ->password('$2y$13$PFi1I ... rGwXCZ')
-                ->roles(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'providers' => [
+                    'backend_users' => [
+                        'memory' => [
+                            'users' => [
+                                'john_admin' => ['password' => '$2y$13$jxGxc ... IuqDju', 'roles' => ['ROLE_ADMIN']],
+                                'jane_admin' => ['password' => '$2y$13$PFi1I ... rGwXCZ', 'roles' => ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. warning::
 
@@ -229,31 +246,35 @@ providers until the user is found:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Entity\User;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $security->provider('backend_users')
-                ->ldap()
+        return App::config([
+            'security' => [
                 // ...
-            ;
-
-            $security->provider('legacy_users')
-                ->entity()
-                // ...
-            ;
-
-            $security->provider('users')
-                ->entity()
-                // ...
-            ;
-
-            $security->provider('all_users')->chain()
-                ->providers(['backend_users', 'legacy_users', 'users'])
-            ;
-        };
+                'providers' => [
+                    'backend_users' => [
+                        'ldap' => [
+                            // ...
+                        ],
+                    ],
+                    'legacy_users' => [
+                        'entity' => [
+                            // ...
+                        ],
+                    ],
+                    'users' => [
+                        'entity' => [
+                            // ...
+                        ],
+                    ],
+                    'all_users' => [
+                        'chain' => [
+                            'providers' => ['legacy_users', 'users', 'backend_users'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _security-custom-user-provider:
 
@@ -358,17 +379,21 @@ the user provider by adding it in ``security.yaml``:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Security\UserProvider;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-             $customProvider = $security->provider('your_custom_user_provider')
-                ->id(UserProvider::class)
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+                'providers' => [
+                    // the name of your user provider can be anything
+                    'your_custom_user_provider' => [
+                        'id' => UserProvider::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Lastly, update the ``config/packages/security.yaml`` file to set the
 ``provider`` key to ``your_custom_user_provider`` in all the firewalls which

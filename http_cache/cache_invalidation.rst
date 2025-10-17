@@ -121,18 +121,18 @@ Then, register the class as a service that :doc:`decorates </service_container/s
 
         use App\CacheKernel;
 
-        return function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(CacheKernel::class)
-                ->decorate('http_cache')
-                ->args([
-                    service('kernel'),
-                    service('http_cache.store'),
-                    service('esi')->nullOnInvalid(),
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                CacheKernel::class => [
+                    'decorates' => 'http_cache',
+                    'arguments' => [
+                        service('kernel'),
+                        service('http_cache.store'),
+                        service('esi')->nullOnInvalid(),
+                    ],
+                ],
+            ],
+        ]);
 
 .. danger::
 

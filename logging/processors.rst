@@ -72,16 +72,24 @@ information:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Logger\SessionRequestProcessor;
         use Monolog\Formatter\LineFormatter;
 
-        $container
-            ->register('monolog.formatter.session_request', LineFormatter::class)
-            ->addArgument('[%%datetime%%] [%%extra.token%%] %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%%\n');
-
-        $container
-            ->register(SessionRequestProcessor::class)
-            ->addTag('monolog.processor');
+        return App::config([
+            'services' => [
+                'monolog.formatter.session_request' => [
+                    'class' => LineFormatter::class,
+                    'arguments' => [
+                        "[%%datetime%%] [%%extra.token%%] %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%%\n",
+                    ],
+                ],
+                SessionRequestProcessor::class => [
+                    'tags' => ['monolog.processor'],
+                ],
+            ],
+        ]);
 
 Finally, set the formatter to be used on whatever handler you want:
 
@@ -101,16 +109,20 @@ Finally, set the formatter to be used on whatever handler you want:
     .. code-block:: php
 
         // config/packages/prod/monolog.php
-        use Symfony\Config\MonologConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog): void {
-            $monolog->handler('main')
-                ->type('stream')
-                ->path('%kernel.logs_dir%/%kernel.environment%.log')
-                ->level('debug')
-                ->formatter('monolog.formatter.session_request')
-            ;
-        };
+        return App::config([
+            'monolog' => [
+                'handlers' => [
+                    'main' => [
+                        'type' => 'stream',
+                        'path' => '%kernel.logs_dir%/%kernel.environment%.log',
+                        'level' => 'debug',
+                        'formatter' => 'monolog.formatter.session_request',
+                    ],
+                ],
+            ],
+        ]);
 
 If you use several handlers, you can also register a processor at the
 handler level or at the channel level instead of registering it globally
@@ -190,11 +202,19 @@ the ``monolog.processor`` tag:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-        $container
-            ->register(SessionRequestProcessor::class)
-            ->addTag('monolog.processor', ['handler' => 'main']);
+        use App\Logger\SessionRequestProcessor;
+
+        return App::config([
+            'services' => [
+                SessionRequestProcessor::class => [
+                    'tags' => [
+                        ['monolog.processor' => ['handler' => 'main']],
+                    ],
+                ],
+            ],
+        ]);
 
 Registering Processors per Channel
 ----------------------------------
@@ -215,11 +235,19 @@ to the ``monolog.processor`` tag to only apply a processor for the given channel
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-        $container
-            ->register(SessionRequestProcessor::class)
-            ->addTag('monolog.processor', ['channel' => 'app']);
+        use App\Logger\SessionRequestProcessor;
+
+        return App::config([
+            'services' => [
+                SessionRequestProcessor::class => [
+                    'tags' => [
+                        ['monolog.processor' => ['channel' => 'app']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _`Monolog`: https://github.com/Seldaek/monolog
 .. _`built-in Monolog processors`: https://github.com/Seldaek/monolog/tree/main/src/Monolog/Processor

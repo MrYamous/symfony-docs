@@ -28,6 +28,7 @@ The following block shows all possible configuration keys:
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             dbal:
                 dbname:               database
@@ -59,33 +60,53 @@ The following block shows all possible configuration keys:
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $dbal = $doctrine->dbal();
+        use App\DBAL\MyConnectionWrapper;
+        use App\DBAL\MyCustomType;
+        use App\DBAL\MyDatabaseDriver;
+        use App\DBAL\MyDatabasePlatformService;
 
-            $dbal = $dbal
-                ->connection('default')
-                    ->dbname('database')
-                    ->host('localhost')
-                    ->port(1234)
-                    ->user('user')
-                    ->password('secret')
-                    ->driver('pdo_mysql')
-                    ->url('mysql://db_user:db_password@127.0.0.1:3306/db_name') // if the url option is specified, it will override the above config
-                    ->driverClass(App\DBAL\MyDatabaseDriver::class) // the DBAL driverClass option
-                    ->option('foo', 'bar') // the DBAL driverOptions option
-                    ->path('%kernel.project_dir%/var/data/data.sqlite')
-                    ->memory(true)
-                    ->unixSocket('/tmp/mysql.sock')
-                    ->wrapperClass(App\DBAL\MyConnectionWrapper::class) // the DBAL wrapperClass option
-                    ->charset('utf8mb4')
-                    ->logging('%kernel.debug%')
-                    ->platformService(App\DBAL\MyDatabasePlatformService::class)
-                    ->serverVersion('8.0.37')
-                    ->mappingType('enum', 'string')
-                    ->type('custom', App\DBAL\MyCustomType::class);
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'connection' => [
+                        'default' => [
+                            'dbname' => 'database',
+                            'host' => 'localhost',
+                            'port' => 1234,
+                            'user' => 'user',
+                            'password' => 'secret',
+                            'driver' => 'pdo_mysql',
+                            // if the url option is specified, it will override the above config
+                            'url' => 'mysql://db_user:db_password@127.0.0.1:3306/db_name',
+                            // the DBAL driverClass option
+                            'driver_class' => MyDatabaseDriver::class,
+                            // the DBAL driverOptions option
+                            'options' => [
+                                'foo' => 'bar',
+                            ],
+                            'path' => '%kernel.project_dir%/var/data/data.sqlite',
+                            'memory' => true,
+                            'unix_socket' => '/tmp/mysql.sock',
+                            // the DBAL wrapperClass option
+                            'wrapper_class' => MyConnectionWrapper::class,
+                            'charset' => 'utf8mb4',
+                            'logging' => '%kernel.debug%',
+                            'platform_service' => MyDatabasePlatformService::class,
+                            'server_version' => '8.0.37',
+                            'mapping_types' => [
+                                'enum' => 'string',
+                            ],
+                            'types' => [
+                                'custom' => MyCustomType::class,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -116,6 +137,7 @@ If you want to configure multiple connections in YAML, put them under the
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             dbal:
                 default_connection:       default
@@ -135,26 +157,37 @@ If you want to configure multiple connections in YAML, put them under the
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $dbal = $doctrine->dbal();
-            $dbal->defaultConnection('default');
+        use App\DBAL\MyConnectionWrapper;
+        use App\DBAL\MyCustomType;
+        use App\DBAL\MyDatabaseDriver;
+        use App\DBAL\MyDatabasePlatformService;
 
-            $dbal->connection('default')
-                ->dbname('Symfony')
-                ->user('root')
-                ->password('null')
-                ->host('localhost')
-                ->serverVersion('8.0.37');
-
-            $dbal->connection('customer')
-                ->dbname('customer')
-                ->user('root')
-                ->password('null')
-                ->host('localhost')
-                ->serverVersion('8.2.0');
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'default_connection' => 'default',
+                    'connections' => [
+                        'default' => [
+                            'dbname' => 'Symfony',
+                            'user' => 'root',
+                            'password' => 'null',
+                            'host' => 'localhost',
+                            'server_version' => '8.0.37',
+                        ],
+                        'customer' => [
+                            'dbname' => 'customer',
+                            'user' => 'root',
+                            'password' => 'null',
+                            'host' => 'localhost',
+                            'server_version' => '8.2.0',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 The ``database_connection`` service always refers to the *default* connection,
 which is the first one defined or the one configured via the
@@ -194,6 +227,7 @@ Here's how to disable autocommit mode in DBAL:
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             dbal:
                 connections:
@@ -205,28 +239,27 @@ Here's how to disable autocommit mode in DBAL:
                     # this option disables auto-commit at the DBAL level:
                     auto_commit: false
 
-    .. code-block:: xml
+    .. code-block:: php
 
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:doctrine="http://symfony.com/schema/dic/doctrine"
-           xmlns="http://symfony.com/schema/dic/services"
-           xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/doctrine
-                https://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
-        
-            <doctrine:config>
-                <doctrine:dbal
-                   auto-commit="false"
-                 >
-                     <!-- add this only if you are using DBAL with PDO -->
-                     <doctrine:connection name="default">
-                         <doctrine:option key-type="constant" key="PDO::ATTR_AUTOCOMMIT">false</doctrine:option>
-                     </doctrine:connection>
-              </doctrine:dbal>
-          </doctrine:config>
-        </container>
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'connections' => [
+                        'default' => [
+                            'options' => [
+                                // add this only if you're using DBAL with PDO:
+                                \PDO::ATTR_AUTOCOMMIT => false,
+                            ],
+                        ],
+                        // this option disables auto-commit at the DBAL level:
+                        'auto_commit' => false,
+                    ],
+                ],
+            ],
+        ]);
 
 When using the `Doctrine Migrations Bundle`_, you need to register an additional
 listener to ensure that the final migration is committed properly:
@@ -242,22 +275,6 @@ listener to ensure that the final migration is committed properly:
                     - name: doctrine.event_listener
                       event: onMigrationsMigrated
 
-    .. code-block:: xml
-
-        <!-- config/services.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd">
-        
-            <services>
-                <service id="Doctrine\Migrations\Event\Listeners\AutoCommitListener">
-                    <tag name="doctrine.event_listener" event="onMigrationsMigrated"/>
-                </service>
-            </services>
-        </container>
-
     .. code-block:: php
     
         // config/services.php
@@ -266,15 +283,15 @@ listener to ensure that the final migration is committed properly:
         use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
         use Doctrine\Migrations\Events;
         
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-            
-            $services->set(AutoCommitListener::class)
-                ->tag('doctrine.event_listener', [
-                    'event' => Events::onMigrationsMigrated
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                AutoCommitListener::class => [
+                    'tags' => [
+                        ['doctrine.event_listener' => ['event' => Events::onMigrationsMigrated]],
+                    ],
+                ],
+            ],
+        ]);
 
 Doctrine ORM Configuration
 --------------------------
@@ -286,6 +303,7 @@ that the ORM resolves to:
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             orm:
                 auto_mapping: false
@@ -301,26 +319,25 @@ that the ORM resolves to:
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $orm = $doctrine->orm();
-
-            $orm
-                ->entityManager('default')
-                ->connection('default')
-                ->autoMapping(true)
-                ->metadataCacheDriver()->type('array')
-                ->queryCacheDriver()->type('array')
-                ->resultCacheDriver()->type('array')
-                ->namingStrategy('doctrine.orm.naming_strategy.default');
-
-            $orm
-                ->autoGenerateProxyClasses(false)
-                ->proxyNamespace('Proxies')
-                ->proxyDir('%kernel.cache_dir%/doctrine/orm/Proxies')
-                ->defaultEntityManager('default');
-        };
+        return App::config([
+            'doctrine' => [
+                'orm' => [
+                    'auto_mapping' => false,
+                    // the standard distribution overrides this to be true in debug, false otherwise
+                    'auto_generate_proxy_classes' => false,
+                    'proxy_namespace' => 'Proxies',
+                    'proxy_dir' => '%kernel.cache_dir%/doctrine/orm/Proxies',
+                    'default_entity_manager' => 'default',
+                    'metadata_cache_driver' => 'array',
+                    'query_cache_driver' => 'array',
+                    'result_cache_driver' => 'array',
+                    'naming_strategy' => 'doctrine.orm.naming_strategy.default',
+                ],
+            ],
+        ]);
 
 There are lots of other configuration options that you can use to overwrite
 certain classes, but those are for very advanced use-cases only.
@@ -399,36 +416,46 @@ to cache each of Doctrine ORM elements (queries, results, etc.):
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
-        use Symfony\Config\FrameworkConfig;
+        // config/packages/prod/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework, DoctrineConfig $doctrine): void {
-            $framework
-                ->cache()
-                    ->pool('doctrine.result_cache_pool')
-                        ->adapters('cache.app')
-                    ->pool('doctrine.system_cache_pool')
-                        ->adapters('cache.system');
-
-            $doctrine->orm()
-                // ...
-                ->entityManager('default')
-                ->metadataCacheDriver()
-                    ->type('pool')
-                    ->pool('doctrine.system_cache_pool')
-                ->queryCacheDriver()
-                    ->type('pool')
-                    ->pool('doctrine.system_cache_pool')
-                ->resultCacheDriver()
-                    ->type('pool')
-                    ->pool('doctrine.result_cache_pool')
-
-                // in addition to Symfony cache pools, you can also use the
-                // 'type: service' option to use any service as a cache pool
-                ->queryCacheDriver()
-                    ->type('service')
-                    ->id(App\ORM\MyCacheService::class);
-        };
+        return App::config([
+            'framework' => [
+                'cache' => [
+                    'pools' => [
+                        'doctrine.result_cache_pool' => [
+                            'adapter' => 'cache.app',
+                        ],
+                        'doctrine.system_cache_pool' => [
+                            'adapter' => 'cache.system',
+                        ],
+                    ],
+                ],
+            ],
+            'doctrine' => [
+                'orm' => [
+                    // ...
+                    'metadata_cache_driver' => [
+                        'type' => 'pool',
+                        'pool' => 'doctrine.system_cache_pool',
+                    ],
+                    'query_cache_driver' => [
+                        'type' => 'pool',
+                        'pool' => 'doctrine.system_cache_pool',
+                    ],
+                    'result_cache_driver' => [
+                        'type' => 'pool',
+                        'pool' => 'doctrine.result_cache_pool',
+                    ],
+                    // in addition to Symfony cache pools, you can also use the
+                    // 'type: service' option to use any service as a cache pool
+                    'query_cache_driver' => [
+                        'type' => 'service',
+                        'id' => App\ORM\MyCacheService::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Mapping Configuration
 ~~~~~~~~~~~~~~~~~~~~~
@@ -500,6 +527,7 @@ directory instead:
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             # ...
             orm:
@@ -513,17 +541,22 @@ directory instead:
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $emDefault = $doctrine->orm()->entityManager('default');
-
-            $emDefault->autoMapping(true);
-            $emDefault->mapping('AppBundle')
-                ->type('xml')
-                ->dir('SomeResources/config/doctrine')
-            ;
-        };
+        return App::config([
+            'doctrine' => [
+                'orm' => [
+                    'auto_mapping' => true,
+                    'mappings' => [
+                        'AppBundle' => [
+                            'type' => 'xml',
+                            'dir' => 'SomeResources/config/doctrine',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Mapping Entities Outside of a Bundle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -536,6 +569,7 @@ namespace in the ``src/Entity`` directory and gives them an ``App`` alias
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
                 # ...
                 orm:
@@ -551,20 +585,24 @@ namespace in the ``src/Entity`` directory and gives them an ``App`` alias
 
     .. code-block:: php
 
-        use Symfony\Config\DoctrineConfig;
+        // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $emDefault = $doctrine->orm()->entityManager('default');
-
-            $emDefault->autoMapping(true);
-            $emDefault->mapping('SomeEntityNamespace')
-                ->type('attribute')
-                ->dir('%kernel.project_dir%/src/Entity')
-                ->isBundle(false)
-                ->prefix('App\Entity')
-                ->alias('App')
-            ;
-        };
+        return App::config([
+            'doctrine' => [
+                'orm' => [
+                    'mappings' => [
+                        'SomeEntityNamespace' => [
+                            'type' => 'attribute',
+                            'dir' => '%kernel.project_dir%/src/Entity',
+                            'is_bundle' => false,
+                            'prefix' => 'App\Entity',
+                            'alias' => 'App',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Detecting a Mapping Configuration Format
 ........................................
@@ -609,9 +647,10 @@ set up the connection using environment variables for the certificate paths:
 
     .. code-block:: yaml
 
+        # config/packages/doctrine.yaml
         doctrine:
             dbal:
-                url: '%env(DATABASE_URL)%'
+                url: '%env(resolve:DATABASE_URL)%'
                 server_version: '8.0.31'
                 driver: 'pdo_mysql'
                 options:
@@ -625,21 +664,25 @@ set up the connection using environment variables for the certificate paths:
     .. code-block:: php
 
         // config/packages/doctrine.php
-        use Symfony\Config\DoctrineConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $doctrine->dbal()
-                ->connection('default')
-                ->url(env('DATABASE_URL')->resolve())
-                ->serverVersion('8.0.31')
-                ->driver('pdo_mysql');
-
-            $doctrine->dbal()->defaultConnection('default');
-
-            $doctrine->dbal()->option(\PDO::MYSQL_ATTR_SSL_KEY, '%env(MYSQL_SSL_KEY)%');
-            $doctrine->dbal()->option(\PDO::MYSQL_SSL_CERT, '%env(MYSQL_ATTR_SSL_CERT)%');
-            $doctrine->dbal()->option(\PDO::MYSQL_SSL_CA, '%env(MYSQL_ATTR_SSL_CA)%');
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'url' => env('DATABASE_URL')->resolve(),
+                    'server_version' => '8.0.31',
+                    'driver' => 'pdo_mysql',
+                    'options' => [
+                        // SSL private key
+                        \PDO::MYSQL_ATTR_SSL_KEY => env('MYSQL_SSL_KEY'),
+                        // SSL certificate
+                        \PDO::MYSQL_ATTR_SSL_CERT => env('MYSQL_SSL_CERT'),
+                        // SSL CA authority
+                        \PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_SSL_CA'),
+                    ],
+                ],
+            ],
+        ]);
 
 Ensure your environment variables are correctly set in the ``.env.local`` or
 ``.env.local.php`` file as follows:

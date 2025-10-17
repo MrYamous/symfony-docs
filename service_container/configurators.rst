@@ -145,19 +145,20 @@ all the classes are already loaded as services. All you need to do is specify th
         use App\Mail\GreetingCardManager;
         use App\Mail\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            // Registers all 4 classes as services, including App\Mail\EmailConfigurator
-            $services->load('App\\', '../src/*');
-
-            // override the services to set the configurator
-            $services->set(NewsletterManager::class)
-                ->configurator([service(EmailConfigurator::class), 'configure']);
-
-            $services->set(GreetingCardManager::class)
-                ->configurator([service(EmailConfigurator::class), 'configure']);
-        };
+        return App::config([
+            'services' => [
+                // Registers all 4 classes as services, including App\Mail\EmailConfigurator
+                'App\\' => [
+                    'resource' => '../src/*',
+                ],
+                NewsletterManager::class => [
+                    'configurator' => [service(EmailConfigurator::class), 'configure'],
+                ],
+                GreetingCardManager::class => [
+                    'configurator' => [service(EmailConfigurator::class), 'configure'],
+                ],
+            ],
+        ]);
 
 .. _configurators-invokable:
 
@@ -189,22 +190,24 @@ Services can be configured via invokable configurators (replacing the
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\Mail\EmailConfigurator;
         use App\Mail\GreetingCardManager;
         use App\Mail\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            // Registers all 4 classes as services, including App\Mail\EmailConfigurator
-            $services->load('App\\', '../src/*');
-
-            // override the services to set the configurator
-            $services->set(NewsletterManager::class)
-                ->configurator(service(EmailConfigurator::class));
-
-            $services->set(GreetingCardManager::class)
-                ->configurator(service(EmailConfigurator::class));
-        };
+        return App::config([
+            'services' => [
+                // Registers all 4 classes as services, including App\Mail\EmailConfigurator
+                'App\\' => [
+                    'resource' => '../src/*',
+                ],
+                NewsletterManager::class => [
+                    'configurator' => service(EmailConfigurator::class),
+                ],
+                GreetingCardManager::class => [
+                    'configurator' => service(EmailConfigurator::class),
+                ],
+            ],
+        ]);
 
 That's it! When requesting the ``App\Mail\NewsletterManager`` or
 ``App\Mail\GreetingCardManager`` service, the created instance will first be

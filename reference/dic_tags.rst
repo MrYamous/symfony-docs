@@ -36,6 +36,7 @@ The name of the package is set in this order:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Assets\AvatarPackage:
                 tags:
@@ -43,12 +44,20 @@ The name of the package is set in this order:
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Assets\AvatarPackage;
 
-        $container
-            ->register(AvatarPackage::class)
-            ->addTag('assets.package', ['package' => 'avatars'])
-        ;
+        return App::config([
+            'services' => [
+                AvatarPackage::class => [
+                    'tags' => [
+                        ['assets.package' => ['package' => 'avatars']],
+                    ],
+                ],
+            ],
+        ]);
 
 Now you can use the ``avatars`` package in your templates:
 
@@ -68,6 +77,7 @@ services:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             app.mysql_lock:
                 class: App\Lock\MysqlLock
@@ -85,13 +95,19 @@ services:
         use App\Lock\PostgresqlLock;
         use App\Lock\SqliteLock;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set('app.mysql_lock', MysqlLock::class);
-            $services->set('app.postgresql_lock', PostgresqlLock::class);
-            $services->set('app.sqlite_lock', SqliteLock::class);
-        };
+        return App::config([
+            'services' => [
+                'app.mysql_lock' => [
+                    'class' => MysqlLock::class,
+                ],
+                'app.postgresql_lock' => [
+                    'class' => PostgresqlLock::class,
+                ],
+                'app.sqlite_lock' => [
+                    'class' => SqliteLock::class,
+                ],
+            ],
+        ]);
 
 Instead of dealing with these three services, your application needs a generic
 ``app.lock`` service that will be an alias to one of these services, depending on
@@ -105,13 +121,9 @@ the generic ``app.lock`` service can be defined as follows:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
-            app.mysql_lock:
-                # ...
-            app.postgresql_lock:
-                # ...
-            app.sqlite_lock:
-                # ...
+            # ...
             app.lock:
                 tags:
                     - { name: auto_alias, format: "app.%database_type%_lock" }
@@ -121,21 +133,18 @@ the generic ``app.lock`` service can be defined as follows:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        use App\Lock\MysqlLock;
-        use App\Lock\PostgresqlLock;
-        use App\Lock\SqliteLock;
+        // ...
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set('app.mysql_lock', MysqlLock::class);
-            $services->set('app.postgresql_lock', PostgresqlLock::class);
-            $services->set('app.sqlite_lock', SqliteLock::class);
-
-            $services->set('app.lock')
-                ->tag('auto_alias', ['format' => 'app.%database_type%_lock'])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // ...
+                'app.lock' => [
+                    'tags' => [
+                        ['auto_alias' => ['format' => 'app.%database_type%_lock']],
+                    ],
+                ],
+            ],
+        ]);
 
 The ``format`` option defines the expression used to construct the name of the service
 to alias. This expression can use any container parameter (as usual,
@@ -187,18 +196,25 @@ Add this tag to a service and its class won't be preloaded when using
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\SomeNamespace\SomeService:
                 tags: ['container.no_preload']
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\SomeNamespace\SomeService;
 
-        $container
-            ->register(SomeService::class)
-            ->addTag('container.no_preload')
-        ;
+        return App::config([
+            'services' => [
+                SomeService::class => [
+                    'tags' => ['container.no_preload'],
+                ],
+            ],
+        ]);
 
 If you add some service tagged with ``container.no_preload`` as an argument of
 another service, the ``container.no_preload`` tag is applied automatically to
@@ -220,6 +236,7 @@ is restarted):
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\SomeNamespace\SomeService:
                 tags:
@@ -229,16 +246,23 @@ is restarted):
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Some\OtherClass;
         use App\SomeClass;
         use App\SomeNamespace\SomeService;
 
-        $container
-            ->register(SomeService::class)
-            ->addTag('container.preload', ['class' => SomeClass::class])
-            ->addTag('container.preload', ['class' => OtherClass::class])
-            // ...
-        ;
+        return App::config([
+            'services' => [
+                SomeService::class => [
+                    'tags' => [
+                        ['container.preload' => ['class' => SomeClass::class]],
+                        ['container.preload' => ['class' => OtherClass::class]],
+                    ],
+                ],
+            ],
+        ]);
 
 controller.argument_value_resolver
 ----------------------------------
@@ -343,18 +367,25 @@ can also register it manually:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Cache\MyClearer:
                 tags: [kernel.cache_clearer]
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Cache\MyClearer;
 
-        $container
-            ->register(MyClearer::class)
-            ->addTag('kernel.cache_clearer')
-        ;
+        return App::config([
+            'services' => [
+                MyClearer::class => [
+                    'tags' => ['kernel.cache_clearer'],
+                ],
+            ],
+        ]);
 
 kernel.cache_warmer
 -------------------
@@ -423,6 +454,7 @@ can also register it manually:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Cache\MyCustomWarmer:
                 tags:
@@ -430,12 +462,20 @@ can also register it manually:
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Cache\MyCustomWarmer;
 
-        $container
-            ->register(MyCustomWarmer::class)
-            ->addTag('kernel.cache_warmer', ['priority' => 0])
-        ;
+        return App::config([
+            'services' => [
+                MyCustomWarmer::class => [
+                    'tags' => [
+                        ['kernel.cache_warmer' => ['priority' => 0]],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -539,18 +579,25 @@ can also register it manually:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Locale\MyCustomLocaleHandler:
                 tags: [kernel.locale_aware]
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Locale\MyCustomLocaleHandler;
 
-        $container
-            ->register(LocaleHandler::class)
-            ->addTag('kernel.locale_aware')
-        ;
+        return App::config([
+            'services' => [
+                MyCustomLocaleHandler::class => [
+                    'tags' => ['kernel.locale_aware'],
+                ],
+            ],
+        ]);
 
 kernel.reset
 ------------
@@ -593,6 +640,7 @@ channel when injecting the logger in a service.
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Log\CustomLogger:
                 arguments: ['@logger']
@@ -601,12 +649,21 @@ channel when injecting the logger in a service.
 
     .. code-block:: php
 
-        use App\Log\CustomLogger;
-        use Symfony\Component\DependencyInjection\Reference;
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        $container->register(CustomLogger::class)
-            ->addArgument(new Reference('logger'))
-            ->addTag('monolog.logger', ['channel' => 'app']);
+        use App\Log\CustomLogger;
+
+        return App::config([
+            'services' => [
+                CustomLogger::class => [
+                    'arguments' => [service('logger')],
+                    'tags' => [
+                        ['monolog.logger' => ['channel' => 'app']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -634,18 +691,25 @@ You can add a processor globally:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             Monolog\Processor\IntrospectionProcessor:
                 tags: [monolog.processor]
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Monolog\Processor\IntrospectionProcessor;
 
-        $container
-            ->register(IntrospectionProcessor::class)
-            ->addTag('monolog.processor')
-        ;
+        return App::config([
+            'services' => [
+                IntrospectionProcessor::class => [
+                    'tags' => ['monolog.processor'],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -659,6 +723,7 @@ attribute:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             Monolog\Processor\IntrospectionProcessor:
                 tags:
@@ -666,12 +731,20 @@ attribute:
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Monolog\Processor\IntrospectionProcessor;
 
-        $container
-            ->register(IntrospectionProcessor::class)
-            ->addTag('monolog.processor', ['handler' => 'firephp'])
-        ;
+        return App::config([
+            'services' => [
+                IntrospectionProcessor::class => [
+                    'tags' => [
+                        ['monolog.processor' => ['handler' => 'firephp']],
+                    ],
+                ],
+            ],
+        ]);
 
 You can also add a processor for a specific logging channel by using the
 ``channel`` attribute. This will register the processor only for the
@@ -681,6 +754,7 @@ You can also add a processor for a specific logging channel by using the
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             Monolog\Processor\IntrospectionProcessor:
                 tags:
@@ -688,12 +762,20 @@ You can also add a processor for a specific logging channel by using the
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Monolog\Processor\IntrospectionProcessor;
 
-        $container
-            ->register(IntrospectionProcessor::class)
-            ->addTag('monolog.processor', ['channel' => 'security'])
-        ;
+        return App::config([
+            'services' => [
+                IntrospectionProcessor::class => [
+                    'tags' => [
+                        ['monolog.processor' => ['channel' => 'security']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -712,18 +794,25 @@ of your configuration and tag it with ``routing.loader``:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Routing\CustomLoader:
                 tags: [routing.loader]
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Routing\CustomLoader;
 
-        $container
-            ->register(CustomLoader::class)
-            ->addTag('routing.loader')
-        ;
+        return App::config([
+            'services' => [
+                CustomLoader::class => [
+                    'tags' => ['routing.loader'],
+                ],
+            ],
+        ]);
 
 For more information, see :doc:`/routing/custom_route_loader`.
 
@@ -804,6 +893,7 @@ Now, register your loader as a service and tag it with ``translation.loader``:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Translation\MyCustomLoader:
                 tags:
@@ -811,12 +901,20 @@ Now, register your loader as a service and tag it with ``translation.loader``:
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Translation\MyCustomLoader;
 
-        $container
-            ->register(MyCustomLoader::class)
-            ->addTag('translation.loader', ['alias' => 'bin'])
-        ;
+        return App::config([
+            'services' => [
+                MyCustomLoader::class => [
+                    'tags' => [
+                        ['translation.loader' => ['alias' => 'bin']],
+                    ],
+                ],
+            ],
+        ]);
 
 The ``alias`` option is required and very important: it defines the file
 "suffix" that will be used for the resource files that use this loader.
@@ -889,6 +987,7 @@ required option: ``alias``, which defines the name of the extractor::
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Translation\CustomExtractor:
                 tags:
@@ -896,10 +995,20 @@ required option: ``alias``, which defines the name of the extractor::
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Translation\CustomExtractor;
 
-        $container->register(CustomExtractor::class)
-            ->addTag('translation.extractor', ['alias' => 'foo']);
+        return App::config([
+            'services' => [
+                CustomExtractor::class => [
+                    'tags' => [
+                        ['translation.extractor' => ['alias' => 'foo']],
+                    ],
+                ],
+            ],
+        ]);
 
 translation.dumper
 ------------------
@@ -931,6 +1040,7 @@ This is the name that's used to determine which dumper should be used.
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Translation\JsonFileDumper:
                 tags:
@@ -938,10 +1048,20 @@ This is the name that's used to determine which dumper should be used.
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Translation\JsonFileDumper;
 
-        $container->register(JsonFileDumper::class)
-            ->addTag('translation.dumper', ['alias' => 'json']);
+        return App::config([
+            'services' => [
+                JsonFileDumper::class => [
+                    'tags' => [
+                        ['translation.dumper' => ['alias' => 'json']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _reference-dic-tags-translation-provider-factory:
 
@@ -957,6 +1077,7 @@ must register your factory as a service and tag it with ``translation.provider_f
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Translation\CustomProviderFactory:
                 tags:
@@ -964,12 +1085,18 @@ must register your factory as a service and tag it with ``translation.provider_f
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Translation\CustomProviderFactory;
 
-        $container
-            ->register(CustomProviderFactory::class)
-            ->addTag('translation.provider_factory')
-        ;
+        return App::config([
+            'services' => [
+                CustomProviderFactory::class => [
+                    'tags' => ['translation.provider_factory'],
+                ],
+            ],
+        ]);
 
 .. _reference-dic-tags-twig-extension:
 
@@ -987,6 +1114,7 @@ the service is auto-registered and auto-tagged. But, you can also register it ma
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Twig\AppExtension:
                 tags: [twig.extension]
@@ -999,17 +1127,28 @@ the service is auto-registered and auto-tagged. But, you can also register it ma
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Twig\AnotherExtension;
         use App\Twig\AppExtension;
 
-        $container
-            ->register(AppExtension::class)
-            ->addTag('twig.extension')
-        ;
-        $container
-            ->register(AnotherExtension::class)
-            ->addTag('twig.extension', ['priority' => -100])
-        ;
+        return App::config([
+            'services' => [
+                AppExtension::class => [
+                    'tags' => ['twig.extension'],
+                ],
+
+                // optionally you can define the priority of the extension (default = 0).
+                // Extensions with higher priorities are registered earlier. This is mostly
+                // useful to register late extensions that override other extensions.
+                AnotherExtension::class => [
+                    'tags' => [
+                        ['twig.extension' => ['priority' => -100]],
+                    ],
+                ],
+            ],
+        ]);
 
 For information on how to create the actual Twig Extension class, see
 `Twig's documentation`_ on the topic or read the
@@ -1032,6 +1171,7 @@ also register it manually:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Twig\CustomLoader:
                 tags:
@@ -1039,12 +1179,20 @@ also register it manually:
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Twig\CustomLoader;
 
-        $container
-            ->register(CustomLoader::class)
-            ->addTag('twig.loader', ['priority' => 0])
-        ;
+        return App::config([
+            'services' => [
+                CustomLoader::class => [
+                    'tags' => [
+                        ['twig.loader' => ['priority' => 0]],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -1067,18 +1215,25 @@ the service is auto-registered and auto-tagged. But, you can also register it ma
 
     .. code-block:: yaml
 
+        # config/services.yaml
         services:
             App\Twig\AppExtension:
                 tags: [twig.runtime]
 
     .. code-block:: php
 
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Twig\AppExtension;
 
-        $container
-            ->register(AppExtension::class)
-            ->addTag('twig.runtime')
-        ;
+        return App::config([
+            'services' => [
+                AppExtension::class => [
+                    'tags' => ['twig.runtime'],
+                ],
+            ],
+        ]);
 
 validator.constraint_validator
 ------------------------------

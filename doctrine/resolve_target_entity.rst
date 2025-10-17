@@ -105,15 +105,20 @@ how to replace the interface with the concrete class:
     .. code-block:: php
 
         // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\Customer;
         use App\Model\InvoiceSubjectInterface;
-        use Symfony\Config\DoctrineConfig;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $orm = $doctrine->orm();
-            // ...
-            $orm->resolveTargetEntity(InvoiceSubjectInterface::class, Customer::class);
-        };
+        return App::config([
+            'doctrine' => [
+                'orm' => [
+                    'resolve_target_entities' => [
+                        InvoiceSubjectInterface::class => Customer::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Final Thoughts
 --------------

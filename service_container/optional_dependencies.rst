@@ -9,23 +9,20 @@ Setting Missing Dependencies to null
 ------------------------------------
 
 You can use the ``null`` strategy to explicitly set the argument to ``null``
-if the service does not exist:
+if the service does not exist::
 
-.. configuration-block::
+    // config/services.php
+    namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-    .. code-block:: php
+    use App\Newsletter\NewsletterManager;
 
-        // config/services.php
-        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
-
-        use App\Newsletter\NewsletterManager;
-
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->args([service('logger')->nullOnInvalid()]);
-        };
+    return App::config([
+        'services' => [
+            NewsletterManager::class => [
+                'arguments' => [service('logger')->nullOnInvalid()],
+            ],
+        ],
+    ]);
 
 .. note::
 
@@ -58,13 +55,15 @@ call if the service exists and remove the method call if it does not:
 
         use App\Newsletter\NewsletterManager;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(NewsletterManager::class)
-                ->call('setLogger', [service('logger')->ignoreOnInvalid()])
-            ;
-        };
+        return App::config([
+            'services' => [
+                NewsletterManager::class => [
+                    'calls' => [
+                        'setLogger' => [service('logger')->ignoreOnInvalid()],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
