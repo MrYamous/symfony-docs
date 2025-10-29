@@ -289,6 +289,14 @@ have deleted it entirely (for example in the production servers), override the
         }
     }
 
+This project directory is also available through the ``APP_PROJECT_DIR`` environment
+variable. This variable is read-only, so you cannot override it to change the project
+directory. Instead, use the ``Kernel::getProjectDir()`` method shown above.
+
+.. versionadded:: 7.4
+
+    The ``APP_PROJECT_DIR`` environment variable was introduced in Symfony 7.4.
+
 .. _configuration-kernel-runtime-environment:
 
 ``kernel.runtime_environment``
