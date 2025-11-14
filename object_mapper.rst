@@ -292,6 +292,48 @@ from a given source object, and can be used as an alternative to
     $adminProfile = $mapper->map($user, AdminUserProfile::class);
     // $adminProfile->ipAddress = '192.168.1.100'
 
+Note: When using conditions like `if: new TargetClass()`, ensure that the
+ source property exists. If the property does not exist, the PropertyAccess
+component may throw an exception. To avoid this, configure Symfony's
+PropertyAccess component in `config/packages/framework.yaml`:
+
+.. configuration-block::
+    .. code-block:: yaml
+        # config/framework.yaml
+        framework:
+            property_access:
+                exception_on_invalid_property_path: false
+
+    .. code-block:: xml
+        <!-- config/packages/framework.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <framework:config>
+                <framework:property-access exception-on-invalid-property-path="false"/>
+            </framework:config>
+        </container>
+
+    .. code-block:: php
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use Symfony\Config\FrameworkConfig;
+
+        return function(ContainerConfigurator $container): void {
+            $container->extension('framework', [
+                'property_access' => [
+                    'exception_on_invalid_property_path' => false,
+                ],
+            ]);
+        };
+
+This setting ensures that the mapper skips invalid properties gracefully instead
+of throwing an exception.
+
 Transforming Values
 -------------------
 
