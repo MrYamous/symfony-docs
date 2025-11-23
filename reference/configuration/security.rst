@@ -373,7 +373,8 @@ The ``Clear-Site-Data`` HTTP header clears browsing data (cookies, storage, cach
 associated with the requesting website. It allows web developers to have more
 control over the data stored by a client browser for their origins.
 
-Allowed values are ``cache``, ``cookies``, ``storage`` and ``executionContexts``.
+Allowed values are ``cache``, ``cookies``, ``storage``, ``clientHints``, ``executionContexts``,
+``prefetchCache`` and ``prerenderCache``.
 It's also possible to use ``*`` as a wildcard for all directives:
 
 .. configuration-block::
@@ -405,6 +406,11 @@ It's also possible to use ``*`` as a wildcard for all directives:
                 ->logout()
                     ->clearSiteData(['cookies', 'storage']);
         };
+
+.. versionadded:: 8.1
+
+    The ``clientHints``, ``prefetchCache`` and ``prerenderCache`` options were
+    introduced in Symfony 8.1.
 
 invalidate_session
 ..................
