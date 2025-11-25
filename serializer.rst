@@ -1590,8 +1590,6 @@ or :ref:`serializer.encoder <reference-dic-tags-serializer-encoder>` tags:
             # ...
 
             Symfony\Component\Serializer\Normalizer\CustomNormalizer:
-                # prevent this normalizer from being automatically added to the default serializer
-                autoconfigure: false
                 tags:
                     # add this normalizer only to a specific named serializer
                     - serializer.normalizer: { serializer: 'api_client1' }
@@ -1611,9 +1609,6 @@ or :ref:`serializer.encoder <reference-dic-tags-serializer-encoder>` tags:
             // ...
 
             $services->set(CustomNormalizer::class)
-                // prevent this normalizer from being automatically added to the default serializer
-                ->autoconfigure(false)
-
                 // add this normalizer only to a specific named serializer
                 ->tag('serializer.normalizer', ['serializer' => 'api_client1'])
                 // add this normalizer to several named serializers
