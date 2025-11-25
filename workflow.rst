@@ -391,10 +391,6 @@ when needed and vice-versa when working with your objects::
 Using Weighted Transitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 7.4
-
-    Support for weighted transitions was introduced in Symfony 7.4.
-
 A key feature of workflows (as opposed to state machines) is that an object can
 be in multiple places simultaneously. For example, when building a product, you
 might assemble several components in parallel. However, in the previous example,
@@ -456,58 +452,6 @@ and track the process with a stopwatch. You can use weighted transitions to mode
                                 - top_created  # weight defaults to 1
                                 - stopwatch_running
                             to: finished
-
-    .. code-block:: xml
-
-        <!-- config/packages/workflow.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-            https://symfony.com/schema/dic/services/services-1.0.xsd
-            http://symfony.com/schema/dic/symfony
-            https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-
-            <framework:config>
-                <framework:workflow name="make_table" type="workflow">
-                    <framework:marking-store type="method">
-                        <framework:argument>marking</framework:argument>
-                    </framework:marking-store>
-                    <framework:support>App\Entity\TableProject</framework:support>
-                    <framework:initial-marking>init</framework:initial-marking>
-
-                    <framework:place>init</framework:place>
-                    <framework:place>prepare_leg</framework:place>
-                    <framework:place>prepare_top</framework:place>
-                    <framework:place>stopwatch_running</framework:place>
-                    <framework:place>leg_created</framework:place>
-                    <framework:place>top_created</framework:place>
-                    <framework:place>finished</framework:place>
-
-                    <framework:transition name="start">
-                        <framework:from>init</framework:from>
-                        <framework:to weight="4">prepare_leg</framework:to>
-                        <framework:to weight="1">prepare_top</framework:to>
-                        <framework:to weight="1">stopwatch_running</framework:to>
-                    </framework:transition>
-                    <framework:transition name="build_leg">
-                        <framework:from>prepare_leg</framework:from>
-                        <framework:to>leg_created</framework:to>
-                    </framework:transition>
-                    <framework:transition name="build_top">
-                        <framework:from>prepare_top</framework:from>
-                        <framework:to>top_created</framework:to>
-                    </framework:transition>
-                    <framework:transition name="join">
-                        <framework:from weight="4">leg_created</framework:from>
-                        <framework:from>top_created</framework:from>
-                        <framework:from>stopwatch_running</framework:from>
-                        <framework:to>finished</framework:to>
-                    </framework:transition>
-                </framework:workflow>
-            </framework:config>
-        </container>
 
     .. code-block:: php
 
