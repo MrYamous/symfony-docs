@@ -388,6 +388,233 @@ when needed and vice-versa when working with your objects::
                 // ...
             };
 
+Using Weighted Transitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 7.4
+
+    Support for weighted transitions was introduced in Symfony 7.4.
+
+A key feature of workflows (as opposed to state machines) is that an object can
+be in multiple places simultaneously. For example, when building a product, you
+might assemble several components in parallel. However, in the previous example,
+each place could only record whether the object was there or not, like a binary flag.
+
+**Weighted transitions** introduce multiplicity: a place can now track how many
+times an object is in that place. Technically, weighted transitions allow you to
+define transitions where multiple tokens (instances) are consumed from or produced
+to places. This is useful for modeling complex workflows such as manufacturing
+processes, resource allocation, or any scenario where multiple instances of something
+need to be produced or consumed.
+
+For example, imagine a table-making workflow where you need to create 4 legs, 1 top,
+and track the process with a stopwatch. You can use weighted transitions to model this:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/workflow.yaml
+        framework:
+            workflows:
+                make_table:
+                    type: 'workflow'
+                    marking_store:
+                        type: 'method'
+                        property: 'marking'
+                    supports:
+                        - App\Entity\TableProject
+                    initial_marking: init
+                    places:
+                        - init
+                        - prepare_leg
+                        - prepare_top
+                        - stopwatch_running
+                        - leg_created
+                        - top_created
+                        - finished
+                    transitions:
+                        start:
+                            from: init
+                            to:
+                                - place: prepare_leg
+                                  weight: 4
+                                - place: prepare_top
+                                  weight: 1
+                                - place: stopwatch_running
+                                  weight: 1
+                        build_leg:
+                            from: prepare_leg
+                            to: leg_created
+                        build_top:
+                            from: prepare_top
+                            to: top_created
+                        join:
+                            from:
+                                - place: leg_created
+                                  weight: 4
+                                - top_created  # weight defaults to 1
+                                - stopwatch_running
+                            to: finished
+
+    .. code-block:: xml
+
+        <!-- config/packages/workflow.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+            https://symfony.com/schema/dic/services/services-1.0.xsd
+            http://symfony.com/schema/dic/symfony
+            https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:workflow name="make_table" type="workflow">
+                    <framework:marking-store type="method">
+                        <framework:argument>marking</framework:argument>
+                    </framework:marking-store>
+                    <framework:support>App\Entity\TableProject</framework:support>
+                    <framework:initial-marking>init</framework:initial-marking>
+
+                    <framework:place>init</framework:place>
+                    <framework:place>prepare_leg</framework:place>
+                    <framework:place>prepare_top</framework:place>
+                    <framework:place>stopwatch_running</framework:place>
+                    <framework:place>leg_created</framework:place>
+                    <framework:place>top_created</framework:place>
+                    <framework:place>finished</framework:place>
+
+                    <framework:transition name="start">
+                        <framework:from>init</framework:from>
+                        <framework:to weight="4">prepare_leg</framework:to>
+                        <framework:to weight="1">prepare_top</framework:to>
+                        <framework:to weight="1">stopwatch_running</framework:to>
+                    </framework:transition>
+                    <framework:transition name="build_leg">
+                        <framework:from>prepare_leg</framework:from>
+                        <framework:to>leg_created</framework:to>
+                    </framework:transition>
+                    <framework:transition name="build_top">
+                        <framework:from>prepare_top</framework:from>
+                        <framework:to>top_created</framework:to>
+                    </framework:transition>
+                    <framework:transition name="join">
+                        <framework:from weight="4">leg_created</framework:from>
+                        <framework:from>top_created</framework:from>
+                        <framework:from>stopwatch_running</framework:from>
+                        <framework:to>finished</framework:to>
+                    </framework:transition>
+                </framework:workflow>
+            </framework:config>
+        </container>
+
+    .. code-block:: php
+
+        // config/packages/workflow.php
+        use App\Entity\TableProject;
+        use Symfony\Config\FrameworkConfig;
+
+        return static function (FrameworkConfig $framework): void {
+            $makeTable = $framework->workflows()->workflows('make_table');
+            $makeTable
+                ->type('workflow')
+                ->supports([TableProject::class])
+                ->initialMarking(['init']);
+
+            $makeTable->markingStore()
+                ->type('method')
+                ->property('marking');
+
+            $makeTable->place()->name('init');
+            $makeTable->place()->name('prepare_leg');
+            $makeTable->place()->name('prepare_top');
+            $makeTable->place()->name('stopwatch_running');
+            $makeTable->place()->name('leg_created');
+            $makeTable->place()->name('top_created');
+            $makeTable->place()->name('finished');
+
+            $makeTable->transition()
+                ->name('start')
+                    ->from(['init'])
+                    ->to([
+                        ['place' => 'prepare_leg', 'weight' => 4],
+                        ['place' => 'prepare_top', 'weight' => 1],
+                        ['place' => 'stopwatch_running', 'weight' => 1],
+                    ]);
+
+            $makeTable->transition()
+                ->name('build_leg')
+                    ->from(['prepare_leg'])
+                    ->to(['leg_created']);
+
+            $makeTable->transition()
+                ->name('build_top')
+                    ->from(['prepare_top'])
+                    ->to(['top_created']);
+
+            $makeTable->transition()
+                ->name('join')
+                    ->from([
+                        ['place' => 'leg_created', 'weight' => 4],
+                        'top_created',  // weight defaults to 1
+                        'stopwatch_running',
+                    ])
+                    ->to(['finished']);
+        };
+
+In this example, when the ``start`` transition is applied, it creates 4 tokens in
+the ``prepare_leg`` place, 1 token in ``prepare_top``, and 1 token in
+``stopwatch_running``. Then, the ``build_leg`` transition must be applied 4 times
+(once for each token), and the ``build_top`` transition once. Finally, the ``join``
+transition can only be applied when all 4 legs are created, the top is created,
+and the stopwatch is still running.
+
+Weighted transitions can also be defined programmatically using the
+:class:`Symfony\\Component\\Workflow\\Arc` class::
+
+    use Symfony\Component\Workflow\Arc;
+    use Symfony\Component\Workflow\Definition;
+    use Symfony\Component\Workflow\Transition;
+    use Symfony\Component\Workflow\Workflow;
+
+    $definition = new Definition(
+        ['init', 'prepare_leg', 'prepare_top', 'stopwatch_running', 'leg_created', 'top_created', 'finished'],
+        [
+            new Transition('start', 'init', [
+                new Arc('prepare_leg', 4),
+                new Arc('prepare_top', 1),
+                'stopwatch_running',  // defaults to weight 1
+            ]),
+            new Transition('build_leg', 'prepare_leg', 'leg_created'),
+            new Transition('build_top', 'prepare_top', 'top_created'),
+            new Transition('join', [
+                new Arc('leg_created', 4),
+                'top_created',
+                'stopwatch_running',
+            ], 'finished'),
+        ]
+    );
+
+    $workflow = new Workflow($definition);
+    $workflow->apply($subject, 'start');
+
+    // Build each leg (4 times)
+    $workflow->apply($subject, 'build_leg');
+    $workflow->apply($subject, 'build_leg');
+    $workflow->apply($subject, 'build_leg');
+    $workflow->apply($subject, 'build_leg');
+
+    // Build the top
+    $workflow->apply($subject, 'build_top');
+
+    // Now we can join all parts
+    $workflow->apply($subject, 'join');
+
+The ``Arc`` class takes two parameters: the place name and the weight (which must be
+greater than or equal to 1). When a place is specified as a simple string instead of
+an ``Arc`` object, it defaults to a weight of 1.
+
 Using a multiple state marking store
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
