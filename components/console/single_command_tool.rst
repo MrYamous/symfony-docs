@@ -36,7 +36,7 @@ You can still register a command as usual::
     $application = new Application('echo', '1.0.0');
     $command = new DefaultCommand();
 
-    $application->add($command);
+    $application->addCommand($command);
 
     $application->setDefaultCommand($command->getName(), true);
     $application->run();
