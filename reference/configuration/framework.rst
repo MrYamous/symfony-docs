@@ -2126,10 +2126,6 @@ named ``kernel.http_method_override``.
 allowed_http_method_override
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 7.4
-
-    The ``allowed_http_method_override`` option was introduced in Symfony 7.4.
-
 **type**: ``array`` **default**: ``null``
 
 This option controls which HTTP methods can be overridden via the ``_method``
@@ -2199,6 +2195,15 @@ method::
     Request::setAllowedHttpMethodOverride(['PUT', 'PATCH', 'DELETE']);
     $request = Request::createFromGlobals();
     // ...
+
+.. versionadded:: 7.4
+
+    The ``allowed_http_method_override`` option was introduced in Symfony 7.4.
+
+.. deprecated:: 7.4
+
+    Overriding methods ``GET``, ``HEAD``, ``CONNECT`` and ``TRACE`` is deprecated
+    since Symfony 7.4 and will stop working in Symfony 8.0.
 
 .. _reference-framework-ide:
 
