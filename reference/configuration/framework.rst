@@ -1786,9 +1786,10 @@ This option controls which HTTP methods can be overridden via the ``_method``
 request parameter or the ``X-HTTP-METHOD-OVERRIDE`` header when
 :ref:`http_method_override <configuration-framework-http_method_override>` is enabled.
 
-When set to ``null`` (the default), all HTTP methods can be overridden. When set
-to an empty array (``[]``), HTTP method overriding is completely disabled. When
-set to a specific list of methods, only those methods will be allowed as overrides:
+When set to ``null`` (the default), all HTTP methods except for ``GET``, ``HEAD``,
+``TRACE``, and ``CONNECT`` can be overridden. When set to an empty array (``[]``),
+HTTP method overriding is completely disabled. When set to a specific list of methods,
+only those methods will be allowed as overrides:
 
 .. configuration-block::
 
