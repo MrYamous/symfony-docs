@@ -48,11 +48,6 @@ Then, you can register the commands using
     // ...
     $application->addCommand(new GenerateAdminCommand());
 
-.. versionadded:: 7.4
-
-    The ``addCommand()`` method was introduced in Symfony 7.4. In earlier
-    versions, you had to use the ``add()`` method of the same class.
-
 You can also register inline commands and define their behavior thanks to the
 ``Command::setCode()`` method::
 
