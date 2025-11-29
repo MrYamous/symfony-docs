@@ -30,28 +30,17 @@ Creating Routes as Attributes
 PHP attributes allow you to define routes next to the code of the
 :doc:`controllers </controller>` associated to those routes.
 
-You need to add a bit of configuration to your project before using them. If your
+You don't need to add any configuration to your project before using them. If your
 project uses :ref:`Symfony Flex <symfony-flex>`, this file is already created for you.
-Otherwise, create the following file manually:
 
 .. code-block:: yaml
 
-    # config/routes/attributes.yaml
+    # config/routes.yaml
     controllers:
-        resource:
-            path: ../../src/Controller/
-            namespace: App\Controller
-        type: attribute
+        resource: routing.controllers
 
-    kernel:
-        resource: App\Kernel
-        type: attribute
-
-This configuration tells Symfony to look for routes defined as attributes on
-classes declared in the ``App\Controller`` namespace and stored in the
-``src/Controller/`` directory which follows the PSR-4 standard. The kernel can
-act as a controller too, which is especially useful for small applications that
-use Symfony as a microframework.
+This configuration tells Symfony to enables auto-registration of ``#[Route]`` attribute of controllers, 
+independently of where they are located in the app.
 
 Suppose you want to define a route for the ``/blog`` URL in your application. To
 do so, create a :doc:`controller class </controller>` like the following:
@@ -89,7 +78,10 @@ the ``list()`` method of the ``BlogController`` class.
 .. warning::
 
     If you define multiple PHP classes in the same file, Symfony only loads the
-    routes of the first class, ignoring all the other routes.
+    routes of the first class, ignoring all the other routes.The route attribute 
+    is always wins over route with yaml, xml or PHP file and Symfony will always 
+    load the route attribute.
+    
 
 The route name (``blog_list``) is not important for now, but it will be
 essential later when :ref:`generating URLs <routing-generating-urls>`. You only
