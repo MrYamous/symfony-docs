@@ -1149,6 +1149,11 @@ the entire email contents from Markdown to HTML:
 Inky Email Templating Language
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. tip::
+
+    Symfony recommends Inky, but you can also use `MJML`_, a more actively
+    maintained alternative for responsive email templates.
+
 Creating beautifully designed emails that work on every email client is so
 complex that there are HTML/CSS frameworks dedicated to that. One of the most
 popular frameworks is called `Inky`_. It defines a syntax based on some HTML-like
@@ -2004,4 +2009,5 @@ the :class:`Symfony\\Bundle\\FrameworkBundle\\Test\\MailerAssertionsTrait`::
 .. _`S/MIME`: https://en.wikipedia.org/wiki/S/MIME
 .. _`Scaleway`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Mailer/Bridge/Scaleway/README.md
 .. _`SendGrid`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Mailer/Bridge/Sendgrid/README.md
+.. _`MJML`: https://github.com/mjmlio/mjml
 .. _`Sweego`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Mailer/Bridge/Sweego/README.md
