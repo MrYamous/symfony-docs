@@ -22,11 +22,9 @@ of the output:
     {
         // ...
 
-        public function __invoke(OutputInterface $output): int
+        public function __invoke(Cursor $cursor, OutputInterface $output): int
         {
             // ...
-
-            $cursor = new Cursor($output);
 
             // moves the cursor to a specific column (1st argument) and
             // row (2nd argument) position
