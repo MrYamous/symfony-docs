@@ -28,6 +28,7 @@ rules:
         ignored_namespaces:
             - '/^Acme/'
             - '/^Shared/'
+            - '/^Symfony/'
         ignored_paths:
             - '/^config\//'
             - '/^example\.com\//'
