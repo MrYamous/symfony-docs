@@ -86,7 +86,7 @@ If your valid choice list is simple, you can pass them in directly via the
 
     .. code-block:: php
 
-        // src/EntityAuthor.php
+        // src/Entity/Author.php
         namespace App\Entity;
 
         use Symfony\Component\Validator\Constraints as Assert;
@@ -173,7 +173,7 @@ constraint.
 
     .. code-block:: php
 
-        // src/EntityAuthor.php
+        // src/Entity/Author.php
         namespace App\Entity;
 
         use Symfony\Component\Validator\Constraints as Assert;
