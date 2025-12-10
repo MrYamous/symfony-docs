@@ -423,7 +423,7 @@ You can also manually hash a password by running:
     $ php bin/console security:hash-password
 
 Read more about all available hashers (including specific hashers) and password
-migration in :doc:`security/passwords`.
+migration in :doc:`/security/passwords`.
 
 .. _firewalls-authentication:
 .. _a-authentication-firewalls:
