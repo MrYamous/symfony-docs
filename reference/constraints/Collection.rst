@@ -144,10 +144,10 @@ following:
                         'personal_email' => new Assert\Email(),
                         'short_bio' => [
                             new Assert\NotBlank(),
-                            new Assert\Length([
-                                'max' => 100,
-                                'maxMessage' => 'Your short bio is too long!',
-                            ]),
+                            new Assert\Length(
+                                max: 100,
+                                maxMessage: 'Your short bio is too long!',
+                            ),
                         ],
                     ],
                     allowMissingFields: true,
@@ -196,13 +196,13 @@ you can do the following:
         {
             #[Assert\Collection(
                 fields: [
-                    'personal_email' => new Assert\Required([
+                    'personal_email' => new Assert\Required(constraints: [
                         new Assert\NotBlank,
                         new Assert\Email,
                     ]),
-                    'alternate_email' => new Assert\Optional(
+                    'alternate_email' => new Assert\Optional(constraints: [
                         new Assert\Email
-                    ),
+                    ]),
                 ],
             )]
             protected array $profileData = ['personal_email' => 'email@example.com'];
@@ -218,11 +218,13 @@ you can do the following:
                         fields:
                             personal_email:
                                 - Required:
-                                    - NotBlank: ~
-                                    - Email: ~
+                                    constraints:
+                                        - NotBlank: ~
+                                        - Email: ~
                             alternate_email:
                                 - Optional:
-                                    - Email: ~
+                                    constraints:
+                                        - Email: ~
 
     .. code-block:: xml
 
@@ -238,13 +240,17 @@ you can do the following:
                         <option name="fields">
                             <value key="personal_email">
                                 <constraint name="Required">
-                                    <constraint name="NotBlank"/>
-                                    <constraint name="Email"/>
+                                    <option name="constraints">
+                                        <constraint name="NotBlank"/>
+                                        <constraint name="Email"/>
+                                    </option>
                                 </constraint>
                             </value>
                             <value key="alternate_email">
                                 <constraint name="Optional">
-                                    <constraint name="Email"/>
+                                    <option name="constraints">
+                                        <constraint name="Email"/>
+                                    </option>
                                 </constraint>
                             </value>
                         </option>
@@ -269,11 +275,11 @@ you can do the following:
             {
                 $metadata->addPropertyConstraint('profileData', new Assert\Collection(
                     fields: [
-                        'personal_email'  => new Assert\Required([
+                        'personal_email'  => new Assert\Required(constraints: [
                             new Assert\NotBlank(),
                             new Assert\Email(),
                         ]),
-                        'alternate_email' => new Assert\Optional(new Assert\Email()),
+                        'alternate_email' => new Assert\Optional(constraints: [new Assert\Email()]),
                     ],
                 ));
             }
@@ -293,8 +299,8 @@ groups. Take the following example::
 
     $constraint = new Assert\Collection(
         fields: [
-            'name' => new Assert\NotBlank(['groups' => 'basic']),
-            'email' => new Assert\NotBlank(['groups' => 'contact']),
+            'name' => new Assert\NotBlank(groups: ['basic']),
+            'email' => new Assert\NotBlank(groups: ['contact']),
         ],
     );
 

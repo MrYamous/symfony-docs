@@ -67,22 +67,22 @@ Validation of arrays is possible using the ``Collection`` constraint::
 
     $groups = new Assert\GroupSequence(['Default', 'custom']);
 
-    $constraint = new Assert\Collection([
+    $constraint = new Assert\Collection(fields: [
         // the keys correspond to the keys in the input array
-        'name' => new Assert\Collection([
-            'first_name' => new Assert\Length(['min' => 101]),
-            'last_name' => new Assert\Length(['min' => 1]),
+        'name' => new Assert\Collection(fields: [
+            'first_name' => new Assert\Length(min: 101),
+            'last_name' => new Assert\Length(min: 1),
         ]),
         'email' => new Assert\Email(),
-        'simple' => new Assert\Length(['min' => 102]),
+        'simple' => new Assert\Length(min: 102),
         'eye_color' => new Assert\Choice(choices: [3, 4]),
         'file' => new Assert\File(),
-        'password' => new Assert\Length(['min' => 60]),
-        'tags' => new Assert\Optional([
-            new Assert\Type('array'),
-            new Assert\Count(['min' => 1]),
+        'password' => new Assert\Length(min: 60),
+        'tags' => new Assert\Optional(constraints: [
+            new Assert\Type(type: 'array'),
+            new Assert\Count(min: 1),
             new Assert\All([
-                new Assert\Collection([
+                new Assert\Collection(constraints: [
                     'slug' => [
                         new Assert\NotBlank(),
                         new Assert\Type(['type' => 'string']),
@@ -91,7 +91,7 @@ Validation of arrays is possible using the ``Collection`` constraint::
                         new Assert\NotBlank(),
                     ],
                 ]),
-                new CustomUniqueTagValidator(['groups' => 'custom']),
+                new CustomUniqueTagValidator(groups: ['custom']),
             ]),
         ]),
     ]);
