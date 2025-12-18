@@ -72,8 +72,6 @@ Set this option to ``false`` to only display the currencies that are no longer
 `legal tender`_ in their countries. Set it to ``null`` to include all curencies,
 regardless of their legal tender status.
 
-.. include:: /reference/forms/types/options/choice_translation_domain.rst.inc
-
 ``not_active_at``
 ~~~~~~~~~~~~~~~~~
 
