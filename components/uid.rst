@@ -159,7 +159,7 @@ following methods to create a ``Uuid`` object from it::
     $uuid = Uuid::fromRfc4122('d9e7a184-5d5b-11ea-a62a-3499710062d0');
 
 You can also use the ``UuidFactory`` to generate UUIDs. Inject the factory in
-your services and use it as follows:
+your services and use it as follows::
 
     namespace App\Service;
 
