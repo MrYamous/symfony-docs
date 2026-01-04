@@ -130,27 +130,27 @@ work:
   that falls into the :doc:`list of acceptable changes in patch versions
   </contributing/code/maintenance>`, pick the oldest concerned maintained
   branch (you can find them on the `Symfony releases page`_). E.g. if you
-  found a bug introduced in ``v5.1.10``, you need to work on ``5.4``.
+  found a bug introduced in ``v7.1.10``, you need to work on ``7.4``.
 
-* ``7.2``, if you are adding a new feature.
+* ``8.1``, if you are adding a new feature.
 
   The only exception is when a new :doc:`major Symfony version </contributing/community/releases>`
-  (5.0, 6.0, etc.) comes out every two years. Because of the
+  (7.0, 8.0, etc.) comes out every two years. Because of the
   :ref:`special development process <major-version-development>` of those versions,
-  you need to use the previous minor version for the features (e.g. use ``5.4``
-  instead of ``6.0``, use ``6.4`` instead of ``7.0``, etc.)
+  you need to use the previous minor version for the features (e.g. use ``6.4``
+  instead of ``7.0``, use ``7.4`` instead of ``8.0``, etc.)
 
 .. note::
 
     All bug fixes merged into maintenance branches are also merged into more
     recent branches on a regular basis. For instance, if you submit a PR
-    for the ``5.4`` branch, the PR will also be applied by the core team on
-    all the ``6.x`` branches that are still maintained.
+    for the ``6.4`` branch, the PR will also be applied by the core team on
+    all the ``7.x`` branches that are still maintained.
 
 During the :ref:`stabilization phase <contributing-release-development>`, the development branch is in
 feature freeze. Please help the community prepare for the new version release. If you want to submit a
-new feature pull request, you should target the next version. For example, if ``6.3`` reached feature
-freeze, new features should target ``6.4``. If the ``6.4`` branch does not yet exist, target ``6.3``
+new feature pull request, you should target the next version. For example, if ``8.1`` reached feature
+freeze, new features should target ``8.2``. If the ``8.2`` branch does not yet exist, target ``8.1``
 and rebase your pull requests once the branch is created.
 
 Create a Topic Branch
@@ -161,20 +161,20 @@ topic branch:
 
 .. code-block:: terminal
 
-    $ git checkout -b BRANCH_NAME 6.1
+    $ git checkout -b BRANCH_NAME 8.1
 
-Or, if you want to provide a bug fix for the ``5.4`` branch, first track the remote
-``5.4`` branch locally:
-
-.. code-block:: terminal
-
-    $ git checkout --track origin/5.4
-
-Then create a new branch off the ``5.4`` branch to work on the bug fix:
+Or, if you want to provide a bug fix for the ``6.4`` branch, first track the remote
+``6.4`` branch locally:
 
 .. code-block:: terminal
 
-    $ git checkout -b BRANCH_NAME 5.4
+    $ git checkout --track origin/6.4
+
+Then create a new branch off the ``6.4`` branch to work on the bug fix:
+
+.. code-block:: terminal
+
+    $ git checkout -b BRANCH_NAME 6.4
 
 .. tip::
 
@@ -290,15 +290,15 @@ while to finish your changes):
 
 .. code-block:: terminal
 
-    $ git checkout 6.x
+    $ git checkout 8.x
     $ git fetch upstream
-    $ git merge upstream/6.x
+    $ git merge upstream/8.x
     $ git checkout BRANCH_NAME
-    $ git rebase 6.x
+    $ git rebase 8.x
 
 .. tip::
 
-    Replace ``6.x`` with the branch you selected previously (e.g. ``5.4``)
+    Replace ``8.x`` with the branch you selected previously (e.g. ``6.4``)
     if you are working on a bug fix.
 
 When doing the ``rebase`` command, you might have to fix merge conflicts.
@@ -325,8 +325,8 @@ You can now make a pull request on the ``symfony/symfony`` GitHub repository.
 
 .. tip::
 
-    Take care to point your pull request towards ``symfony:5.4`` if you want
-    the core team to pull a bug fix based on the ``5.4`` branch.
+    Take care to point your pull request towards ``symfony:6.4`` if you want
+    the core team to pull a bug fix based on the ``6.4`` branch.
 
 To ease the core team work, always include the modified components in your
 pull request message, like in:
@@ -467,7 +467,7 @@ test scenarios run on each change:
 
     This job also runs relevant packages using a "flipped" test (indicated
     by a ``^`` suffix in the package name). These tests checkout the
-    previous major release (e.g. ``5.4`` for a pull requests on ``6.3``)
+    previous major release (e.g. ``6.4`` for a pull requests on ``7.3``)
     and run the tests with your branch as dependency.
 
     A failure in these flipped tests indicate a backwards compatibility
@@ -507,7 +507,7 @@ Rework your Pull Request
 
 Based on the feedback on the pull request, you might need to rework your
 PR. Before re-submitting the PR, rebase with ``upstream/6.x`` or
-``upstream/5.4``, don't merge; and force the push to the origin:
+``upstream/6.4``, don't merge; and force the push to the origin:
 
 .. code-block:: terminal
 
