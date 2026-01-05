@@ -86,9 +86,9 @@ method in the extension)::
         }
     }
 
-If your compiler pass is relatively small, you can make the main bundle class implements
-:class:`Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface` so that
-it can add itself::
+If your compiler pass is relatively small, you can make the main bundle class implement
+:class:`Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface` and
+it will be automatically registered as a compiler pass::
 
     // src/MyBundle/MyBundle.php
     namespace App\MyBundle;
@@ -100,12 +100,6 @@ it can add itself::
 
     class MyBundle extends AbstractBundle implements CompilerPassInterface
     {
-
-        public function build(ContainerBuilder $container): void
-        {
-            $container->addCompilerPass($this);
-        }
-
         public function process(ContainerBuilder $container): void
         {
             // in this method you can manipulate the service container:
