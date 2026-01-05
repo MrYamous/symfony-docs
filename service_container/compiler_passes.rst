@@ -113,6 +113,12 @@ it will be automatically registered as a compiler pass::
         }
     }
 
+.. versionadded:: 8.1
+
+    Support for using bundle classes as compiler passes was introduced in
+    Symfony 8.1. Previously, you had to register the bundle class itself by
+    calling ``$container->addCompilerPass($this);`` in the ``build()`` method.
+
 If you are using custom :doc:`service tags </service_container/tags>` in a
 bundle, the convention is to format tag names by starting with the bundle's name
 in lowercase (using underscores as separators), followed by a dot, and finally
