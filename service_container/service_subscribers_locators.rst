@@ -86,10 +86,10 @@ in the service subscriber::
 
         public static function getSubscribedServices(): array
         {
-            return [
+            return App::config([
                 'App\FooCommand' => FooHandler::class,
                 'App\BarCommand' => BarHandler::class,
-            ];
+            ]);
         }
 
         public function handle(Command $command): mixed
@@ -146,10 +146,10 @@ service locator::
 
     public static function getSubscribedServices(): array
     {
-        return [
+        return App::config([
             // ...
             LoggerInterface::class,
-        ];
+        ]);
     }
 
 Service types can also be keyed by a service name for internal use::
@@ -158,10 +158,10 @@ Service types can also be keyed by a service name for internal use::
 
     public static function getSubscribedServices(): array
     {
-        return [
+        return App::config([
             // ...
             'logger' => LoggerInterface::class,
-        ];
+        ]);
     }
 
 When extending a class that also implements ``ServiceSubscriberInterface``,
@@ -192,10 +192,10 @@ errors if there's no matching service found in the service container::
 
     public static function getSubscribedServices(): array
     {
-        return [
+        return App::config([
             // ...
             '?'.LoggerInterface::class,
-        ];
+        ]);
     }
 
 .. note::
@@ -228,12 +228,15 @@ service type to a service.
 
         use App\CommandBus;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(CommandBus::class)
-                ->tag('container.service_subscriber', ['key' => 'logger', 'id' => 'monolog.logger.event']);
-        };
+        return App::config([
+            'services' => [
+                CommandBus::class => [
+                    'tags' => [
+                        ['container.service_subscriber' => ['key' => 'logger', 'id' => 'monolog.logger.event']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -267,7 +270,7 @@ This is done by having ``getSubscribedServices()`` return an array of
 
     public static function getSubscribedServices(): array
     {
-        return [
+        return App::config([
             // ...
             new SubscribedService('logger', LoggerInterface::class, attributes: new Autowire(service: 'monolog.logger.event')),
 
@@ -282,7 +285,7 @@ This is done by having ``getSubscribedServices()`` return an array of
 
             // AutowireLocator
             new SubscribedService('handlers', ContainerInterface::class, attributes: new AutowireLocator('handler.tag')),
-        ];
+        ]);
     }
 
 .. note::
@@ -467,17 +470,20 @@ or directly via PHP attributes:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\BarCommand;
         use App\CommandBus;
+        use App\FooCommand;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(CommandBus::class)
-                ->args([service_locator([
-                    'App\FooCommand' => service('app.command_handler.foo'),
-                    'App\BarCommand' => service('app.command_handler.bar'),
-                ])]);
-        };
+        return App::config([
+            'services' => [
+                CommandBus::class => [
+                    'arguments' => [service_locator([
+                        FooCommand::class => service('app.command_handler.foo'),
+                        BarCommand::class => service('app.command_handler.bar'),
+                    ]],
+                ],
+            ]),
+        ]);
 
 As shown in the previous sections, the constructor of the ``CommandBus`` class
 must type-hint its argument with ``ContainerInterface``. Then, you can get any of
@@ -512,21 +518,24 @@ other services. To do so, create a new service definition using the
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\BarCommand;
+        use App\FooCommand;
         use Symfony\Component\DependencyInjection\ServiceLocator;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set('app.command_handler_locator', ServiceLocator::class)
-                ->args([[
-                    'App\FooCommand' => service('app.command_handler.foo'),
-                    'App\BarCommand' => service('app.command_handler.bar'),
-                ]])
-                // if you are not using the default service autoconfiguration,
-                // add the following tag to the service definition:
-                // ->tag('container.service_locator')
-            ;
-        };
+        return App::config([
+            'services' => [
+                'app.command_handler_locator' => [
+                    'class' => ServiceLocator::class,
+                    'arguments' => [[
+                        FooCommand::class => service('app.command_handler.foo'),
+                        BarCommand::class => service('app.command_handler.bar'),
+                    ]],
+                    // if you are not using the default service autoconfiguration,
+                    // add the following tag to the service definition:
+                    // 'tags' => ['container.service_locator'],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -568,12 +577,13 @@ Now you can inject the service locator in any other services:
 
         use App\CommandBus;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(CommandBus::class)
-                ->args([service('app.command_handler_locator')]);
-        };
+        return App::config([
+            'services' => [
+                CommandBus::class => [
+                    'arguments' => [service('app.command_handler_locator')],
+                ],
+            ],
+        ]);
 
 Using Service Locators in Compiler Passes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -654,22 +664,28 @@ to index the services:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
+        use App\Handler\HandlerCollection;
+        use App\Handler\One;
+        use App\Handler\Two;
 
-            $services->set(App\Handler\One::class)
-                ->tag('app.handler', ['key' => 'handler_one'])
-            ;
-
-            $services->set(App\Handler\Two::class)
-                ->tag('app.handler', ['key' => 'handler_two'])
-            ;
-
-            $services->set(App\Handler\HandlerCollection::class)
-                // inject all services tagged with app.handler as first argument
-                ->args([tagged_locator('app.handler', indexAttribute: 'key')])
-            ;
-        };
+        return App::config([
+            'services' => [
+                One::class => [
+                    'tags' => [
+                        ['app.handler' => ['key' => 'handler_one']],
+                    ],
+                ],
+                Two::class => [
+                    'tags' => [
+                        ['app.handler' => ['key' => 'handler_two']],
+                    ],
+                ],
+                HandlerCollection::class => [
+                    // inject all services tagged with app.handler as first argument
+                    'arguments' => [tagged_locator('app.handler', indexAttribute: 'key')],
+                ],
+            ],
+        ]);
 
 In this example, the ``index_by`` option is ``key``. All services define that
 option/attribute, so that will be the value used to index the services. For example,
@@ -738,12 +754,16 @@ get the value used to index the services:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $container->services()
-                ->set(App\HandlerCollection::class)
-                    ->args([tagged_locator('app.handler', defaultIndexMethod: 'getLocatorKey')])
-            ;
-        };
+        use App\Handler\HandlerCollection;
+
+        return App::config([
+            'services' => [
+                HandlerCollection::class => [
+                    // inject all services tagged with app.handler as first argument
+                    'arguments' => [tagged_locator('app.handler', defaultIndexMethod: 'getLocatorKey')],
+                ],
+            ],
+        ]);
 
 If some service class doesn't define the method configured in ``default_index_method``,
 Symfony will fall back to using the service ID as its index inside the locator.

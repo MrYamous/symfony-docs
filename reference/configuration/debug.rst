@@ -44,11 +44,11 @@ Typically, you would set this to ``php://stderr``:
         // config/packages/debug.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->extension('debug', [
+        return App::config([
+            'debug' => [
                 'dump_destination' => 'php://stderr',
-            ]);
-        };
+            ],
+        ]);
 
 
 Configure it to ``"tcp://%env(VAR_DUMPER_SERVER)%"`` in order to use the :ref:`ServerDumper feature <var-dumper-dump-server>`.

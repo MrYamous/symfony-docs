@@ -379,14 +379,16 @@ add this new template at the end of the list (each theme overrides all the previ
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->formThemes([
-                '...',
-                'form/custom_types.html.twig',
-            ]);
-        };
+        return App::config([
+            'twig' => [
+                'form_themes' => [
+                    '...',
+                    'form/custom_types.html.twig',
+                ],
+            ],
+        ]);
 
 The last step is to create the actual Twig template that will render the type.
 The template contents depend on which HTML, CSS and JavaScript frameworks and

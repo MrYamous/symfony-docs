@@ -49,11 +49,13 @@ You can mark the service as ``lazy`` by manipulating its definition:
 
         use App\Twig\AppExtension;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(AppExtension::class)->lazy();
-        };
+        return App::config([
+            'services' => [
+                AppExtension::class => [
+                    'lazy' => true,
+                ],
+            ],
+        ]);
 
 Once you inject the service into another service, a lazy ghost object with the
 same signature of the class representing the service should be injected. A lazy
@@ -155,14 +157,16 @@ specific interfaces.
         use App\Twig\AppExtension;
         use Twig\Extension\ExtensionInterface;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(AppExtension::class)
-                ->lazy()
-                ->tag('proxy', ['interface' => ExtensionInterface::class])
-            ;
-        };
+        return App::config([
+            'services' => [
+                AppExtension::class => [
+                    'lazy' => ExtensionInterface::class,
+                    'tags' => [
+                        ['proxy' => ['interface' => ExtensionInterface::class]],
+                    ],
+                ],
+            ],
+        ]);
 
 Just like in the :ref:`Configuration <lazy-services_configuration>` section, you can
 use the :class:`Symfony\\Component\\DependencyInjection\\Attribute\\Autoconfigure`

@@ -142,10 +142,10 @@ MercureBundle provides a more advanced configuration:
         mercure:
             hubs:
                 default:
-                    url: '%env(string:MERCURE_URL)%'
-                    public_url: '%env(string:MERCURE_PUBLIC_URL)%'
+                    url: '%env(MERCURE_URL)%'
+                    public_url: '%env(MERCURE_PUBLIC_URL)%'
                     jwt:
-                        secret: '%env(string:MERCURE_JWT_SECRET)%'
+                        secret: '%env(MERCURE_JWT_SECRET)%'
                         publish: ['https://example.com/foo1', 'https://example.com/foo2']
                         subscribe: ['https://example.com/bar1', 'https://example.com/bar2']
                         algorithm: 'hmac.sha256'
@@ -156,19 +156,26 @@ MercureBundle provides a more advanced configuration:
     .. code-block:: php
 
         // config/packages/mercure.php
-        $container->loadFromExtension('mercure', [
-            'hubs' => [
-                'default' => [
-                    'url' => '%env(string:MERCURE_URL)%',
-                    'public_url' => '%env(string:MERCURE_PUBLIC_URL)%',
-                    'jwt' => [
-                        'secret' => '%env(string:MERCURE_JWT_SECRET)%',
-                        'publish' => ['https://example.com/foo1', 'https://example.com/foo2'],
-                        'subscribe' => ['https://example.com/bar1', 'https://example.com/bar2'],
-                        'algorithm' => 'hmac.sha256',
-                        'provider' => 'My\Provider',
-                        'factory' => 'My\Factory',
-                        'value' => 'my.jwt',
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use App\Mercure\MyFactory;
+        use App\Mercure\MyProvider;
+
+        return App::config([
+            'mercure' => [
+                'hubs' => [
+                    'default' => [
+                        'url' => env('MERCURE_URL'),
+                        'public_url' => env('MERCURE_PUBLIC_URL'),
+                        'jwt' => [
+                            'secret' => env('MERCURE_JWT_SECRET'),
+                            'publish' => ['https://example.com/foo1', 'https://example.com/foo2'],
+                            'subscribe' => ['https://example.com/bar1', 'https://example.com/bar2'],
+                            'algorithm' => 'hmac.sha256',
+                            'provider' => MyProvider::class,
+                            'factory' => MyFactory::class,
+                            'value' => 'my.jwt',
+                        ],
                     ],
                 ],
             ],
@@ -541,14 +548,18 @@ Then, reference this service in the bundle configuration:
     .. code-block:: php
 
         // config/packages/mercure.php
-        use App\Mercure\MyJwtProvider;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        $container->loadFromExtension('mercure', [
-            'hubs' => [
-                'default' => [
-                    'url' => 'https://mercure-hub.example.com/.well-known/mercure',
-                    'jwt' => [
-                        'provider' => MyJwtProvider::class,
+        use App\Mercure\MyTokenProvider;
+
+        return App::config([
+            'mercure' => [
+                'hubs' => [
+                    'default' => [
+                        'url' => 'https://mercure-hub.example.com/.well-known/mercure',
+                        'jwt' => [
+                            'provider' => MyTokenProvider::class,
+                        ],
                     ],
                 ],
             ],

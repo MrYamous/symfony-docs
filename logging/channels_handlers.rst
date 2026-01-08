@@ -47,23 +47,28 @@ from the ``security`` channel. The following example does that only in the
 
     .. code-block:: php
 
-        // config/packages/prod/monolog.php
-        use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-        use Symfony\Config\MonologConfig;
+        // config/packages/monolog.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog, ContainerConfigurator $container) {
-            if ('prod' === $container->env()) {
-                $monolog->handler('security')
-                    ->type('stream')
-                    ->path(param('kernel.logs_dir') . \DIRECTORY_SEPARATOR . 'security.log')
-                    ->channels()->elements(['security']);
-
-                $monolog->handler('main')
-                     // ...
-
-                    ->channels()->elements(['!security']);
-            }
-        };
+        return App::config([
+            'when@prod' => [
+                'monolog' => [
+                    'handlers' => [
+                        'security' => [
+                            // log all messages (since debug is the lowest level)
+                            'level' => 'debug',
+                            'type' => 'stream',
+                            'path' => '%kernel.logs_dir%/security.log',
+                            'channels' => ['security'],
+                        ],
+                        // an example of *not* logging security channel messages for this handler
+                        'main' => [
+                            // 'channels' => ['!security'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. warning::
 
@@ -114,11 +119,13 @@ You can also configure additional channels without the need to tag your services
     .. code-block:: php
 
         // config/packages/monolog.php
-        use Symfony\Config\MonologConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog): void {
-            $monolog->channels(['foo', 'bar', 'foo_bar']);
-        };
+        return App::config([
+            'monolog' => [
+                'channels' => ['foo', 'bar', 'foo_bar'],
+            ],
+        ]);
 
 Symfony automatically registers one service per channel (in this example, the
 channel ``foo`` creates a service called ``monolog.logger.foo``). In order to

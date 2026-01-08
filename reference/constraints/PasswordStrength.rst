@@ -181,13 +181,14 @@ service to use your own estimator:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\Validator\CustomPasswordStrengthEstimator;
         use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
-        return function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set('custom_password_strength_estimator', CustomPasswordStrengthEstimator::class);
-
-            $services->set(PasswordStrengthValidator::class)
-                ->args([closure('custom_password_strength_estimator')]);
-        };
+        return App::config([
+            'services' => [
+                'custom_password_strength_estimator' => CustomPasswordStrengthEstimator::class,
+                PasswordStrengthValidator::class => [
+                    'arguments' => [closure(service('custom_password_strength_estimator'))],
+                ],
+            ],
+        ]);

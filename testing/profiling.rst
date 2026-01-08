@@ -19,24 +19,26 @@ but **disables data collection** by default in the test environment:
 
     .. code-block:: yaml
 
-        # config/packages/test/web_profiler.yaml
-
-        # ...
-        framework:
-            profiler: { enabled: true, collect: false }
+        # config/packages/web_profiler.yaml
+        when@test:
+            framework:
+                profiler: { enabled: true, collect: false }
 
     .. code-block:: php
 
-        // config/packages/test/web_profiler.php
-        use Symfony\Config\FrameworkConfig;
+        // config/packages/web_profiler.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->profiler()
-                ->enabled(true)
-                ->collect(false)
-            ;
-        };
+        return App::config([
+            'when@test' => [
+                'framework' => [
+                    'profiler' => [
+                        'enabled' => true,
+                        'collect' => false,
+                    ],
+                ],
+            ],
+        ]);
 
 Setting ``collect`` to ``true`` enables profiler data collection for all tests.
 However, if you only need profiler data in a few specific tests, you can keep

@@ -161,15 +161,17 @@ automatically when installing ``symfony/framework-bundle``):
     .. code-block:: php
 
         // config/routes/framework.php
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            if ('dev' === $routes->env()) {
-                $routes->import('@FrameworkBundle/Resources/config/routing/errors.php', 'php')
-                    ->prefix('/_error')
-                ;
-            }
-        };
+        return Routes::config([
+            'when@dev' => [
+                '_errors' => [
+                    'resource' => '@FrameworkBundle/Resources/config/routing/errors.php',
+                    'type' => 'php',
+                    'prefix' => '/_error',
+                ],
+            ],
+        ]);
 
 With this route added, you can use URLs like these to preview the *error* page
 for a given status code as HTML or for a given status code and format (you might
@@ -245,12 +247,15 @@ configuration option to point to it:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->errorController('App\Controller\ErrorController::show');
-        };
+        use App\Controller\ErrorController;
+
+        return App::config([
+            'framework' => [
+                'error_controller' => [ErrorController::class, 'show'],
+            ],
+        ]);
 
 The :class:`Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener`
 class used by the FrameworkBundle as a listener of the ``kernel.exception`` event creates

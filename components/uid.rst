@@ -209,13 +209,8 @@ You can configure these default values::
         // config/packages/uid.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services()
-                ->defaults()
-                ->autowire()
-                ->autoconfigure();
-
-            $container->extension('framework', [
+        return App::config([
+            'framework' => [
                 'uid' => [
                     'default_uuid_version' => 6,
                     'name_based_uuid_version' => 3,
@@ -223,8 +218,8 @@ You can configure these default values::
                     'time_based_uuid_version' => 6,
                     'time_based_uuid_node' => 121212121212,
                 ],
-            ]);
-        };
+            ],
+        ]);
 
 Converting UUIDs
 ~~~~~~~~~~~~~~~~
@@ -672,15 +667,15 @@ configuration in your application before using these commands:
         use Symfony\Component\Uid\Command\InspectUlidCommand;
         use Symfony\Component\Uid\Command\InspectUuidCommand;
 
-        return static function (ContainerConfigurator $container): void {
-            // ...
-
-            $services
-                ->set(GenerateUlidCommand::class)
-                ->set(GenerateUuidCommand::class)
-                ->set(InspectUlidCommand::class)
-                ->set(InspectUuidCommand::class);
-        };
+        return App::config([
+            'services' => [
+                // ...
+                GenerateUlidCommand::class => null,
+                GenerateUuidCommand::class => null,
+                InspectUlidCommand::class => null,
+                InspectUuidCommand::class => null,
+            ],
+        ]);
 
 Now you can generate UUIDs/ULIDs as follows (add the ``--help`` option to the
 commands to learn about all their options):

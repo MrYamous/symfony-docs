@@ -58,36 +58,50 @@ The following configuration code shows how you can configure two entity managers
     .. code-block:: php
 
         // config/packages/doctrine.php
-        use Symfony\Config\DoctrineConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            // Connections:
-            $doctrine->dbal()
-                ->connection('default')
-                ->url(env('DATABASE_URL')->resolve());
-            $doctrine->dbal()
-                ->connection('customer')
-                ->url(env('CUSTOMER_DATABASE_URL')->resolve());
-            $doctrine->dbal()->defaultConnection('default');
-
-            // Entity Managers:
-            $doctrine->orm()->defaultEntityManager('default');
-            $defaultEntityManager = $doctrine->orm()->entityManager('default');
-            $defaultEntityManager->connection('default');
-            $defaultEntityManager->mapping('Main')
-                ->isBundle(false)
-                ->dir('%kernel.project_dir%/src/Entity/Main')
-                ->prefix('App\Entity\Main')
-                ->alias('Main');
-            $customerEntityManager = $doctrine->orm()->entityManager('customer');
-            $customerEntityManager->connection('customer');
-            $customerEntityManager->mapping('Customer')
-                ->isBundle(false)
-                ->dir('%kernel.project_dir%/src/Entity/Customer')
-                ->prefix('App\Entity\Customer')
-                ->alias('Customer')
-            ;
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'connections' => [
+                        'default' => [
+                            'url' => env('DATABASE_URL')->resolve(),
+                        ],
+                        'customer' => [
+                            'url' => env('CUSTOMER_DATABASE_URL')->resolve(),
+                        ],
+                    ],
+                    'default_connection' => 'default',
+                ],
+                'orm' => [
+                    'default_entity_manager' => 'default',
+                    'entity_managers' => [
+                        'default' => [
+                            'connection' => 'default',
+                            'mappings' => [
+                                'Main' => [
+                                    'is_bundle' => false,
+                                    'dir' => '%kernel.project_dir%/src/Entity/Main',
+                                    'prefix' => 'App\Entity\Main',
+                                    'alias' => 'Main',
+                                ],
+                            ],
+                        ],
+                        'customer' => [
+                            'connection' => 'customer',
+                            'mappings' => [
+                                'Customer' => [
+                                    'is_bundle' => false,
+                                    'dir' => '%kernel.project_dir%/src/Entity/Customer',
+                                    'prefix' => 'App\Entity\Customer',
+                                    'alias' => 'Customer',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 In this case, you've defined two entity managers and called them ``default``
 and ``customer``. The ``default`` entity manager manages entities in the

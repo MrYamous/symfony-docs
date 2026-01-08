@@ -112,17 +112,16 @@ After creating the strategy PHP class, register it as a Symfony service.
 
         use App\Asset\VersionStrategy\GulpBusterVersionStrategy;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(GulpBusterVersionStrategy::class)
-                ->args(
-                    [
+        return App::config([
+            'services' => [
+                GulpBusterVersionStrategy::class => [
+                    'arguments' => [
                         '%kernel.project_dir%/busters.json',
                         '%%s?version=%%s',
-                    ]
-                );
-        };
+                    ],
+                ],
+            ],
+        ]);
 
 Finally, enable the new asset versioning for all the application assets or just
 for some :ref:`asset package <reference-framework-assets-packages>` thanks to
@@ -141,14 +140,16 @@ the :ref:`version_strategy <reference-assets-version-strategy>` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use App\Asset\VersionStrategy\GulpBusterVersionStrategy;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->assets()
-                ->versionStrategy(GulpBusterVersionStrategy::class)
-            ;
-        };
+        use App\Asset\VersionStrategy\GulpBusterVersionStrategy;
+
+        return App::config([
+            'framework' => [
+                'assets' => [
+                    'version_strategy' => GulpBusterVersionStrategy::class,
+                ],
+            ],
+        ]);
 
 .. _`gulp-buster`: https://www.npmjs.com/package/gulp-buster

@@ -146,26 +146,25 @@ enforce different levels of service (free or paid):
     .. code-block:: php
 
         // config/packages/rate_limiter.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->rateLimiter()
-                ->limiter('anonymous_api')
-                    // use 'sliding_window' if you prefer that policy
-                    ->policy('fixed_window')
-                    ->limit(100)
-                    ->interval('60 minutes')
-                ;
-
-            $framework->rateLimiter()
-                ->limiter('authenticated_api')
-                    ->policy('token_bucket')
-                    ->limit(5000)
-                    ->rate()
-                        ->interval('15 minutes')
-                        ->amount(500)
-                ;
-        };
+        return App::config([
+            'framework' => [
+                'rate_limiter' => [
+                    'anonymous_api' => [
+                        // use 'sliding_window' if you prefer that policy
+                        'policy' => 'fixed_window',
+                        'limit' => 100,
+                        'interval' => '60 minutes',
+                    ],
+                ],
+                'authenticated_api' => [
+                    'policy' => 'token_bucket',
+                    'limit' => 5000,
+                    'rate' => ['interval' => '15 minutes', 'amount' => 500],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -421,17 +420,18 @@ You can use the ``cache_pool`` option to override the cache used by a specific l
     .. code-block:: php
 
         // config/packages/rate_limiter.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->rateLimiter()
-                ->limiter('anonymous_api')
-                    // ...
-
-                    // use the "cache.anonymous_rate_limiter" cache pool
-                    ->cachePool('cache.anonymous_rate_limiter')
-                ;
-        };
+        return App::config([
+            'framework' => [
+                'rate_limiter' => [
+                    'anonymous_api' => [
+                        // use the "cache.anonymous_rate_limiter" cache pool
+                        'cache_pool' => 'cache.anonymous_rate_limiter',
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -473,20 +473,21 @@ at all):
     .. code-block:: php
 
         // config/packages/rate_limiter.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->rateLimiter()
-                ->limiter('anonymous_api')
-                    // ...
+        return App::config([
+            'framework' => [
+                'rate_limiter' => [
+                    'anonymous_api' => [
+                        // use the "lock.rate_limiter.factory" for this limiter
+                        'lock_factory' => 'lock.rate_limiter.factory',
 
-                    // use the "lock.rate_limiter.factory" for this limiter
-                    ->lockFactory('lock.rate_limiter.factory')
-
-                    // or don't use any lock mechanism
-                    ->lockFactory(null)
-                ;
-        };
+                        // or don't use any lock mechanism
+                        'lock_factory' => null,
+                    ],
+                ],
+            ],
+        ]);
 
 Compound Rate Limiter
 ---------------------
@@ -515,29 +516,28 @@ You can configure multiple rate limiters to work together:
     .. code-block:: php
 
         // config/packages/rate_limiter.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->rateLimiter()
-                ->limiter('two_per_minute')
-                    ->policy('fixed_window')
-                    ->limit(2)
-                    ->interval('1 minute')
-                ;
-
-            $framework->rateLimiter()
-                ->limiter('five_per_hour')
-                    ->policy('fixed_window')
-                    ->limit(5)
-                    ->interval('1 hour')
-                ;
-
-            $framework->rateLimiter()
-                ->limiter('contact_form')
-                    ->policy('compound')
-                    ->limiters(['two_per_minute', 'five_per_hour'])
-                ;
-        };
+        return App::config([
+            'framework' => [
+                'rate_limiter' => [
+                    'two_per_minute' => [
+                        'policy' => 'fixed_window',
+                        'limit' => 2,
+                        'interval' => '1 minute',
+                    ],
+                    'five_per_hour' => [
+                        'policy' => 'fixed_window',
+                        'limit' => 5,
+                        'interval' => '1 hour',
+                    ],
+                    'contact_form' => [
+                        'policy' => 'compound',
+                        'limiters' => ['two_per_minute', 'five_per_hour'],
+                    ],
+                ],
+            ],
+        ]);
 
 Then, inject and use as normal::
 

@@ -81,15 +81,21 @@ mapping types, read Doctrine's `Custom Mapping Types`_ section of their document
     .. code-block:: php
 
         // config/packages/doctrine.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Type\CustomFirst;
         use App\Type\CustomSecond;
-        use Symfony\Config\DoctrineConfig;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $dbal = $doctrine->dbal();
-            $dbal->type('custom_first')->class(CustomFirst::class);
-            $dbal->type('custom_second')->class(CustomSecond::class);
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'types' => [
+                        'custom_first' => CustomFirst::class,
+                        'custom_second' => CustomSecond::class,
+                    ],
+                ],
+            ],
+        ]);
 
 Registering custom Mapping Types in the SchemaTool
 --------------------------------------------------
@@ -114,13 +120,17 @@ mapping type:
     .. code-block:: php
 
         // config/packages/doctrine.php
-        use Symfony\Config\DoctrineConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $dbalDefault = $doctrine->dbal()
-                ->connection('default');
-            $dbalDefault->mappingType('enum', 'string');
-        };
+        return App::config([
+            'doctrine' => [
+            'dbal' => [
+                    'mapping_types' => [
+                        'enum' => 'string',
+                    ],
+                ],
+            ],
+        ]);
 
 .. _`PDO`: https://www.php.net/pdo
 .. _`Doctrine`: https://www.doctrine-project.org/

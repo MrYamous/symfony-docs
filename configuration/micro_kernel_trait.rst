@@ -360,15 +360,14 @@ because the configuration started to get bigger:
     .. code-block:: php
 
         // config/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework
-                ->secret('SOME_SECRET')
-                ->profiler()
-                    ->onlyExceptions(false)
-            ;
-        };
+        return App::config([
+            'framework' => [
+            'secret' => 'SOME_SECRET',
+                'profiler' => ['only_exceptions' => false],
+            ],
+        ]);
 
 This also loads attribute routes from an ``src/Controller/`` directory, which
 has one file in it::

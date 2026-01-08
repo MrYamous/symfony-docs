@@ -116,9 +116,9 @@ Now, create a ``validators`` catalog file in the ``translations/`` directory:
     .. code-block:: php
 
         // translations/validators/validators.en.php
-        return [
+        return App::config([
             'author.name.not_blank' => 'Please enter an author name.',
-        ];
+        ]);
 
 You may need to clear your cache (even in the dev environment) after creating
 this file for the first time.
@@ -172,15 +172,15 @@ The default translation domain can be changed globally using the
     .. code-block:: php
 
         // config/packages/validator.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework) {
-            // ...
-            $framework
-                ->validation()
-                    ->translationDomain('validation_errors')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'validation' => [
+                    'translation_domain' => 'validation_errors',
+                ],
+            ],
+        ]);
 
 Or it can be customized for a specific violation from a constraint validator::
 

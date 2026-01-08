@@ -24,15 +24,17 @@ When overriding an existing definition, the original service is lost:
         use App\Mailer;
         use App\NewMailer;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
+        return App::config([
+            'services' => [
+                Mailer::class => null,
 
-            $services->set(Mailer::class);
-
-            // this replaces the old App\Mailer definition with the new one, the
-            // old definition is lost
-            $services->set(Mailer::class, NewMailer::class);
-        };
+                // this replaces the old App\Mailer definition with the new one, the
+                // old definition is lost
+                Mailer::class => [
+                    'class' => NewMailer::class,
+                ],
+            ],
+        ]);
 
 Most of the time, that's exactly what you want to do. But sometimes,
 you might want to decorate the old one instead (i.e. apply the `Decorator pattern`_).
@@ -75,16 +77,16 @@ but keeps a reference of the old one as ``.inner``:
         use App\DecoratingMailer;
         use App\Mailer;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(Mailer::class);
-
-            $services->set(DecoratingMailer::class)
-                // overrides the App\Mailer service
-                // but that service is still available as ".inner"
-                ->decorate(Mailer::class);
-        };
+        return App::config([
+            'services' => [
+                Mailer::class => null,
+                DecoratingMailer::class => [
+                    // overrides the App\Mailer service
+                    // but that service is still available as ".inner"
+                    'decorates' => Mailer::class,
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -146,16 +148,16 @@ automatically changed to ``'.inner'``):
         use App\DecoratingMailer;
         use App\Mailer;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(Mailer::class);
-
-            $services->set(DecoratingMailer::class)
-                ->decorate(Mailer::class)
-                // pass the old service as an argument
-                ->args([service('.inner')]);
-        };
+        return App::config([
+            'services' => [
+                Mailer::class => null,
+                DecoratingMailer::class => [
+                    'decorates' => Mailer::class,
+                    // pass the old service as an argument
+                    'arguments' => [service('.inner')],
+                ],
+            ],
+        ]);
 
 When decorating a service, the original service (e.g. ``App\Mailer``) is available
 inside the decorating service (e.g. ``App\DecoratingMailer``) using an ID constructed
@@ -224,6 +226,43 @@ name via the ``decoration_inner_name`` option:
     ``kernel.event_subscriber``, ``kernel.event_listener``, ``kernel.locale_aware``,
     and ``kernel.reset``.
 
+.. note::
+
+    The generated inner id is based on the id of the decorator service
+    (``App\DecoratingMailer`` here), not of the decorated service (``App\Mailer``
+    here). You can control the inner service name via the ``decoration_inner_name``
+    option:
+
+    .. configuration-block::
+
+        .. code-block:: yaml
+
+            # config/services.yaml
+            services:
+                App\DecoratingMailer:
+                    # ...
+                    decoration_inner_name: App\DecoratingMailer.wooz
+                    arguments: ['@App\DecoratingMailer.wooz']
+
+        .. code-block:: php
+
+            // config/services.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            use App\DecoratingMailer;
+            use App\Mailer;
+
+            return App::config([
+                'services' => [
+                    Mailer::class => null,
+                    DecoratingMailer::class => [
+                        'decorates' => Mailer::class,
+                        'decoration_inner_name' => DecoratingMailer::class.'.wooz',
+                        'arguments' => [service(DecoratingMailer::class.'.wooz')],
+                    ],
+                ],
+            ]);
+
 Decoration Priority
 -------------------
 
@@ -283,19 +322,25 @@ the ``decoration_priority`` option. Its value is an integer that defaults to
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
+        use App\Bar;
+        use App\Baz;
+        use App\Foo;
 
-            $services->set(\Foo::class);
-
-            $services->set(\Bar::class)
-                ->decorate(\Foo::class, null, 5)
-                ->args([service('.inner')]);
-
-            $services->set(\Baz::class)
-                ->decorate(\Foo::class, null, 1)
-                ->args([service('.inner')]);
-        };
+        return App::config([
+            'services' => [
+                Foo::class => null,
+                Bar::class => [
+                    'decorates' => Foo::class,
+                    'decoration_priority' => 5,
+                    'arguments' => [service('.inner')],
+                ],
+                Baz::class => [
+                    'decorates' => Foo::class,
+                    'decoration_priority' => 1,
+                    'arguments' => [service('.inner')],
+                ],
+            ],
+        ]);
 
 The generated code will be the following::
 
@@ -340,22 +385,37 @@ ordered services, each one decorating the next:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $container->services()
-                ->stack('decorated_foo_stack', [
-                    inline_service(\Baz::class)->args([service('.inner')]),
-                    inline_service(\Bar::class)->args([service('.inner')]),
-                    inline_service(\Foo::class),
-                ])
+        use App\Bar;
+        use App\Baz;
+        use App\Foo;
 
+        return App::config([
+            'services' => [
+                'decorated_foo_stack' => [
+                    'stack' => [
+                        ['class' => Baz::class, 'arguments' => [service('.inner')]],
+                        ['class' => Bar::class, 'arguments' => [service('.inner')]],
+                        ['class' => Foo::class],
+                    ],
+                ],
+                // using the short syntax:
+                'decorated_foo_stack' => [
+                    'stack' => [
+                        [Baz::class => ['arguments' => [service('.inner')]]],
+                        [Bar::class => ['arguments' => [service('.inner')]]],
+                        [Foo::class => null],
+                    ],
+                ],
                 // can be simplified when autowiring is enabled:
-                ->stack('decorated_foo_stack', [
-                    inline_service(\Baz::class),
-                    inline_service(\Bar::class),
-                    inline_service(\Foo::class),
-                ])
-            ;
-        };
+                'decorated_foo_stack' => [
+                    'stack' => [
+                        [Baz::class => null],
+                        [Bar::class => null],
+                        [Foo::class => null],
+                    ],
+                ],
+            ],
+        ]);
 
 The result will be the same as in the previous section::
 
@@ -394,26 +454,33 @@ advanced example of composition:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+        use App\Bar;
+        use App\Baz;
         use App\Decorated;
         use App\Decorator;
+        use App\Foo;
 
-        return function(ContainerConfigurator $container): void {
-            $container->services()
-                ->set('some_decorator', Decorator::class)
-
-                ->stack('embedded_stack', [
-                    service('some_decorator'),
-                    inline_service(Decorated::class),
-                ])
-
-                ->stack('decorated_foo_stack', [
-                    inline_service()->parent('embedded_stack'),
-                    inline_service(\Baz::class),
-                    inline_service(\Bar::class),
-                    inline_service(\Foo::class),
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                'some_decorator' => [
+                    'class' => Decorator::class,
+                ],
+                'embedded_stack' => [
+                    'stack' => [
+                        ['alias' => 'some_decorator'],
+                        [Decorated::class => null],
+                    ],
+                ],
+                'decorated_foo_stack' => [
+                    'stack' => [
+                        ['parent' => 'embedded_stack'],
+                        [Baz::class => null],
+                        [Bar::class => null],
+                        [Foo::class => null],
+                    ],
+                ],
+            ],
+        ]);
 
 The result will be::
 
@@ -444,12 +511,21 @@ The result will be::
 
         .. code-block:: php
 
-            // ...
-            ->stack('decorated_foo_stack', [
-                'first' => inline_service()->parent('embedded_stack'),
-                'second' => inline_service(\Baz::class),
-                // ...
-            ])
+            // config/services.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            use App\Baz;
+
+            return App::config([
+                'services' => [
+                    'decorated_foo_stack' => [
+                        'stack' => [
+                            'first' => ['parent' => 'embedded_stack'],
+                            'second' => [Baz::class => null],
+                        ],
+                    ],
+                ],
+            ]);
 
     The ``Baz`` frame id will now be ``.decorated_foo_stack.second``.
 
@@ -488,30 +564,32 @@ Three different behaviors are available:
     .. code-block:: yaml
 
         # config/services.yaml
-        Foo: ~
+        services:
+            Foo: ~
 
-        Bar:
-            decorates: Foo
-            decoration_on_invalid: ignore
-            arguments: ['@.inner']
+            Bar:
+                decorates: Foo
+                decoration_on_invalid: ignore
+                arguments: ['@.inner']
 
     .. code-block:: php
 
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        use Symfony\Component\DependencyInjection\ContainerInterface;
+        use App\Bar;
+        use App\Foo;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(Foo::class);
-
-            $services->set(Bar::class)
-                ->decorate(Foo::class, null, 0, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
-                ->args([service('.inner')])
-            ;
-        };
+        return App::config([
+            'services' => [
+                Foo::class => null,
+                Bar::class => [
+                    'decorates' => Foo::class,
+                    'decoration_on_invalid' => 'ignore',
+                    'arguments' => [service('.inner')],
+                ],
+            ],
+        ]);
 
 .. warning::
 

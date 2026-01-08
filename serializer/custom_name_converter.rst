@@ -58,15 +58,17 @@ Then, configure the serializer to use your name converter:
     .. code-block:: php
 
         // config/packages/serializer.php
-        use App\Serializer\OrgPrefixNameConverter;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework) {
-            $framework->serializer()
-                // pass the service ID of your name converter
-                ->nameConverter(OrgPrefixNameConverter::class)
-            ;
-        };
+        use App\Serializer\OrgPrefixNameConverter;
+
+        return App::config([
+            'framework' => [
+                'serializer' => [
+                    'name_converter' => OrgPrefixNameConverter::class,
+                ],
+            ],
+        ]);
 
 Now, when using the serializer in the application, all attributes will be
 prefixed by ``org_``::

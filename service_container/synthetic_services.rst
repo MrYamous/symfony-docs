@@ -46,13 +46,14 @@ configuration:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            // synthetic services don't specify a class
-            $services->set('app.synthetic_service')
-                ->synthetic();
-        };
+        return App::config([
+            'services' => [
+                'app.synthetic_service' => [
+                    // synthetic services don't specify a class
+                    'synthetic' => true,
+                ],
+            ],
+        ]);
 
 Now, you can inject the instance in the container using
 :method:`Container::set() <Symfony\\Component\\DependencyInjection\\Container::set>`::

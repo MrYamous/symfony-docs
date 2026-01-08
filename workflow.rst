@@ -79,42 +79,48 @@ follows:
     .. code-block:: php
 
         // config/packages/workflow.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\BlogPost;
-        use Symfony\Config\FrameworkConfig;
 
-        return static function (FrameworkConfig $framework): void {
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            $blogPublishing
-                ->type('workflow') // or 'state_machine'
-                ->supports([BlogPost::class])
-                ->initialMarking(['draft']);
-
-            $blogPublishing->auditTrail()->enabled(true);
-            $blogPublishing->markingStore()
-                ->type('method')
-                ->property('currentPlace');
-
-            // defining places manually is optional
-            $blogPublishing->place()->name('draft');
-            $blogPublishing->place()->name('reviewed');
-            $blogPublishing->place()->name('rejected');
-            $blogPublishing->place()->name('published');
-
-            $blogPublishing->transition()
-                ->name('to_review')
-                    ->from(['draft'])
-                    ->to(['reviewed']);
-
-            $blogPublishing->transition()
-                ->name('publish')
-                    ->from(['reviewed'])
-                    ->to(['published']);
-
-            $blogPublishing->transition()
-                ->name('reject')
-                    ->from(['reviewed'])
-                    ->to(['rejected']);
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        'type' => 'workflow', // or 'state_machine'
+                        'audit_trail' => [
+                            'enabled' => true,
+                        ],
+                        'marking_store' => [
+                            'type' => 'method',
+                            'property' => 'currentPlace',
+                        ],
+                        'supports' => [BlogPost::class],
+                        'initial_marking' => 'draft',
+                        'places' => [
+                            'draft',
+                            'reviewed',
+                            'rejected',
+                            'published',
+                        ],
+                        'transitions' => [
+                            'to_review' => [
+                                'from' => 'draft',
+                                'to' => 'reviewed',
+                            ],
+                            'publish' => [
+                                'from' => 'reviewed',
+                                'to' => 'published',
+                            ],
+                            'reject' => [
+                                'from' => 'reviewed',
+                                'to' => 'rejected',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -295,38 +301,41 @@ and transitions:
     .. code-block:: php
 
         // config/packages/workflow.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\BlogPost;
         use App\Enumeration\BlogPostStatus;
-        use Symfony\Config\FrameworkConfig;
 
-        return static function (FrameworkConfig $framework): void {
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            $blogPublishing
-                ->type('workflow')
-                ->supports([BlogPost::class])
-                ->initialMarking([BlogPostStatus::Draft]);
-
-            $blogPublishing->markingStore()
-                ->type('method')
-                ->property('status');
-
-            $blogPublishing->places(BlogPostStatus::cases());
-
-            $blogPublishing->transition()
-                ->name('to_review')
-                    ->from(BlogPostStatus::Draft)
-                    ->to([BlogPostStatus::Reviewed]);
-
-            $blogPublishing->transition()
-                ->name('publish')
-                    ->from([BlogPostStatus::Reviewed])
-                    ->to([BlogPostStatus::Published]);
-
-            $blogPublishing->transition()
-                ->name('reject')
-                    ->from([BlogPostStatus::Reviewed])
-                    ->to([BlogPostStatus::Rejected]);
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        'type' => 'workflow',
+                        'marking_store' => [
+                            'type' => 'method',
+                            'property' => 'status',
+                        ],
+                        'supports' => [BlogPost::class],
+                        'initial_marking' => BlogPostStatus::Draft,
+                        'places' => BlogPostStatus::cases(),
+                        'transitions' => [
+                            'to_review' => [
+                                'from' => BlogPostStatus::Draft,
+                                'to' => BlogPostStatus::Reviewed,
+                            ],
+                            'publish' => [
+                                'from' => BlogPostStatus::Reviewed,
+                                'to' => BlogPostStatus::Published,
+                            ],
+                            'reject' => [
+                                'from' => BlogPostStatus::Reviewed,
+                                'to' => BlogPostStatus::Rejected,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 The component will now transparently cast the enum to its backing value
 when needed and vice-versa when working with your objects::
@@ -372,21 +381,22 @@ when needed and vice-versa when working with your objects::
         .. code-block:: php
 
             // config/packages/workflow.php
-            use App\Entity\BlogPost;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
             use App\Enumeration\BlogPostStatus;
-            use Symfony\Config\FrameworkConfig;
 
-            return static function (FrameworkConfig $framework): void {
-                $blogPublishing = $framework->workflows()->workflows('my_workflow_name');
-
-                // with constants:
-                $blogPublishing->places('App\Workflow\MyWorkflow::PLACE_*');
-
-                // with enums:
-                $blogPublishing->places(BlogPostStatus::cases());
-
-                // ...
-            };
+            return App::config([
+                'framework' => [
+                    'workflows' => [
+                        'my_workflow_name' => [
+                            // with constants:
+                            'places' => 'App\Workflow\MyWorkflow::PLACE_*',
+                            // with enums:
+                            'places' => BlogPostStatus::cases(),
+                        ],
+                    ],
+                ],
+            ]);
 
 Using Weighted Transitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -855,11 +865,11 @@ workflow leaves a place::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 LeaveEvent::getName('blog_publishing') => 'onLeave',
                 // if you prefer, you can write the event name manually like this:
                 // 'workflow.blog_publishing.leave' => 'onLeave',
-            ];
+            ]);
         }
     }
 
@@ -948,9 +958,9 @@ missing a title::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 'workflow.blog_publishing.guard.to_review' => ['guardReview'],
-            ];
+            ]);
         }
     }
 
@@ -982,25 +992,21 @@ to :ref:`Guard events <workflow-usage-guard-events>`, which are always fired:
     .. code-block:: php
 
         // config/packages/workflow.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-
-            // ...
-            // you can pass one or more event names
-            $blogPublishing->eventsToDispatch([
-                'workflow.leave',
-                'workflow.completed',
-            ]);
-
-            // pass an empty array to not dispatch any event
-            $blogPublishing->eventsToDispatch([]);
-
-            // ...
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        // you can pass one or more event names
+                        'events_to_dispatch' => ['workflow.leave', 'workflow.completed'],
+                        // pass an empty array to not dispatch any event
+                        'events_to_dispatch' => [],
+                        // ...
+                    ],
+                ],
+            ],
+        ]);
 
 You can also disable a specific event from being fired when applying a transition::
 
@@ -1009,10 +1015,8 @@ You can also disable a specific event from being fired when applying a transitio
 
     $post = new BlogPost();
 
-    $workflow = $this->container->get('workflow.blog_publishing');
-
     try {
-        $workflow->apply($post, 'to_review', [
+        $blogPublishingWorkflow->apply($post, 'to_review', [
             Workflow::DISABLE_ANNOUNCE_EVENT => true,
             Workflow::DISABLE_LEAVE_EVENT => true,
         ]);
@@ -1113,33 +1117,35 @@ transition. The value of this option is any valid expression created with the
     .. code-block:: php
 
         // config/packages/workflow.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            // ... previous configuration
-
-            $blogPublishing->transition()
-                ->name('to_review')
-                    // the transition is allowed only if the current user has the ROLE_REVIEWER role.
-                    ->guard('is_granted("ROLE_REVIEWER")')
-                    ->from(['draft'])
-                    ->to(['reviewed']);
-
-            $blogPublishing->transition()
-                ->name('publish')
-                    // or "is_remember_me", "is_fully_authenticated", "is_granted"
-                    ->guard('is_authenticated')
-                    ->from(['reviewed'])
-                    ->to(['published']);
-
-            $blogPublishing->transition()
-                ->name('reject')
-                    // or any valid expression language with "subject" referring to the post
-                    ->guard('is_granted("ROLE_ADMIN") and subject.isStatusReviewed()')
-                    ->from(['reviewed'])
-                    ->to(['rejected']);
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        'transitions' => [
+                            'to_review' => [
+                                'guard' => 'is_granted("ROLE_REVIEWER")',
+                                'from' => ['draft'],
+                                'to' => ['reviewed'],
+                            ],
+                            'publish' => [
+                                // or "is_remember_me", "is_fully_authenticated", "is_granted"
+                                'guard' => 'is_authenticated',
+                                'from' => ['reviewed'],
+                                'to' => ['published'],
+                            ],
+                            'reject' => [
+                                // or any valid expression language with "subject" referring to the post
+                                'guard' => 'is_granted("ROLE_ADMIN") and subject.isStatusReviewed()',
+                                'from' => ['reviewed'],
+                                'to' => ['rejected'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 You can also use transition blockers to block and return a user-friendly error
 message when you stop a transition from happening.
@@ -1177,9 +1183,9 @@ place::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 'workflow.blog_publishing.guard.publish' => ['guardPublish'],
-            ];
+            ]);
         }
     }
 
@@ -1235,18 +1241,21 @@ it:
     .. code-block:: php
 
         // config/packages/workflow.php
-        use App\Workflow\MarkingStore\ReflectionMarkingStore;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
+        use App\Workflow\MarkingStore\BlogPostMarkingStore;
 
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            // ...
-
-            $blogPublishing->markingStore()
-                ->service(BlogPostMarkingStore::class);
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        'marking_store' => [
+                            'service' => BlogPostMarkingStore::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Usage in Twig
 -------------
@@ -1350,43 +1359,47 @@ be only the title of the workflow or very complex objects:
     .. code-block:: php
 
         // config/packages/workflow.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            // ... previous configuration
-
-            $blogPublishing->metadata([
-                'title' => 'Blog Publishing Workflow'
-            ]);
-
-            // ...
-
-            $blogPublishing->place()
-                ->name('draft')
-                ->metadata([
-                    'max_num_of_words' => 500,
-                ]);
-
-            // ...
-
-            $blogPublishing->transition()
-                ->name('to_review')
-                    ->from(['draft'])
-                    ->to(['reviewed'])
-                    ->metadata([
-                        'priority' => 0.5,
-                    ]);
-
-            $blogPublishing->transition()
-                ->name('publish')
-                    ->from(['reviewed'])
-                    ->to(['published'])
-                    ->metadata([
-                        'hour_limit' => 20,
-                        'explanation' => 'You can not publish after 8 PM.',
-                    ]);
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        // ... previous configuration
+                        'metadata' => [
+                            'title' => 'Blog Publishing Workflow'
+                        ],
+                        // ...
+                        'places' => [
+                            [
+                                'name' => 'draft',
+                                'metadata' => [
+                                    'max_num_of_words' => 500,
+                                ],
+                            ],
+                            // ...
+                        ],
+                        'transitions' => [
+                            'to_review' => [
+                                'from' => 'draft',
+                                'to' => 'reviewed',
+                                'metadata' => [
+                                    'priority' => 0.5,
+                                ],
+                            ],
+                            'publish' => [
+                                'from' => 'reviewed',
+                                'to' => 'published',
+                                'metadata' => [
+                                    'hour_limit' => 20,
+                                    'explanation' => 'You can not publish after 8 PM.',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Then you can access this metadata in your controller as follows::
 
@@ -1521,18 +1534,22 @@ After implementing your validator, configure your workflow to use it:
     .. code-block:: php
 
         // config/packages/workflow.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $blogPublishing = $framework->workflows()->workflows('blog_publishing');
-            // ...
+        use App\Workflow\Validator\BlogPublishingValidator;
 
-            $blogPublishing->definitionValidators([
-                App\Workflow\Validator\BlogPublishingValidator::class
-            ]);
-
-            // ...
-        };
+        return App::config([
+            'framework' => [
+                'workflows' => [
+                    'blog_publishing' => [
+                        // ...
+                        'definition_validators' => [
+                            BlogPublishingValidator::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 The ``BlogPublishingValidator`` will be executed during container compilation
 to validate the workflow definition.

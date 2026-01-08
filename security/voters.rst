@@ -440,14 +440,16 @@ security configuration:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->accessDecisionManager()
-                ->strategy('unanimous')
-                ->allowIfAllAbstain(false)
-            ;
-        };
+        return App::config([
+            'security' => [
+                'access_decision_manager' => [
+                    'strategy' => 'unanimous',
+                    'allow_if_all_abstain' => false,
+                ],
+            ],
+        ]);
 
 Custom Access Decision Strategy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -469,15 +471,17 @@ option to use a custom service (your service must implement the
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\MyCustomAccessDecisionStrategy;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->accessDecisionManager()
-                ->strategyService(MyCustomAccessDecisionStrategy::class)
-                // ...
-            ;
-        };
+        use App\Security\MyCustomAccessDecisionStrategy;
+
+        return App::config([
+            'security' => [
+                'access_decision_manager' => [
+                    'strategy_service' => MyCustomAccessDecisionStrategy::class,
+                ],
+            ],
+        ]);
 
 When creating custom decision strategies, you can store additional data in votes
 to be used later when making a decision. For example, if not all votes should
@@ -549,12 +553,14 @@ must implement the :class:`Symfony\\Component\\Security\\Core\\Authorization\\Ac
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\MyCustomAccessDecisionManager;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->accessDecisionManager()
-                ->service(MyCustomAccessDecisionManager::class)
-                // ...
-            ;
-        };
+        use App\Security\MyCustomAccessDecisionManager;
+
+        return App::config([
+            'security' => [
+                'access_decision_manager' => [
+                    'service' => MyCustomAccessDecisionManager::class,
+                ],
+            ],
+        ]);

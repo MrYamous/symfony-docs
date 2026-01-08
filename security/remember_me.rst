@@ -29,22 +29,25 @@ the session lasts using a cookie with the ``remember_me`` firewall option:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
+        return App::config([
+            'security' => [
                 // ...
-                ->rememberMe()
-                    ->secret('%kernel.secret%')
-                    ->lifetime(604800) // 1 week in seconds
-
-                    // by default, the feature is enabled by checking a
-                    // checkbox in the login form (see below), uncomment
-                    // the following line to always enable it.
-                    // ->alwaysRememberMe(true)
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'remember_me' => [
+                            'secret' => param('kernel.secret'),
+                            'lifetime' => 604800, // 1 week in seconds
+                            // by default, the feature is enabled by checking a
+                            // checkbox in the login form (see below), uncomment the
+                            // following line to always enable it.
+                            // 'always_remember_me' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 After enabling the ``remember_me`` system in the configuration, there are a
 couple more things to do before remember me works correctly:
@@ -142,17 +145,20 @@ allow users to opt-out. In these cases, you can use the
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
+        return App::config([
+            'security' => [
             // ...
-            $security->firewall('main')
-                // ...
-                ->rememberMe()
-                    // ...
-                    ->alwaysRememberMe(true)
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'remember_me' => [
+                            'always_remember_me' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Now, no request parameter is checked and each successful authentication
 will produce a remember me cookie.
@@ -278,17 +284,19 @@ are fetched from the user object using the
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
-                // ...
-                ->rememberMe()
-                    // ...
-                    ->signatureProperties(['password', 'updatedAt'])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'remember_me' => [
+                            'signature_properties' => ['password', 'updatedAt'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 In this example, the remember me cookie will no longer be considered valid
 if the ``updatedAt``, password or user identifier for this user changes.
@@ -335,19 +343,21 @@ You can enable the doctrine token provider using the ``doctrine`` setting:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
-                // ...
-                ->rememberMe()
-                    // ...
-                    ->tokenProvider([
-                        'doctrine' => true,
-                    ])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'remember_me' => [
+                            'token_provider' => [
+                                'doctrine' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 This also instructs Doctrine to create a table for the remember me tokens.
 If you use the DoctrineMigrationsBundle, you can create a new migration for
@@ -397,20 +407,24 @@ Then, configure the service ID of your custom token provider as ``service``:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\RememberMe\CustomTokenProvider;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
+        use App\Security\RememberMe\CustomTokenProvider;
+
+        return App::config([
+            'security' => [
                 // ...
-                ->rememberMe()
-                    // ...
-                    ->tokenProvider([
-                        'service' => CustomTokenProvider::class,
-                    ])
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'remember_me' => [
+                            'token_provider' => [
+                                'service' => CustomTokenProvider::class,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _security-remember-me-authorization:
 

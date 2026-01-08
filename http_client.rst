@@ -102,14 +102,17 @@ You can configure the global options using the ``default_options`` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()
-                ->defaultOptions()
-                    ->maxRedirects(7)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'default_options' => [
+                        'max_redirects' => 7,
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -169,14 +172,15 @@ This option cannot be overridden per request:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()
-                ->maxHostConnections(10)
-                // ...
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'max_host_connections' => 10,
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -219,26 +223,34 @@ autoconfigure the HTTP client based on the requested URL:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // only requests matching scope will use these options
-            $framework->httpClient()->scopedClient('github.client')
-                ->scope('https://api\.github\.com')
-                ->header('Accept', 'application/vnd.github.v3+json')
-                ->header('Authorization', 'token %env(GITHUB_API_TOKEN)%')
-                // ...
-            ;
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        // only requests matching scope will use these options
+                        'github.client' => [
+                            'scope' => 'https://api\.github\.com',
+                            'headers' => [
+                                'Accept' => 'application/vnd.github.v3+json',
+                                'Authorization' => 'token %env(GITHUB_API_TOKEN)%',
+                            ],
+                        ],
 
-            // using base_url, relative URLs (e.g. request("GET", "/repos/symfony/symfony-docs"))
-            // will default to these options
-            $framework->httpClient()->scopedClient('github.client')
-                ->baseUri('https://api.github.com')
-                ->header('Accept', 'application/vnd.github.v3+json')
-                ->header('Authorization', 'token %env(GITHUB_API_TOKEN)%')
-                // ...
-            ;
-        };
+                        // using base_uri, relative URLs (e.g. request("GET", "/repos/symfony/symfony-docs"))
+                        // will default to these options
+                        'github.client' => [
+                            'base_uri' => 'https://api.github.com',
+                            'headers' => [
+                                'Accept' => 'application/vnd.github.v3+json',
+                                'Authorization' => 'token %env(GITHUB_API_TOKEN)%',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -356,21 +368,28 @@ each request (which overrides any global authentication):
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()->scopedClient('example_api')
-                ->baseUri('https://example.com/')
-                // HTTP Basic authentication
-                ->authBasic('the-username:the-password')
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        'example_api' => [
+                            'base_uri' => 'https://example.com/',
 
-                // HTTP Bearer authentication (also called token authentication)
-                ->authBearer('the-bearer-token')
+                            // HTTP Basic authentication
+                            'auth_basic' => 'the-username:the-password',
 
-                // Microsoft NTLM authentication
-                ->authNtlm('the-username:the-password')
-            ;
-        };
+                            // HTTP Bearer authentication (also called token authentication)
+                            'auth_bearer' => 'the-bearer-token',
+
+                            // Microsoft NTLM authentication
+                            'auth_ntlm' => 'the-username:the-password',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -443,14 +462,19 @@ Use the ``headers`` option to define the default headers added to all requests:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()
-                ->defaultOptions()
-                    ->header('User-Agent', 'My Fancy App')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'default_options' => [
+                        'headers' => [
+                            'User-Agent' => 'My Fancy App',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -840,14 +864,19 @@ of your application:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework) {
-            $framework->httpClient()
-                ->defaultOptions()
-                    ->vars(['secret' => 'secret-token'])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'default_options' => [
+                        'vars' => [
+                            'secret' => 'secret-token',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 If you want to define your own logic to handle variables of URI templates, you
 can do so by redefining the ``http_client.uri_template_expander`` alias. Your
@@ -976,14 +1005,17 @@ To force HTTP/2 for ``http`` URLs, you need to enable it explicitly via the
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()
-                ->defaultOptions()
-                    ->httpVersion('2.0')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'default_options' => [
+                        'http_version' => '2.0',
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -1473,25 +1505,28 @@ installed in your application::
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()->scopedClient('example.client')
-                ->baseUri('https://example.com')
-                ->rateLimiter('http_example_limiter');
-                // ...
-            ;
-
-            $framework->rateLimiter()
-                // Don't send more than 10 requests in 5 seconds
-                ->limiter('http_example_limiter')
-                    ->policy('token_bucket')
-                    ->limit(10)
-                    ->rate()
-                        ->interval('5 seconds')
-                        ->amount(10)
-                ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        'example.client' => [
+                            'base_uri' => 'https://example.com',
+                            'rate_limiter' => 'http_example_limiter',
+                        ],
+                    ],
+                    'rate_limiter' => [
+                        // Don't send more than 10 requests in 5 seconds
+                        'http_example_limiter' => [
+                            'policy' => 'token_bucket',
+                            'limit' => 10,
+                            'rate' => ['interval' => '5 seconds', 'amount' => 10],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -2085,26 +2120,26 @@ Then configure Symfony to use your callback:
 
     .. code-block:: yaml
 
-        # config/services_test.yaml
-        services:
-            # ...
-            App\Tests\MockClientCallback: ~
-
-        # config/packages/test/framework.yaml
-        framework:
-            http_client:
-                mock_response_factory: App\Tests\MockClientCallback
+        # config/packages/framework.yaml
+        when@test:
+            framework:
+                http_client:
+                    mock_response_factory: App\Tests\MockClientCallback
 
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()
-                ->mockResponseFactory(MockClientCallback::class)
-            ;
-        };
+        use App\Tests\MockClientCallback;
+
+        return App::config([
+            'when@test' => 'framework' => [
+                'http_client' => [
+                    'mock_response_factory' => MockClientCallback::class,
+                ],
+            ],
+        ]);
 
 To return json, you would normally do::
 

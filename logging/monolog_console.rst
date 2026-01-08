@@ -79,31 +79,43 @@ The Monolog console handler is enabled by default:
 
     .. code-block:: yaml
 
-        # config/packages/dev/monolog.yaml
-        monolog:
-            handlers:
-                # ...
-                console:
-                    type:   console
-                    process_psr_3_messages: false
-                    channels: ['!event', '!doctrine', '!console']
+        # config/packages/monolog.yaml
+        when@dev:
+            monolog:
+                handlers:
+                    # ...
+                    console:
+                        type:   console
+                        process_psr_3_messages: false
+                        channels: ['!event', '!doctrine', '!console']
 
-                    # optionally configure the mapping between verbosity levels and log levels
-                    # verbosity_levels:
-                    #     VERBOSITY_NORMAL: NOTICE
+                        # optionally configure the mapping between verbosity levels and log levels
+                        # verbosity_levels:
+                        #     VERBOSITY_NORMAL: NOTICE
 
     .. code-block:: php
 
-        // config/packages/dev/monolog.php
-        use Symfony\Config\MonologConfig;
+        // config/packages/monolog.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (MonologConfig $monolog): void {
-            $monolog->handler('console')
-                ->type('console')
-                ->processPsr3Messages(false)
-                ->channels()->elements(['!event', '!doctrine', '!console'])
-            ;
-        };
+        return App::config([
+            'when@dev' => [
+                'monolog' => [
+                    'handlers' => [
+                        'console' => [
+                            'type' => 'console',
+                            'process_psr_3_messages' => false,
+                            'channels' => ['!event', '!doctrine', '!console'],
+
+                            // optionally configure the mapping between verbosity levels and log levels
+                            // 'verbosity_levels' => [
+                            //     'VERBOSITY_NORMAL' => 'NOTICE',
+                            // ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Now, log messages will be shown on the console based on the log levels and verbosity.
 By default (normal verbosity level), warnings and higher will be shown. But in

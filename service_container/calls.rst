@@ -47,12 +47,15 @@ To configure the container to call the ``setLogger`` method, use the ``calls`` k
 
         use App\Service\MessageGenerator;
 
-        return function(ContainerConfigurator $container): void {
-            // ...
-
-            $services->set(MessageGenerator::class)
-                ->call('setLogger', [service('logger')]);
-        };
+        return App::config([
+            'services' => [
+                MessageGenerator::class => [
+                    'calls' => [
+                        'setLogger' => [service('logger')],
+                    ],
+                ],
+            ],
+        ]);
 
 To provide immutable services, some classes implement immutable setters.
 Such setters return a new instance of the configured class
@@ -96,11 +99,19 @@ The configuration to tell the container it should do so would be like:
     .. code-block:: php
 
         // config/services.php
-        use App\Service\MessageGenerator;
-        use Symfony\Component\DependencyInjection\Reference;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        $container->register(MessageGenerator::class)
-            ->addMethodCall('withLogger', [new Reference('logger')], true);
+        use App\Service\MessageGenerator;
+
+        return App::config([
+            'services' => [
+                MessageGenerator::class => [
+                    'calls' => [
+                        ['withLogger', [service('logger')], true],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 

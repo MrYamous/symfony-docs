@@ -38,12 +38,15 @@ over SMTP by configuring the DSN in your ``.env`` file (the ``user``,
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->mailer()->dsn(env('MAILER_DSN'));
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'dsn' => env('MAILER_DSN'),
+                ],
+            ],
+        ]);
 
 .. warning::
 
@@ -777,20 +780,23 @@ and headers.
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $mailer = $framework->mailer();
-            $mailer
-                ->envelope()
-                    ->sender('fabien@example.com')
-                    ->recipients(['foo@example.com', 'bar@example.com'])
-            ;
-
-            $mailer->header('From')->value('Fabien <fabien@example.com>');
-            $mailer->header('Bcc')->value('baz@example.com');
-            $mailer->header('X-Custom-Header')->value('foobar');
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'envelope' => [
+                        'sender' => 'fabien@example.com',
+                        'recipients' => ['foo@example.com', 'bar@example.com'],
+                    ],
+                    'headers' => [
+                        'From' => 'Fabien <fabien@example.com>',
+                        'Bcc' => 'baz@example.com',
+                        'X-Custom-Header' => 'foobar',
+                    ],
+                ],
+            ],
+        ]);
 
 .. warning::
 
@@ -1006,14 +1012,17 @@ image files as usual. First, to simplify things, define a Twig namespace called
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-
-            // point this wherever your images live
-            $twig->path('%kernel.project_dir%/assets/images', 'images');
-        };
+        return App::config([
+            'twig' => [
+                // ...
+                'paths' => [
+                    // point this wherever your images live
+                    '%kernel.project_dir%/assets/images' => 'images',
+                ],
+            ],
+        ]);
 
 Now, use the special ``email.image()`` Twig helper to embed the images inside
 the email contents:
@@ -1105,14 +1114,17 @@ called ``styles`` that points to the directory where ``email.css`` lives:
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-
-            // point this wherever your css files live
-            $twig->path('%kernel.project_dir%/assets/styles', 'styles');
-        };
+        return App::config([
+            'twig' => [
+                // ...
+                'paths' => [
+                    // point this wherever your css files live
+                    '%kernel.project_dir%/assets/styles' => 'styles',
+                ],
+            ],
+        ]);
 
 .. _mailer-markdown:
 
@@ -1344,22 +1356,24 @@ minimizes repetition and centralizes your configuration for DKIM and S/MIME sign
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $mailer = $framework->mailer();
-            $mailer->dsn('%env(MAILER_DSN)%');
-            $mailer->dkimSigner()
-                    ->key('file://%kernel.project_dir%/var/certificates/dkim.pem')
-                    ->domain('symfony.com')
-                    ->select('s1');
-
-            $mailer->smimeSigner()
-                    ->key('%kernel.project_dir%/var/certificates/smime.key')
-                    ->certificate('%kernel.project_dir%/var/certificates/smime.crt')
-                    ->passphrase('')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'dkim_signer' => [
+                        'key' => 'file://%kernel.project_dir%/var/certificates/dkim.pem',
+                        'domain' => 'symfony.com',
+                        'select' => 's1',
+                    ],
+                    'smime_signer' => [
+                        'key' => '%kernel.project_dir%/var/certificates/smime.key',
+                        'certificate' => '%kernel.project_dir%/var/certificates/smime.crt',
+                        'passphrase' => '',
+                    ],
+                ],
+            ],
+        ]);
 
 Encrypting Messages
 ~~~~~~~~~~~~~~~~~~~
@@ -1421,15 +1435,19 @@ encrypter that automatically applies to all outgoing messages:
     .. code-block:: php
 
         // config/packages/mailer.php
-        use App\Security\LocalFileCertificateRepository;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $mailer = $framework->mailer();
-            $mailer->smimeEncrypter()
-                    ->repository(LocalFileCertificateRepository::class)
-            ;
-        };
+        use App\Security\LocalFileCertificateRepository;
+
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'smime_encrypter' => [
+                        'repository' => LocalFileCertificateRepository::class,
+                    ],
+                ],
+            ],
+        ]);
 
 The ``repository`` option is the ID of a service that implements
 :class:`Symfony\\Component\\Mailer\\EventListener\\SmimeCertificateRepositoryInterface`.
@@ -1480,15 +1498,18 @@ This can be configured by replacing the ``dsn`` configuration entry with a
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->mailer()
-                ->transport('main', env('MAILER_DSN'))
-                ->transport('alternative', env('MAILER_DSN_IMPORTANT'))
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'transports' => [
+                        'main' => env('MAILER_DSN'),
+                        'alternative' => env('MAILER_DSN_IMPORTANT'),
+                    ],
+                ],
+            ],
+        ]);
 
 By default the first transport is used. The other transports can be selected by
 adding an ``X-Transport`` header (which Mailer will remove automatically from
@@ -1532,16 +1553,22 @@ you have a transport called ``async``, you can route the message there:
     .. code-block:: php
 
         // config/packages/messenger.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->messenger()
-                ->transport('async')->dsn(env('MESSENGER_TRANSPORT_DSN'));
+        use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 
-            $framework->messenger()
-                ->routing('Symfony\Component\Mailer\Messenger\SendEmailMessage')
-                ->senders(['async']);
-        };
+        return App::config([
+            'framework' => [
+                'messenger' => [
+                    'transports' => [
+                        'async' => env('MESSENGER_TRANSPORT_DSN'),
+                    ],
+                    'routing' => [
+                        SendEmailMessage::class => 'async',
+                    ],
+                ],
+            ],
+        ]);
 
 Thanks to this, instead of being delivered immediately, messages will be sent
 to the transport to be handled later (see :ref:`messenger-worker`). Note that
@@ -1587,12 +1614,15 @@ disable asynchronous delivery.
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->mailer()
-                ->messageBus('app.another_bus');
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'message_bus' => 'app.another_bus',
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -1855,13 +1885,15 @@ the mailer configuration file (e.g. in the ``dev`` or ``test`` environments):
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->mailer()
-                ->dsn('null://null');
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'dsn' => 'null://null',
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -1888,15 +1920,17 @@ a specific address, instead of the *real* address:
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->mailer()
-                ->envelope()
-                    ->recipients(['youremail@example.com'])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'envelope' => [
+                        'recipients' => ['youremail@example.com'],
+                    ],
+                ],
+            ],
+        ]);
 
 Use the ``allowed_recipients`` option to define specific addresses that should
 still receive their original emails. These messages will also be sent to the
@@ -1920,20 +1954,22 @@ address(es) defined in ``recipients``, as with all other emails:
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->mailer()
-                ->envelope()
-                    ->recipients(['youremail@example.com'])
-                    ->allowedRecipients([
-                        'internal@example.com',
-                        // you can also use regular expression to define allowed recipients
-                        'internal-.*@example.(com|fr)',
-                    ])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'envelope' => [
+                        'recipients' => ['youremail@example.com'],
+                        'allowed_recipients' => [
+                            'internal@example.com',
+                            // you can also use regular expression to define allowed recipients
+                            'internal-.*@example.(com|fr)',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 With this configuration, all emails will be sent to ``youremail@example.com``.
 Additionally, emails sent to ``internal@example.com``, ``internal-monitoring@example.fr``,

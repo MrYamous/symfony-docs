@@ -56,9 +56,11 @@ container into a single file, which could improve performance when using
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $container->parameters()->set('.container.dumper.inline_factories', true);
-        };
+        return App::config([
+            'parameters' => [
+                '.container.dumper.inline_factories' => true,
+            ],
+        ]);
 
 .. _performance-use-opcache:
 
@@ -220,9 +222,13 @@ in performance, you can stop generating the file as follows:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-        $container->parameters()->set('debug.container.dump', false);
+        return App::config([
+            'parameters' => [
+                'debug.container.dump' => false,
+            ],
+        ]);
 
 .. _profiling-applications:
 

@@ -342,13 +342,13 @@ can set this option to generate forms compatible with the Bootstrap 5 CSS framew
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->formThemes(['bootstrap_5_layout.html.twig']);
-
-            // ...
-        };
+        return App::config([
+            'twig' => [
+                'form_themes' => ['bootstrap_5_layout.html.twig'],
+            ],
+        ]);
 
 The :ref:`built-in Symfony form themes <symfony-builtin-forms>` include
 Bootstrap 3, 4 and 5, Foundation 5 and 6, as well as Tailwind 2. You can also

@@ -292,13 +292,15 @@ Then, define a service for this class:
 
         use App\Service\FileUploader;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(FileUploader::class)
-                ->arg('$targetDirectory', '%brochures_directory%')
-            ;
-        };
+        return App::config([
+            'services' => [
+                FileUploader::class => [
+                    'arguments' => [
+                        '$targetDirectory' => param('brochures_directory'),
+                    ],
+                ],
+            ],
+        ]);
 
 Now you're ready to use this service in the controller::
 

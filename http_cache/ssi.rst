@@ -55,13 +55,15 @@ First, to use SSI, be sure to enable it in your application configuration:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->ssi()
-                ->enabled(true)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'ssi' => [
+                    'enabled' => true,
+                ],
+            ],
+        ]);
 
 Suppose you have a page with private content like a Profile page and you want
 to cache a static GDPR content block. With SSI, you can add some expiration
