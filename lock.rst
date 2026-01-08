@@ -250,7 +250,7 @@ processes asking for the same ``$version``::
 Naming Locks
 ------------
 
-If the application needs different kind of Stores alongside each other, Symfony
+If the application needs different kinds of stores alongside each other, Symfony
 provides :ref:`named lock <reference-lock-resources-name>`:
 
 .. configuration-block::
@@ -310,7 +310,7 @@ For example, to inject the ``invoice`` package defined earlier::
     {
         public function __construct(
             private LockFactory $invoiceLockFactory
-        ): void {
+        ) {
             // ...
         }
     }
@@ -330,7 +330,7 @@ For example, to select the ``invoice`` lock defined earlier::
     {
         public function __construct(
             #[Target('invoice')] private LockFactory $lockFactory
-        ): void {
+        ) {
             // ...
         }
     }
