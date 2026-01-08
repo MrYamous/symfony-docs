@@ -188,7 +188,7 @@ to inject the ``foo_package`` package defined earlier::
     {
         public function __construct(
             private PackageInterface $fooPackage
-        ): void {
+        ) {
             // ...
         }
     }
@@ -208,7 +208,7 @@ For example, to select the ``foo_package`` package defined earlier::
     {
         public function __construct(
             #[Target('foo_package')] private PackageInterface $package
-        ): void {
+        ) {
             // ...
         }
     }
