@@ -55,9 +55,9 @@ normalization process::
 
         public function getSupportedTypes(?string $format): array
         {
-            return [
+            return App::config([
                 Topic::class => true,
-            ];
+            ]);
         }
     }
 
@@ -93,17 +93,16 @@ If you're not using ``autoconfigure``, you have to tag the service with
 
         use App\Serializer\TopicNormalizer;
 
-        return function(ContainerConfigurator $container) {
-            // ...
-
-            // if you're using autoconfigure, the tag will be automatically applied
-            $services->set(TopicNormalizer::class)
-                // register the normalizer with a high priority (called earlier)
-                ->tag('serializer.normalizer', [
-                    'priority' => 500,
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                TopicNormalizer::class => [
+                    'tags' => [
+                        // register the normalizer with a high priority (called earlier)
+                        ['serializer.normalizer' => ['priority' => 500]],
+                    ],
+                ],
+            ],
+        ]);
 
 Improving Performance of Normalizers/Denormalizers
 --------------------------------------------------
@@ -142,11 +141,11 @@ Here is an example of how to use the ``getSupportedTypes()`` method::
 
         public function getSupportedTypes(?string $format): array
         {
-            return [
+            return App::config([
                 'object' => null,             // doesn't support any classes or interfaces
                 '*' => false,                 // supports any other types, but the decision is not cacheable
                 MyCustomClass::class => true, // supports MyCustomClass and decision is cacheable
-            ];
+            ]);
         }
     }
 

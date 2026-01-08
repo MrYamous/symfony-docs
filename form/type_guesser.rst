@@ -194,11 +194,17 @@ and tag it with ``form.type_guesser``:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Form\TypeGuesser\PhpDocTypeGuesser;
 
-        $container->register(PhpDocTypeGuesser::class)
-            ->addTag('form.type_guesser')
-        ;
+        return App::config([
+            'services' => [
+                PhpDocTypeGuesser::class => [
+                    'tags' => ['form.type_guesser'],
+                ],
+            ],
+        ]);
 
 .. sidebar:: Registering a Type Guesser in the Component
 

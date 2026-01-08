@@ -304,23 +304,26 @@ configuration <config-framework-session>` in
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Component\HttpFoundation\Cookie;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                // Enables session support. Note that the session will ONLY be started if you read or write from it.
-                // Remove or comment this section to explicitly disable session support.
-                ->enabled(true)
-                // ID of the service used for session storage
-                // NULL means that Symfony uses PHP default session mechanism
-                ->handlerId(null)
-                // improves the security of the cookies used for sessions
-                ->cookieSecure('auto')
-                ->cookieSamesite(Cookie::SAMESITE_LAX)
-                ->storageFactoryId('session.storage.factory.native')
-            ;
-        };
+        use Symfony\Component\HttpFoundation\Cookie;
+
+        return App::config([
+            'framework' => [
+                'session' => [
+                    // Enables session support. Note that the session will ONLY be started if you read or write from it.
+                    // Remove or comment this section to explicitly disable session support.
+                    'enabled' => true,
+                    // ID of the service used for session storage
+                    // NULL means that Symfony uses PHP default session mechanism
+                    'handler_id' => null,
+                    // improves the security of the cookies used for sessions
+                    'cookie_secure' => 'auto',
+                    'cookie_samesite' => Cookie::SAMESITE_LAX,
+                    'storage_factory_id' => 'session.storage.factory.native',
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -361,15 +364,17 @@ session metadata files:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                // ...
-                ->handlerId('session.handler.native_file')
-                ->savePath('%kernel.project_dir%/var/sessions/%kernel.environment%')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    // ...
+                    'handler_id' => 'session.handler.native_file',
+                    'save_path' => '%kernel.project_dir%/var/sessions/%kernel.environment%',
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -541,27 +546,35 @@ a Symfony service for the connection to the Redis server:
     .. code-block:: php
 
         // config/services.php
-        use Symfony\Component\DependencyInjection\Reference;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
-        $container
-            // you can also use \RedisArray, \RedisCluster, \Relay\Relay or \Predis\Client classes
-            ->register('Redis', \Redis::class)
-            ->addMethodCall('connect', ['%env(REDIS_HOST)%', '%env(int:REDIS_PORT)%'])
-            // uncomment the following if your Redis server requires a password:
-            // ->addMethodCall('auth', ['%env(REDIS_PASSWORD)%'])
-            // uncomment the following if your Redis server requires a user and a password (when user is not default):
-            // ->addMethodCall('auth', ['%env(REDIS_USER)%', '%env(REDIS_PASSWORD)%'])
-
-            ->register(RedisSessionHandler::class)
-            ->addArgument(
-                new Reference('Redis'),
-                // you can optionally pass an array of options. The only options are 'prefix' and 'ttl',
-                // which define the prefix to use for the keys to avoid collision on the Redis server
-                // and the expiration time for any given entry (in seconds), defaults are 'sf_s' and null:
-                // ['prefix' => 'my_prefix', 'ttl' => 600],
-            )
-        ;
+        return App::config([
+            'services' => [
+                // ...
+                RedisSessionHandler::class => [
+                    'arguments' => [
+                        service('Redis'),
+                        // you can optionally pass an array of options. The only options are 'prefix' and 'ttl',
+                        // which define the prefix to use for the keys to avoid collision on the Redis server
+                        // and the expiration time for any given entry (in seconds), defaults are 'sf_s' and null:
+                        // ['prefix' => 'my_prefix', 'ttl' => 600],
+                    ],
+                ],
+                \Redis::class => [
+                    // you can also use \RedisArray, \RedisCluster, \Relay\Relay or \Predis\Client classes
+                    'class' => \Redis::class,
+                    'calls' => [
+                        'connect' => [env('REDIS_HOST'), env('REDIS_PORT')->int()],
+                        // uncomment the following if your Redis server requires a password:
+                        // 'auth' => [env('REDIS_PASSWORD')],
+                        // uncomment the following if your Redis server requires a user and a password (when user is not default):
+                        // 'auth' => [env('REDIS_USER'), env('REDIS_PASSWORD')],
+                    ],
+                ],
+            ],
+        ]);
 
 Next, use the :ref:`handler_id <config-framework-session-handler-id>`
 configuration option to tell Symfony to use this service as the session handler:
@@ -579,15 +592,18 @@ configuration option to tell Symfony to use this service as the session handler:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->session()
-                ->handlerId(RedisSessionHandler::class)
-            ;
-        };
+        use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
+
+        return App::config([
+            'framework' => [
+                // ...
+                'session' => [
+                    'handler_id' => RedisSessionHandler::class,
+                ],
+            ],
+        ]);
 
 Symfony will now use your Redis server to read and write the session data. The
 main drawback of this solution is that Redis does not perform session locking,
@@ -640,18 +656,19 @@ To use it, first register a new handler service with your database credentials:
 
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(PdoSessionHandler::class)
-                ->args([
-                    env('DATABASE_URL'),
-                    // you can also use PDO configuration, but requires passing two arguments:
-                    // 'mysql:dbname=mydatabase; host=myhost; port=myport',
-                    // ['db_username' => 'myuser', 'db_password' => 'mypassword'],
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // ...
+                PdoSessionHandler::class => [
+                    'arguments' => [
+                        env('DATABASE_URL'),
+                        // you can also use PDO configuration, but requires passing two arguments
+                        // 'mysql:dbname=mydatabase; host=myhost; port=myport',
+                        // ['db_username' => 'myuser', 'db_password' => 'mypassword'],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -674,15 +691,18 @@ configuration option to tell Symfony to use this service as the session handler:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
+        use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
+
+        return App::config([
+            'framework' => [
             // ...
-            $framework->session()
-                ->handlerId(PdoSessionHandler::class)
-            ;
-        };
+                'session' => [
+                    'handler_id' => PdoSessionHandler::class,
+                ],
+            ],
+        ]);
 
 Configuring the Session Table and Column Names
 ..............................................
@@ -711,16 +731,17 @@ passed to the ``PdoSessionHandler`` service:
 
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(PdoSessionHandler::class)
-                ->args([
-                    env('DATABASE_URL'),
-                    ['db_table' => 'customer_session', 'db_id_col' => 'guid'],
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // ...
+                PdoSessionHandler::class => [
+                    'arguments' => [
+                        env('DATABASE_URL'),
+                        ['db_table' => 'customer_session', 'db_id_col' => 'guid'],
+                    ],
+                ],
+            ],
+        ]);
 
 These are parameters that you can configure:
 
@@ -886,16 +907,17 @@ the MongoDB connection as argument, and the required parameters:
 
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(MongoDbSessionHandler::class)
-                ->args([
-                    service('doctrine_mongodb.odm.default_connection'),
-                    ['database' => '%env("MONGODB_DB")%', 'collection' => 'sessions']
-                ])
-            ;
-        };
+        return App::config([
+            'services' => [
+                // ...
+                MongoDbSessionHandler::class => [
+                    'arguments' => [
+                        service('doctrine_mongodb.odm.default_connection'),
+                        ['database' => env('MONGODB_DB'), 'collection' => 'sessions'],
+                    ],
+                ],
+            ],
+        ]);
 
 Next, use the :ref:`handler_id <config-framework-session-handler-id>`
 configuration option to tell Symfony to use this service as the session handler:
@@ -913,15 +935,18 @@ configuration option to tell Symfony to use this service as the session handler:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->session()
-                ->handlerId(MongoDbSessionHandler::class)
-            ;
-        };
+        use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
+
+        return App::config([
+            'framework' => [
+                // ...
+                'session' => [
+                    'handler_id' => MongoDbSessionHandler::class,
+                ],
+            ],
+        ]);
 
 That's all! Symfony will now use your MongoDB server to read and write the
 session data. You do not need to do anything to initialize your session
@@ -964,21 +989,22 @@ configure these values with the second argument passed to the
 
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
-        return static function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(MongoDbSessionHandler::class)
-                ->args([
-                    service('doctrine_mongodb.odm.default_connection'),
-                    [
-                        'database' => '%env('MONGODB_DB')%',
-                        'collection' => 'sessions'
-                        'id_field' => '_guid',
-                        'expiry_field' => 'eol',
+        return App::config([
+            'services' => [
+                // ...
+                MongoDbSessionHandler::class => [
+                    'arguments' => [
+                        service('doctrine_mongodb.odm.default_connection'),
+                        [
+                            'database' => env('MONGODB_DB'),
+                            'collection' => 'sessions',
+                            'id_field' => '_guid',
+                            'expiry_field' => 'eol',
+                        ],
                     ],
-                ])
-            ;
-        };
+                ],
+            ],
+        ]);
 
 These are parameters that you can configure:
 
@@ -1052,14 +1078,21 @@ You need to pass the TTL in the options array of the session handler you are usi
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
-        $services
-            ->set(RedisSessionHandler::class)
-            ->args([
-                service('Redis'),
-                ['ttl' => 600],
-            ]);
+        return App::config([
+            'services' => [
+                // ...
+                RedisSessionHandler::class => [
+                    'arguments' => [
+                        service('Redis'),
+                        ['ttl' => 600],
+                    ],
+                ],
+            ],
+        ]);
 
 Configure the TTL Dynamically at Runtime
 ........................................
@@ -1090,20 +1123,27 @@ has to return an integer which will be used as TTL.
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use App\Some\InvokableClass;
         use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
-        $services
-            ->set(RedisSessionHandler::class)
-            ->args([
-                service('Redis'),
-                ['ttl' => closure(service('my.ttl.handler'))],
-            ]);
-
-        $services
-            // some class with an __invoke() method
-            ->set('my.ttl.handler', 'Some\InvokableClass')
-            // Inject whatever dependencies you need to be able to resolve a TTL for the current session
-            ->args([service('security')]);
+        return App::config([
+            'services' => [
+                // ...
+                RedisSessionHandler::class => [
+                    'arguments' => [
+                        service('Redis'),
+                        ['ttl' => closure(service('my.ttl.handler'))],
+                    ],
+                ],
+                'my.ttl.handler' => [
+                    'class' => InvokableClass::class,
+                    // Inject whatever dependencies you need to be able to resolve a TTL for the current session
+                    'arguments' => [service('security')],
+                ],
+            ],
+        ]);
 
 .. _locale-sticky-session:
 
@@ -1153,10 +1193,10 @@ can determine the correct locale however you want::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 // must be registered before (i.e. with a higher priority than) the default Locale listener
                 KernelEvents::REQUEST => [['onKernelRequest', 20]],
-            ];
+            ]);
         }
     }
 
@@ -1190,13 +1230,20 @@ via some "Change Locale" route & controller), or create a route with the
         .. code-block:: php
 
             // config/services.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
             use App\EventSubscriber\LocaleSubscriber;
 
-            $container->register(LocaleSubscriber::class)
-                ->addArgument('%kernel.default_locale%')
-                // uncomment the next line if you are not using autoconfigure
-                // ->addTag('kernel.event_subscriber')
-            ;
+            return App::config([
+                'services' => [
+                    // ...
+                    LocaleSubscriber::class => [
+                        'arguments' => [param('kernel.default_locale')],
+                        // uncomment the next line if you are not using autoconfigure
+                        // 'tags' => ['kernel.event_subscriber'],
+                    ],
+                ],
+            ]);
 
 Now celebrate by changing the user's locale and seeing that it's sticky
 throughout the request.
@@ -1258,9 +1305,9 @@ event::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 LoginSuccessEvent::class => 'onLoginSuccess',
-            ];
+            ]);
         }
     }
 
@@ -1300,15 +1347,18 @@ Symfony to use your session handler instead of the default one:
     .. code-block:: php
 
         // config/packages/framework.php
-        use App\Session\CustomSessionHandler;
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
+        use App\Session\CustomSessionHandler;
+
+        return App::config([
+            'framework' => [
             // ...
-            $framework->session()
-                ->handlerId(CustomSessionHandler::class)
-            ;
-        };
+            'session' => [
+                    'handler_id' => CustomSessionHandler::class,
+                ],
+            ],
+        ]);
 
 Keep reading the next sections to learn how to use the session handlers in
 practice to solve two common use cases: encrypt session information and define
@@ -1384,22 +1434,22 @@ Then, register the ``SodiumMarshaller`` service using this key:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\Cache\Marshaller\SodiumMarshaller;
-        use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-        // ...
 
-        return function(ContainerConfigurator $container) {
-            $services = $container->services();
-
-            // ...
-
-            $services->set(SodiumMarshaller::class)
-                ->decorate('session.marshaller')
-                ->args([
-                    [env('file:resolve:SESSION_DECRYPTION_FILE')],
-                    service('.inner'),
-                ]);
-        };
+        return App::config([
+            'services' => [
+                // ...
+                SodiumMarshaller::class => [
+                    'decorates' => 'session.marshaller',
+                    'arguments' => [
+                        [env('SESSION_DECRYPTION_FILE')->resolve()->file()],
+                        service('.inner'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. danger::
 
@@ -1474,14 +1524,16 @@ for the ``handler_id``:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                ->storageFactoryId('session.storage.factory.php_bridge')
-                ->handlerId(null)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    'storage_factory_id' => 'session.storage.factory.php_bridge',
+                    'handler_id' => null,
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -1517,14 +1569,16 @@ the example below:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->session()
-                ->storageFactoryId('session.storage.factory.php_bridge')
-                ->handlerId('session.handler.native_file')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'session' => [
+                    'storage_factory_id' => 'session.storage.factory.php_bridge',
+                    'handler_id' => 'session.handler.native_file',
+                ],
+            ],
+        ]);
 
 .. note::
 

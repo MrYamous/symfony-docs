@@ -129,11 +129,11 @@ the :ref:`dump_destination option <configuration-debug-dump_destination>` of the
         // config/packages/debug.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->extension('debug', [
+        return App::config([
+            'debug' => [
                 'dump_destination' => 'tcp://%env(VAR_DUMPER_SERVER)%',
-            ]);
-        };
+            ],
+        ]);
 
 Outside a Symfony application, use the :class:`Symfony\\Component\\VarDumper\\Dumper\\ServerDumper` class::
 

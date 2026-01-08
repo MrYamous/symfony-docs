@@ -38,15 +38,20 @@ and ``signature_properties`` (explained below):
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
-                    ->signatureProperties(['id'])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            'signature_properties' => ['id'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 The ``signature_properties`` are used to create a signed URL. This must
 contain at least one property of your ``User`` object that uniquely
@@ -88,13 +93,11 @@ intercept requests to this route:
     .. code-block:: php
 
         // config/routes.php
-        use App\Controller\DefaultController;
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            // ...
-            $routes->add('login_check', '/login_check');
-        };
+        return Routes::config([
+            'login_check' => ['path' => '/login_check'],
+        ]);
 
 2) Generate the Login Link
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -307,16 +310,21 @@ seconds). You can customize this using the ``lifetime`` option:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
-                    // lifetime in seconds
-                    ->lifetime(300)
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            // lifetime in seconds
+                            'lifetime' => 300,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -370,15 +378,20 @@ You can add more properties to the ``hash`` by using the
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
-                    ->signatureProperties(['id', 'email'])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            'signature_properties' => ['id', 'email'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 The properties are fetched from the user object using the
 :doc:`PropertyAccess component </components/property_access>` (e.g. using
@@ -418,20 +431,24 @@ cache. Enable this support by setting the ``max_uses`` option:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            // only allow the link to be used 3 times
+                            'max_uses' => 3,
 
-                    // only allow the link to be used 3 times
-                    ->maxUses(3)
-
-                    // optionally, configure the cache pool
-                    //->usedLinkCache('cache.redis')
-            ;
-        };
+                            // optionally, configure the cache pool
+                            // 'used_link_cache' => 'cache.redis',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Make sure there is enough space left in the cache, otherwise invalid links
 can no longer be stored (and thus become valid again). Expired invalid
@@ -469,16 +486,21 @@ the authenticator only handle HTTP POST methods:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
-                    ->checkPostOnly(true)
-                    ->maxUses(1)
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            'check_post_only' => true,
+                            'max_uses' => 1,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Then, use the ``check_route`` controller to render a page that lets the
 user create this POST request (e.g. by clicking a button)::
@@ -592,18 +614,24 @@ Then, configure this service ID as the ``success_handler``:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Security\Authentication\AuthenticationSuccessHandler;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->firewall('main')
-                ->loginLink()
-                    ->checkRoute('login_check')
-                    ->lifetime(600)
-                    ->maxUses(1)
-                    ->successHandler(AuthenticationSuccessHandler::class)
-            ;
-        };
+        use App\Security\Authentication\AuthenticationSuccessHandler;
+
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'login_link' => [
+                            'check_route' => 'login_check',
+                            'lifetime' => 600,
+                            'max_uses' => 1,
+                            'success_handler' => AuthenticationSuccessHandler::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 

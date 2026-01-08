@@ -78,13 +78,13 @@ notify Symfony that it is an event listener by using a special "tag":
 
         use App\EventListener\ExceptionListener;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(ExceptionListener::class)
-                ->tag('kernel.event_listener')
-            ;
-        };
+        return App::config([
+            'services' => [
+                ExceptionListener::class => [
+                    'tags' => ['kernel.event_listener'],
+                ],
+            ],
+        ]);
 
 Symfony follows this logic to decide which method to call inside the event
 listener class:
@@ -250,13 +250,13 @@ via its ``ExceptionEvent`` class::
         public static function getSubscribedEvents(): array
         {
             // return the subscribed events, their methods and priorities
-            return [
+            return App::config([
                 ExceptionEvent::class => [
                     ['processException', 10],
                     ['logException', 0],
                     ['notifyException', -10],
                 ],
-            ];
+            ]);
         }
 
         public function processException(ExceptionEvent $event): void
@@ -348,9 +348,9 @@ name (FQCN) of the corresponding event class::
     {
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 RequestEvent::class => 'onKernelRequest',
-            ];
+            ]);
         }
 
         public function onKernelRequest(RequestEvent $event): void
@@ -470,9 +470,15 @@ First, define some token configuration as parameters:
     .. code-block:: php
 
         // config/services.php
-        $container->setParameter('tokens', [
-            'client1' => 'pass1',
-            'client2' => 'pass2',
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'parameters' => [
+                'tokens' => [
+                    'client1' => 'pass1',
+                    'client2' => 'pass2',
+                ],
+            ],
         ]);
 
 Tag Controllers to Be Checked
@@ -552,9 +558,9 @@ event subscribers, you can learn more about :ref:`how to use them <events-subscr
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 KernelEvents::CONTROLLER => 'onKernelController',
-            ];
+            ]);
         }
     }
 
@@ -627,10 +633,10 @@ header on the response if it's found::
 
     public static function getSubscribedEvents(): array
     {
-        return [
+        return App::config([
             KernelEvents::CONTROLLER => 'onKernelController',
             KernelEvents::RESPONSE => 'onKernelResponse',
-        ];
+        ]);
     }
 
 That's it! The ``TokenSubscriber`` is now notified before every controller is
@@ -766,9 +772,9 @@ could listen to the ``mailer.post_send`` event and change the method's return va
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 'mailer.post_send' => 'onMailerPostSend',
-            ];
+            ]);
         }
     }
 

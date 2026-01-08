@@ -121,17 +121,21 @@ should review it:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Security\ApiKeyAuthenticator;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            $security->enableAuthenticatorManager(true);
-            // ....
-
-            $security->firewall('main')
-                ->customAuthenticators([ApiKeyAuthenticator::class])
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'custom_authenticators' => [
+                            ApiKeyAuthenticator::class,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 

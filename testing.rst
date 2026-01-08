@@ -155,7 +155,8 @@ Set-up your Test Environment
 
 The tests create a kernel that runs in the ``test``
 :ref:`environment <configuration-environments>`. This allows to have
-special settings for your tests inside ``config/packages/test/``.
+special settings for your tests inside ``config/packages/test/`` or
+using the ``when@test`` key.
 
 If you have Symfony Flex installed, some packages already installed some
 useful test configuration. For example, by default, the Twig bundle is
@@ -166,18 +167,23 @@ code to production:
 
     .. code-block:: yaml
 
-        # config/packages/test/twig.yaml
-        twig:
-            strict_variables: true
+        # config/packages/twig.yaml
+        when@test:
+            twig:
+                strict_variables: true
 
     .. code-block:: php
 
-        // config/packages/test/twig.php
-        use Symfony\Config\TwigConfig;
+        // config/packages/twig.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->strictVariables(true);
-        };
+        return App::config([
+            'when@test' => [
+                'twig' => [
+                    'strict_variables' => true,
+                ],
+            ],
+        ]);
 
 You can also use a different environment entirely, or override the default
 debug mode (``true``) by passing each as options to the ``bootKernel()``

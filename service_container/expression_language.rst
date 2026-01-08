@@ -35,15 +35,17 @@ to another service: ``App\Mailer``. One way to do this is with an expression:
         use App\Mail\MailerConfiguration;
         use App\Mailer;
 
-        return function(ContainerConfigurator $container): void {
-            // ...
+        return App::config([
+            'services' => [
+                // ...
 
-            $services->set(MailerConfiguration::class);
-
-            $services->set(Mailer::class)
-                // because of the escaping applied by PHP, you must add 4 backslashes for each original backslash
-                ->args([expr("service('App\\\\Mail\\\\MailerConfiguration').getMailerMethod()")]);
-        };
+                MailerConfiguration::class => null,
+                Mailer::class => [
+                    // because of the escaping applied by PHP, you must add 4 backslashes for each original backslash
+                    'arguments' => [expr("service('App\\\\Mail\\\\MailerConfiguration').getMailerMethod()")],
+                ],
+            ],
+        ]);
 
 Learn more about the :doc:`expression language syntax </reference/formats/expression_language>`.
 
@@ -76,12 +78,13 @@ via a ``container`` variable. Here's another example:
 
         use App\Mailer;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(Mailer::class)
-                ->args([expr("container.hasParameter('some_param') ? parameter('some_param') : 'default_value'")]);
-        };
+        return App::config([
+            'services' => [
+                Mailer::class => [
+                    'arguments' => [expr("container.hasParameter('some_param') ? parameter('some_param') : 'default_value'")],
+                ],
+            ],
+        ]);
 
 Expressions can be used in ``arguments``, ``properties``, as arguments with
 ``configurator``, as arguments to ``calls`` (method calls) and in

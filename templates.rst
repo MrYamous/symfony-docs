@@ -233,18 +233,20 @@ Consider the following routing configuration:
     .. code-block:: php
 
         // config/routes.php
+        namespace Symfony\Component\Routing\Loader\Configurator;
+
         use App\Controller\BlogController;
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-        return function (RoutingConfigurator $routes): void {
-            $routes->add('blog_index', '/')
-                ->controller([BlogController::class, 'index'])
-            ;
-
-            $routes->add('blog_post', '/articles/{slug}')
-                ->controller([BlogController::class, 'show'])
-            ;
-        };
+        return Routes::config([
+            'blog_index' => [
+                'path' => '/',
+                'controller' => [BlogController::class, 'index'],
+            ],
+            'blog_post' => [
+                'path' => '/article/{slug}',
+                'controller' => [BlogController::class, 'show'],
+            ],
+        ]);
 
 Use the ``path()`` Twig function to link to these pages and pass the route name
 as the first argument and the route parameters as the optional second argument:
@@ -401,13 +403,16 @@ inside the main Twig configuration file:
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-
-            $twig->global('ga_tracking')->value('UA-xxxxx-x');
-        };
+        return App::config([
+            'twig' => [
+                // ...
+                'globals' => [
+                    'ga_tracking' => 'UA-xxxxx-x',
+                ],
+            ],
+        ]);
 
 Now, the variable ``ga_tracking`` is available in all Twig templates, so you
 can use it without having to pass it explicitly from the controller or service
@@ -421,11 +426,7 @@ In addition to static values, Twig global variables can also reference services
 from the :doc:`service container </service_container>`. The main drawback is
 that these services are not loaded lazily. In other words, as soon as Twig is
 loaded, your service is instantiated, even if you never use that global
-variable.
-
-To define a service as a global Twig variable, prefix the service ID string
-with the ``@`` character, which is the usual syntax to :ref:`refer to services
-in container parameters <service-container-parameters>`:
+variable:
 
 .. configuration-block::
 
@@ -435,20 +436,22 @@ in container parameters <service-container-parameters>`:
         twig:
             # ...
             globals:
-                # the value is the service's id
+                # the value is the service's id prefixed with '@'
                 uuid: '@App\Generator\UuidGenerator'
 
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-
-            $twig->global('uuid')->value(service('App\Generator\UuidGenerator'));
-        };
+        return App::config([
+            'twig' => [
+                // ...
+                'globals' => [
+                    'uuid' => service('App\Generator\UuidGenerator'),
+                ],
+            ],
+        ]);
 
 Now you can use the ``uuid`` variable in any Twig template to access to the
 ``UuidGenerator`` service:
@@ -540,10 +543,10 @@ to define the template to render::
             // when using the #[Template] attribute, you only need to return
             // an array with the parameters to pass to the template (the attribute
             // is the one which will create and return the Response object).
-            return [
+            return App::config([
                 'category' => '...',
                 'promotions' => ['...', '...'],
-            ];
+            ]);
         }
     }
 
@@ -601,9 +604,9 @@ a block to render::
         #[Template('product.html.twig', block: 'price_block')]
         public function price(): array
         {
-            return [
+            return App::config([
                 // ...
-            ];
+            ]);
         }
     }
 
@@ -688,13 +691,15 @@ provided by Symfony:
     .. code-block:: php
 
         // config/routes.php
-        use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            $routes->add('acme_privacy', '/privacy')
-                ->controller(TemplateController::class)
-                ->defaults([
+        use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+
+        return Routes::config([
+            'acme_privacy' => [
+                'path' => '/privacy',
+                'controller' => TemplateController::class,
+                'defaults' => [
                     // the path of the template to render
                     'template'  => 'static/privacy.html.twig',
 
@@ -718,9 +723,9 @@ provided by Symfony:
                     'headers' => [
                         'Content-Type' => 'text/html',
                     ]
-                ])
-            ;
-        };
+                ],
+            ],
+        ]);
 
 Checking if a Template Exists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -985,12 +990,16 @@ template fragments. Configure that special URL in the ``fragments`` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->fragments()->path('/_fragment');
-        };
+        return App::config([
+            'framework' => [
+                // ...
+                'fragments' => [
+                    'path' => '/_fragment',
+                ],
+            ],
+        ]);
 
 .. warning::
 
@@ -1041,14 +1050,16 @@ default content rendering some template:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->fragments()
-                ->hincludeDefaultTemplate('hinclude.html.twig')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                // ...
+                'fragments' => [
+                    'hinclude_default_template' => 'hinclude.html.twig',
+                ],
+            ],
+        ]);
 
 You can define default templates per ``render()`` function (which will override
 any global default template that is defined):
@@ -1270,16 +1281,20 @@ the ``value`` is the Twig namespace, which is explained later:
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
+        return App::config([
+            'twig' => [
+                // ...
 
-            // directories are relative to the project root dir (but you
-            // can also use absolute directories)
-            $twig->path('email/default/templates', null);
-            $twig->path('backend/templates', null);
-        };
+                // directories are relative to the project root dir (but you
+                // can also use absolute directories)
+                'paths' => [
+                    'email/default/templates' => null,
+                    'backend/templates' => null,
+                ],
+            ],
+        ]);
 
 When rendering a template, Symfony looks for it first in the ``twig.paths``
 directories that don't define a namespace and then falls back to the default
@@ -1309,14 +1324,17 @@ configuration to define a namespace for each template directory:
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-
-            $twig->path('email/default/templates', 'email');
-            $twig->path('backend/templates', 'admin');
-        };
+        return App::config([
+            'twig' => [
+                // ...
+                'paths' => [
+                    'email/default/templates' => 'email',
+                    'backend/templates' => 'admin',
+                ],
+            ],
+        ]);
 
 Now, if you render the ``layout.html.twig`` template, Symfony will render the
 ``templates/layout.html.twig`` file. Use the special syntax ``@`` + namespace to
@@ -1475,10 +1493,10 @@ callable defined in ``getFilters()``::
     {
         public function getFilters(): array
         {
-            return [
+            return App::config([
                 // the logic of this filter is now implemented in a different class
                 new TwigFilter('price', [AppRuntime::class, 'formatPrice']),
-            ];
+            ]);
         }
     }
 

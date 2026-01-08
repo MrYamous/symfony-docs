@@ -111,20 +111,19 @@ If you stored a ``DATABASE_PASSWORD`` secret, you can reference it by:
         doctrine:
             dbal:
                 password: '%env(DATABASE_PASSWORD)%'
-                # ...
-            # ...
 
     .. code-block:: php
 
         // config/packages/doctrine.php
-        use Symfony\Config\DoctrineConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $doctrine->dbal()
-                ->connection('default')
-                    ->password(env('DATABASE_PASSWORD'))
-            ;
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'password' => env('DATABASE_PASSWORD'),
+                ],
+            ],
+        ]);
 
 The actual value will be resolved at runtime: container compilation and cache
 warmup don't need the **decryption key**.
@@ -280,12 +279,14 @@ The secrets system is enabled by default and some of its behavior can be configu
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->secrets()
-                // ->vaultDirectory('%kernel.project_dir%/config/secrets/%kernel.environment%')
-                // ->localDotenvFile('%kernel.project_dir%/.env.%kernel.environment%.local')
-                // ->decryptionEnvVar('base64:default::SYMFONY_DECRYPTION_SECRET')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'secrets' => [
+                    // 'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                    // 'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
+                    // 'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
+                ],
+            ],
+        ]);

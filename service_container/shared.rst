@@ -39,12 +39,13 @@ in your service definition:
 
         use App\SomeNonSharedService;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(SomeNonSharedService::class)
-                ->share(false);
-        };
+        return App::config([
+            'services' => [
+                SomeNonSharedService::class => [
+                    'shared' => false,
+                ],
+            ],
+        ]);
 
 Now, whenever you request the ``App\SomeNonSharedService`` from the container,
 you will be passed a new instance.

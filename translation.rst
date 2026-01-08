@@ -80,16 +80,16 @@ are located:
     .. code-block:: php
 
         // config/packages/translation.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework
-                ->defaultLocale('en')
-                ->translator()
-                    ->defaultPath('%kernel.project_dir%/translations')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'default_locale' => 'en',
+                'translator' => [
+                    'default_path' => '%kernel.project_dir%/translations',
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -444,15 +444,21 @@ of your main configuration file using either ``%...%`` or ``{...}`` syntax:
     .. code-block:: php
 
         // config/packages/translator.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $translator): void {
-            // ...
-            // when using the '%' wrapping characters, you must escape them
-            $translator->globals('%%app_name%%')->value('My application');
-            $translator->globals('{app_version}')->value('1.2.3');
-            $translator->globals('{url}')->value(['message' => 'url', 'parameters' => ['scheme' => 'https://']]);
-        };
+        return App::config([
+            'framework' => [
+                // ...
+                'translator' => [
+                    'globals' => [
+                        // when using the '%' wrapping characters, you must escape them
+                        '%%app_name%%' => 'My application',
+                        '{app_version}' => '1.2.3',
+                        '{url}' => ['message' => 'url', 'parameters' => ['scheme' => 'https://']],
+                    ],
+                ],
+            ],
+        ]);
 
 Once defined, you can use these parameters in translation messages anywhere in
 your application:
@@ -613,13 +619,15 @@ if you're generating translations with specialized programs or teams.
         .. code-block:: php
 
             // config/packages/translation.php
-            use Symfony\Config\FrameworkConfig;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (FrameworkConfig $framework): void {
-                $framework->translator()
-                    ->paths(['%kernel.project_dir%/custom/path/to/translations'])
-                ;
-            };
+            return App::config([
+                'framework' => [
+                    'translator' => [
+                        'paths' => ['%kernel.project_dir%/custom/path/to/translations'],
+                    ],
+                ],
+            ]);
 
 Translations of Doctrine Entities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -716,13 +724,17 @@ configure the ``providers`` option:
     .. code-block:: php
 
         # config/packages/translation.php
-        $container->loadFromExtension('framework', [
-            'translator' => [
-                'providers' => [
-                    'loco' => [
-                        'dsn' => env('LOCO_DSN'),
-                        'domains' => ['messages'],
-                        'locales' => ['en', 'fr'],
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'translator' => [
+                    'providers' => [
+                        'loco' => [
+                            'dsn' => env('LOCO_DSN'),
+                            'domains' => ['messages'],
+                            'locales' => ['en', 'fr'],
+                        ],
                     ],
                 ],
             ],
@@ -914,17 +926,19 @@ A better policy is to include the locale in the URL using the
     .. code-block:: php
 
         // config/routes.php
-        use App\Controller\ContactController;
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            $routes->add('contact', '/{_locale}/contact')
-                ->controller([ContactController::class, 'index'])
-                ->requirements([
+        use App\Controller\ContactController;
+
+        return Routes::config([
+            'contact' => [
+                'path' => '/{_locale}/contact',
+                'controller' => [ContactController::class, 'index'],
+                'requirements' => [
                     '_locale' => 'en|fr|de',
-                ])
-            ;
-        };
+                ],
+            ],
+        ]);
 
 When using the special ``_locale`` parameter in a route, the matched locale
 is *automatically set on the Request* and can be retrieved via the
@@ -960,11 +974,13 @@ the framework:
     .. code-block:: php
 
         // config/packages/translation.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->defaultLocale('en');
-        };
+        return App::config([
+            'framework' => [
+                'default_locale' => 'en',
+            ],
+        ]);
 
 This ``default_locale`` is also relevant for the translator, as shown in the
 next section.
@@ -1026,14 +1042,15 @@ checks translation resources for several locales:
        .. code-block:: php
 
            // config/packages/translation.php
-           use Symfony\Config\FrameworkConfig;
+           namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (FrameworkConfig $framework): void {
-                // ...
-                $framework->translator()
-                    ->fallbacks(['en'])
-                ;
-            };
+            return [
+                'framework' => [
+                'translator' => [
+                    'fallbacks' => ['en'],
+                ],
+            ],
+        ];
 
 .. note::
 
@@ -1447,25 +1464,26 @@ it in the translator configuration:
     .. code-block:: php
 
         // config/packages/translation.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework) {
-            // ...
-            $framework
-                ->translator()
-                    ->pseudoLocalization()
+        return App::config([
+            'framework' => [
+                'translator' => [
+                    'pseudo_localization' => [
                         // replace characters by their accented version
-                        ->accents(true)
+                        'accents' => true,
                         // wrap strings with brackets
-                        ->brackets(true)
+                        'brackets' => true,
                         // controls how many extra characters are added to make text longer
-                        ->expansionFactor(1.4)
+                        'expansion_factor' => 1.4,
                         // maintain the original HTML tags of the translated contents
-                        ->parseHtml(true)
+                        'parse_html' => true,
                         // also translate the contents of these HTML attributes
-                        ->localizableHtmlAttributes(['title'])
-            ;
-        };
+                        'localizable_html_attributes' => ['title'],
+                    ],
+                ],
+            ],
+        ]);
 
 That's all. The application will now start displaying those strange, but
 readable, contents to help you internationalize it. See for example the

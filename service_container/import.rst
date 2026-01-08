@@ -41,9 +41,16 @@ decided to move some configuration to a new file:
     .. code-block:: php
 
         // config/services/mailer.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ... some parameters
-        // ... some services
+        return App::config([
+            'parameters' => [
+                // ... some parameters
+            ],
+            'services' => [
+                // ... some services
+            ],
+        ]);
 
 To import this file, use the ``imports`` key from any other file and pass either
 a relative or absolute path to the imported file:
@@ -72,19 +79,24 @@ a relative or absolute path to the imported file:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $container->import('services/mailer.php');
-            // If you want to import a whole directory:
-            $container->import('services/');
+        return App::config([
+            'imports' => [
+                ['resource' => 'services/mailer.php'],
+                // If you want to import a whole directory:
+                ['resource' => 'services/'],
+            ],
+            'services' => [
+                '_defaults' => [
+                    'autowire' => true,
+                    'autoconfigure' => true,
+                ],
+                'App\\' => [
+                    'resource' => '../src/*',
+                ],
 
-            $services = $container->services()
-                ->defaults()
-                    ->autowire()
-                    ->autoconfigure()
-            ;
-
-            $services->load('App\\', '../src/*');
-        };
+                // ...
+            ],
+        ]);
 
 When loading a configuration file, Symfony first processes all imported files in
 the order they are listed under the ``imports`` key. After all imports are processed,
@@ -136,23 +148,25 @@ from auto-registering classes that are defined manually elsewhere:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $container->import('services/mailer.php');
-            // If you want to import a whole directory:
-            $container->import('services/');
-
-            $services = $container->services()
-                ->defaults()
-                    ->autowire()
-                    ->autoconfigure()
-            ;
-
-            $services->load('App\\', '../src/*')
-                ->exclude([
-                    '../src/Mailer/',
-                    '../src/SpecificClass.php',
-                ]);
-        };
+        return App::config([
+            'imports' => [
+                ['resource' => 'services/mailer.php'],
+                // ... other imports
+            ],
+            'services' => [
+                '_defaults' => [
+                    'autowire' => true,
+                    'autoconfigure' => true,
+                ],
+                'App\\' => [
+                    'resource' => '../src/*',
+                    'exclude' => [
+                        '../src/Mailer/',
+                        '../src/SpecificClass.php',
+                    ],
+                ],
+            ],
+        ]);
 
 .. _import-override-services-in-the-same-file:
 
@@ -182,17 +196,24 @@ same file. These later definitions will override the auto-registered ones:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function(ContainerConfigurator $container): void {
-            $services = $container->services()
-                ->defaults()
-                    ->autowire()
-                    ->autoconfigure();
+        use App\Mailer\MyMailer;
 
-            $services->load('App\\', '../src/*');
-
-            $services->set(App\Mailer\MyMailer::class)
-                ->arg(0, '%env(MAILER_DSN)%');
-        };
+        return App::config([
+            'services' => [
+                '_defaults' => [
+                    'autowire' => true,
+                    'autoconfigure' => true,
+                ],
+                'App\\' => [
+                    'resource' => '../src/*',
+                ],
+                MyMailer::class => [
+                    'arguments' => [
+                        env('MAILER_DSN'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. _import-control-import-order:
 
@@ -235,43 +256,48 @@ can override the auto-discovered ones.
     .. code-block:: php
 
         // config/services/autodiscovery.php
-        use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function (ContainerConfigurator $container): void {
-            $services = $container->services()
-                ->defaults()
-                    ->autowire()
-                    ->autoconfigure();
-
-            $services->load('App\\', '../../src/*')
-                ->exclude([
-                    '../../src/Mailer/',
-                ]);
-        };
+        return App::config([
+            'services' => [
+                '_defaults' => [
+                    'autowire' => true,
+                    'autoconfigure' => true,
+                ],
+                'App\\' => [
+                    'resource' => '../../src/*',
+                    'exclude' => [
+                        '../../src/Mailer/',
+                    ],
+                ],
+            ],
+        ]);
 
         // config/services/mailer.php
-        use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function (ContainerConfigurator $container): void {
-            $services = $container->services();
-
-            $services->set(App\Mailer\SpecificMailer::class);
-            // Add any custom configuration here if needed
-        };
+        return App::config([
+            'services' => [
+                App\Mailer\SpecificMailer::class => [
+                    // Add any custom configuration here if needed
+                ],
+            ],
+        ]);
 
         // config/services.php
-        use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return function (ContainerConfigurator $container): void {
-            $container->import('services/autodiscovery.php');
-            $container->import('services/mailer.php');
-            $container->import('services/');
-
-            $services = $container->services();
-
-            // definitions here override anything from the imports above
-            // consider keeping most definitions inside imported files
-        };
+        return App::config([
+            'imports' => [
+                ['resource' => 'services/autodiscovery.php'],
+                ['resource' => 'services/mailer.php'],
+                ['resource' => 'services/'],
+            ],
+            'services' => [
+                // definitions here override anything from the imports above
+                // consider keeping most definitions inside imported files
+            ],
+        ]);
 
 .. include:: /components/dependency_injection/_imports-parameters-note.rst.inc
 

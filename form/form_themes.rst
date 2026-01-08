@@ -70,15 +70,13 @@ want to use another theme for all the forms of your app, configure it in the
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->formThemes([
-                'bootstrap_5_horizontal_layout.html.twig',
-            ]);
-
-            // ...
-        };
+        return App::config([
+            'twig' => [
+                'form_themes' => ['bootstrap_5_horizontal_layout.html.twig'],
+            ],
+        ]);
 
 You can pass multiple themes to this option because sometimes form themes only
 redefine a few elements. This way, if some theme doesn't override some element,
@@ -480,15 +478,13 @@ you want to apply the theme globally to all forms, define the
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->formThemes([
-                'form/my_theme.html.twig',
-            ]);
-
-            // ...
-        };
+        return App::config([
+            'twig' => [
+                'form_themes' => ['form/my_theme.html.twig'],
+            ],
+        ]);
 
 If you only want to apply it to some specific forms, use the ``form_theme`` tag:
 

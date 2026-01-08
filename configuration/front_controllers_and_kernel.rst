@@ -169,12 +169,13 @@ parameter used, for example, to turn Twig's debug mode on:
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            // ...
-            $twig->debug('%kernel.debug%');
-        };
+        return App::config([
+            'twig' => [
+                'debug' => '%kernel.debug%',
+            ],
+        ]);
 
 The Environments
 ----------------

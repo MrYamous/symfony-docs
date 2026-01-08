@@ -243,13 +243,17 @@ configure the ``texter_transports``:
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->notifier()
-                ->texterTransport('twilio', env('TWILIO_DSN'))
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    'texter_transports' => [
+                        'twilio' => env('TWILIO_DSN'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. _sending-sms:
 
@@ -394,13 +398,17 @@ Chatters are configured using the ``chatter_transports`` setting:
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->notifier()
-                ->chatterTransport('slack', env('SLACK_DSN'))
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    'chatter_transports' => [
+                        'slack' => env('SLACK_DSN'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. _sending-chat-messages:
 
@@ -469,15 +477,18 @@ notification emails:
     .. code-block:: php
 
         // config/packages/mailer.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->mailer()
-                ->dsn(env('MAILER_DSN'))
-                ->envelope()
-                    ->sender('notifications@example.com')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'mailer' => [
+                    'dsn' => env('MAILER_DSN'),
+                    'envelope' => [
+                        'sender' => 'notifications@example.com',
+                    ],
+                ],
+            ],
+        ]);
 
 .. _notifier-push-channel:
 
@@ -537,13 +548,17 @@ configure the ``texter_transports``:
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->notifier()
-                ->texterTransport('expo', env('EXPO_DSN'))
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    'texter_transports' => [
+                        'expo' => env('EXPO_DSN'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. _notifier-desktop-channel:
 
@@ -586,13 +601,17 @@ need to add the following manually:
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->notifier()
-                ->texterTransport('jolinotif', env('JOLINOTIF'))
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    'texter_transports' => [
+                        'jolinotif' => env('JOLINOTIF'),
+                    ],
+                ],
+            ],
+        ]);
 
 Now you can send notifications to your desktop as follows::
 
@@ -663,18 +682,22 @@ transport:
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->notifier()
-                // Send notifications to Slack and use Telegram if
-                // Slack errored
-                ->chatterTransport('main', env('SLACK_DSN').' || '.env('TELEGRAM_DSN'))
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    'chatter_transports' => [
+                        // Send notifications to Slack and use Telegram if
+                        // Slack errored
+                        'main' => env('SLACK_DSN').' || '.env('TELEGRAM_DSN'),
 
-                // Send notifications to the next scheduled transport calculated by round robin
-                ->chatterTransport('roundrobin', env('SLACK_DSN').' && '.env('TELEGRAM_DSN'))
-            ;
-        };
+                        // Send notifications to the next scheduled transport calculated by round robin
+                        'roundrobin' => env('SLACK_DSN').' && '.env('TELEGRAM_DSN'),
+                    ],
+                ],
+            ]
+        ]);
 
 Creating & Sending Notifications
 --------------------------------
@@ -768,20 +791,26 @@ specify what channels should be used for specific levels (using
     .. code-block:: php
 
         // config/packages/notifier.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            // ...
-            $framework->notifier()
-                // Use SMS, Slack and email for urgent notifications
-                ->channelPolicy('urgent', ['sms', 'chat/slack', 'email'])
-                // Use Slack for highly important notifications
-                ->channelPolicy('high', ['chat/slack'])
-                // Use browser for medium and low notifications
-                ->channelPolicy('medium', ['browser'])
-                ->channelPolicy('low', ['browser'])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'notifier' => [
+                    // ...
+                    'channel_policy' => [
+                        // Use SMS, Slack and email for urgent notifications
+                        'urgent' => ['sms', 'chat/slack', 'email'],
+
+                        // Use Slack for highly important notifications
+                        'high' => ['chat/slack'],
+
+                        // Use browser for medium and low notifications
+                        'medium' => ['browser'],
+                        'low' => ['browser'],
+                    ],
+                ],
+            ],
+        ]);
 
 Now, whenever the notification's importance is set to "high", it will be
 sent using the Slack transport::
@@ -918,11 +947,13 @@ typical alert levels, which you can implement immediately using:
 
         use Symfony\Component\Notifier\FlashMessage\BootstrapFlashMessageImportanceMapper;
 
-        return function(ContainerConfigurator $containerConfigurator) {
-            $containerConfigurator->services()
-                ->set('notifier.flash_message_importance_mapper', BootstrapFlashMessageImportanceMapper::class)
-            ;
-        };
+        return App::config([
+            'services' => [
+                'flash_message_importance_mapper' => [
+                    'class' => BootstrapFlashMessageImportanceMapper::class,
+                ],
+            ],
+        ]);
 
 Testing Notifier
 ----------------
@@ -944,13 +975,34 @@ all configured texter and chatter transports only in the ``dev`` (and/or
 
 .. code-block:: yaml
 
-    # config/packages/dev/notifier.yaml
-    framework:
-        notifier:
-            texter_transports:
-                twilio: 'null://null'
-            chatter_transports:
-                slack: 'null://null'
+    # config/packages/notifier.yaml
+    when@dev:
+        framework:
+            notifier:
+                texter_transports:
+                    twilio: 'null://null'
+                chatter_transports:
+                    slack: 'null://null'
+
+.. code-block:: php
+
+    // config/packages/notifier.php
+    namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+    return App::config([
+        'when@dev' => [
+            'framework' => [
+                'notifier' => [
+                    'texter_transports' => [
+                        'twilio' => 'null://null',
+                    ],
+                    'chatter_transports' => [
+                        'slack' => 'null://null',
+                    ],
+                ],
+            ],
+        ],
+    ]);
 
 .. _notifier-events:
 

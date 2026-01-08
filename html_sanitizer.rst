@@ -171,14 +171,19 @@ You can do this by defining a new HTML sanitizer in the configuration:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    ->blockElement('h1')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'block_elements' => ['h1'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -264,16 +269,21 @@ Safe elements
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // enable either of these
-                    ->allowSafeElements(true)
-                    ->allowStaticElements(true)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            // enable either of these
+                            'allow_safe_elements' => true,
+                            'allow_static_elements' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -317,24 +327,28 @@ attributes from the `W3C Standard Proposal`_ are allowed.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // allow the <article> element and 2 attributes
-                    ->allowElement('article', ['class', 'data-attr'])
-
-                    // allow the <img> element and preserve the src attribute
-                    ->allowElement('img', 'src')
-
-                    // allow the <h1> element with all safe attributes
-                    ->allowElement('h1', '*')
-
-                    // allow the <div> element with no attributes
-                    ->allowElement('div', [])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'allow_elements' => [
+                                // allow the <article> element and 2 attributes
+                                'article' => ['class', 'data-attr'],
+                                // allow the <img> element and preserve the src attribute
+                                'img' => 'src',
+                                // allow the <h1> element with all safe attributes
+                                'h1' => '*',
+                                // allow the <div> element with no attributes
+                                'div' => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -384,17 +398,22 @@ This can also be used to remove elements from the allow list.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // remove <div>, but process the children
-                    ->blockElement('div')
-                    // remove <figure> and its children
-                    ->dropElement('figure')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            // remove <div>, but process the children
+                            'block_elements' => ['div'],
+                            // remove <figure> and its children
+                            'drop_elements' => ['figure'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -436,18 +455,24 @@ on all elements allowed *before this setting*.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // allow "src' on <iframe> elements
-                    ->allowAttribute('src', ['iframe'])
-
-                    // allow "data-attr" on all elements currently allowed
-                    ->allowAttribute('data-attr', '*')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'allow_attributes' => [
+                                // allow "src' on <iframe> elements
+                                'src' => ['iframe'],
+                                // allow "data-attr" on all elements currently allowed
+                                'data-attr' => '*',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -491,21 +516,28 @@ This option allows you to disallow attributes that were allowed before.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // allow the "data-attr" on all safe elements...
-                    ->allowAttribute('data-attr', '*')
-
-                    // ...except for the <section> element
-                    ->dropAttribute('data-attr', ['section'])
-
-                    // disallows "style' on any allowed element
-                    ->dropAttribute('style', '*')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'allow_attributes' => [
+                                // allow the "data-attr" on all safe elements...
+                                'data-attr' => '*',
+                            ],
+                            'drop_attributes' => [
+                                // ... except for the <section> element
+                                'data-attr' => ['section'],
+                                // disallows "style" on any allowed element
+                                'style' => '*',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -548,14 +580,23 @@ element (even if the original one didn't contain a ``rel`` attribute):
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    ->forceAttribute('a', ['rel' => 'noopener noreferrer'])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'force_attributes' => [
+                                'a' => [
+                                    'rel' => 'noopener noreferrer',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -606,29 +647,32 @@ URLs of ``<a>`` elements:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            // if `true`, all URLs using the `http://` scheme will be converted to
+                            // use the `https://` scheme instead. `http` still needs to be
+                            // allowed in `allowed_link_schemes`
+                            'force_https_urls' => true,
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // if `true`, all URLs using the `http://` scheme will be converted to
-                    // use the `https://` scheme instead. `http` still needs to be
-                    // allowed in `allowedLinkSchemes`
-                    ->forceHttpsUrls(true)
+                            // specifies the allowed URL schemes. If the URL has a different scheme, the
+                            // attribute will be dropped
+                            'allowed_link_schemes' => ['http', 'https', 'mailto'],
 
-                    // specifies the allowed URL schemes. If the URL has a different scheme, the
-                    // attribute will be dropped
-                    ->allowedLinkSchemes(['http', 'https', 'mailto'])
+                            // specifies the allowed hosts, the attribute will be dropped if the
+                            // URL contains a different host which is not a subdomain of the allowed host
+                            'allowed_link_hosts' => ['symfony.com'],
 
-                    // specifies the allowed hosts, the attribute will be dropped if the
-                    // URL contains a different host. Subdomains are allowed: e.g. the following
-                    // config would also allow 'www.symfony.com', 'live.symfony.com', etc.
-                    ->allowedLinkHosts(['symfony.com'])
-
-                    // whether to allow relative links (i.e. URLs without scheme and host)
-                    ->allowRelativeLinks(true)
-            ;
-        };
+                            // whether to allow relative links (i.e. URLs without scheme and host)
+                            'allow_relative_links' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -691,28 +735,33 @@ the HTML sanitizer: ``src``, ``href``, ``lowsrc``, ``background`` and ``ping``.
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // if `true`, all URLs using the `http://` scheme will be converted to
-                    // use the `https://` scheme instead. `http` still needs to be
-                    // allowed in `allowedMediaSchemes`
-                    ->forceHttpsUrls(true)
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            // if `true`, all URLs using the `http://` scheme will be converted to
+                            // use the `https://` scheme instead. `http` still needs to be
+                            // allowed in `allowed_media_schemes`
+                            'force_https_urls' => true,
 
-                    // specifies the allowed URL schemes. If the URL has a different scheme, the
-                    // attribute will be dropped
-                    ->allowedMediaSchemes(['http', 'https', 'mailto'])
+                            // specifies the allowed URL schemes. If the URL has a different scheme, the
+                            // attribute will be dropped
+                            'allowed_media_schemes' => ['http', 'https', 'mailto'],
 
-                    // specifies the allowed hosts, the attribute will be dropped if the URL
-                    // contains a different host which is not a subdomain of the allowed host
-                    ->allowedMediaHosts(['symfony.com']) // Also allows any subdomain (i.e. www.symfony.com)
+                            // specifies the allowed hosts, the attribute will be dropped if the URL
+                            // contains a different host which is not a subdomain of the allowed host
+                            'allowed_media_hosts' => ['symfony.com'],
 
-                    // whether to allow relative URLs (i.e. URLs without scheme and host)
-                    ->allowRelativeMedias(true)
-            ;
-        };
+                            // whether to allow relative URLs (i.e. URLs without scheme and host)
+                            'allow_relative_medias' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -763,15 +812,20 @@ increase or decrease this limit:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    // inputs longer (in characters) than this value will be truncated (default: 20000)
-                    ->withMaxInputLength(20000)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            // inputs longer (in characters) than this value will be truncated
+                            'max_input_length' => 30000, // default: 20000
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
@@ -818,18 +872,27 @@ to enable it for an HTML sanitizer:
     .. code-block:: php
 
         // config/packages/framework.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Sanitizer\CustomAttributeSanitizer;
-        use Symfony\Config\FrameworkConfig;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->htmlSanitizer()
-                ->sanitizer('app.post_sanitizer')
-                    ->withAttributeSanitizer(CustomAttributeSanitizer::class)
-
-                    // you can also disable previously enabled attribute sanitizers
-                    //->withoutAttributeSanitizer(CustomAttributeSanitizer::class)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'html_sanitizer' => [
+                    'sanitizers' => [
+                        'app.post_sanitizer' => [
+                            'with_attribute_sanitizers' => [
+                                CustomAttributeSanitizer::class,
+                            ],
+                            // you can also disable previously enabled custom attribute sanitizers
+                            // 'without_attribute_sanitizers' => [
+                            //    CustomAttributeSanitizer::class,
+                            // ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 

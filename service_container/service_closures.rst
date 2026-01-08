@@ -66,16 +66,24 @@ argument of type ``service_closure``:
 
         use App\Service\MyService;
 
-        return function (ContainerConfigurator $container): void {
-            $services = $container->services();
+        return App::config([
+            'services' => [
+                MyService::class => [
+                    'arguments' => [service_closure('mailer')],
 
-            $services->set(MyService::class)
-                ->args([service_closure('mailer')]);
+                    // In case the dependency is optional
+                    'arguments' => [service_closure('mailer')->nullOnInvalid()],
+                ],
 
-            // In case the dependency is optional
-            // $services->set(MyService::class)
-            //     ->args([service_closure('mailer')->ignoreOnInvalid()]);
-        };
+                // you can also use the special '@>' syntax as a shortcut of 'service_closure(...)'
+                AnotherService::class => [
+                    'arguments' => ['@>mailer'],
+
+                    // the shortcut also works for optional dependencies
+                    'arguments' => [service_closure('mailer')->nullOnInvalid()],
+                ],
+            ],
+        ]);
 
 .. seealso::
 

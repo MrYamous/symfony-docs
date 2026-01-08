@@ -23,11 +23,13 @@ as integration of other related components:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->form()->enabled(true);
-        };
+        return App::config([
+            'framework' => [
+                'form' => true,
+            ],
+        ]);
 
 There are two different ways of creating friendly configuration for a bundle:
 
@@ -148,13 +150,16 @@ can add some configuration that looks like this:
     .. code-block:: php
 
         // config/packages/acme_social.php
-        use Symfony\Config\AcmeSocialConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (AcmeSocialConfig $acmeSocial): void {
-            $acmeSocial->twitter()
-                ->clientId(123)
-                ->clientSecret('your_secret');
-        };
+        return App::config([
+            'acme_social' => [
+                'twitter' => [
+                    'client_id' => 123,
+                    'client_secret' => 'your_secret',
+                ],
+            ],
+        ]);
 
 The basic idea is that instead of having the user override individual
 parameters, you let the user configure just a few, specifically created,

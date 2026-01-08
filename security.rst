@@ -244,18 +244,24 @@ for a user provider in your security configuration:
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Entity\User;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            $security->provider('app_user_provider')
-                ->entity()
-                    ->class(User::class)
-                    ->property('email')
-            ;
-        };
+                'providers' => [
+                    'app_user_provider' => [
+                        'entity' => [
+                            'class' => User::class,
+                            'property' => 'email',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 This user provider knows how to (re)load users from a storage (e.g. a database)
 based on a "user identifier" (e.g. the user's email address or username).
@@ -354,18 +360,21 @@ have done this for you:
     .. code-block:: php
 
         // config/packages/security.php
-        use App\Entity\User;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            // Use native password hasher, which auto-selects and migrates the best
-            // possible hashing algorithm (currently this is "bcrypt")
-            $security->passwordHasher(PasswordAuthenticatedUserInterface::class)
-                ->algorithm('auto')
-            ;
-        };
+                // Use native password hasher, which auto-selects and migrates the best
+                // possible hashing algorithm (currently this is "bcrypt")
+                'password_hashers' => [
+                    PasswordAuthenticatedUserInterface::class => 'auto',
+                ],
+            ],
+        ]);
 
 Now that Symfony knows *how* you want to hash the passwords, you can use the
 ``UserPasswordHasherInterface`` service to do this before saving your users to
@@ -464,29 +473,35 @@ will be able to authenticate (e.g. login form, API token, etc).
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            // the order in which firewalls are defined is very important, as the
-            // request will be handled by the first firewall whose pattern matches
-            $security->firewall('dev')
-                ->pattern('^/(_(profiler|wdt)|css|images|js)/')
-                ->security(false)
-            ;
+                'firewalls' => [
+                    // the order in which firewalls are defined is very important, as the
+                    // request will be handled by the first firewall whose pattern matches
+                    'dev' => [
+                        'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
+                        'security' => false,
+                    ],
 
-            // a firewall with no pattern should be defined last because it will match all requests
-            $security->firewall('main')
-                ->lazy(true)
+                    // a firewall with no pattern should be defined last because it will match all requests
+                    'main' => [
+                        'lazy' => true,
+                        // provider that you set earlier inside providers
+                        'provider' => 'app_user_provider',
 
-                // activate different ways to authenticate
-                // https://symfony.com/doc/current/security.html#firewalls-authentication
+                        // activate different ways to authenticate
+                        // https://symfony.com/doc/current/security.html#firewalls-authentication
 
-                // https://symfony.com/doc/current/security/impersonating_user.html
-                // ->switchUser(true)
-            ;
-        };
+                        // https://symfony.com/doc/current/security/impersonating_user.html
+                        // 'switch_user' => true,
+                    ],
+                ],
+            ],
+        ]);
 
 Only one firewall is active on each request: Symfony uses the ``pattern`` key
 to find the first match (you can also
@@ -523,23 +538,24 @@ don't accidentally block Symfony's dev tools - which live under URLs like
         .. code-block:: php
 
             // config/packages/security.php
-            use Symfony\Config\SecurityConfig;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (SecurityConfig $security): void {
-                // ...
-                $security->firewall('dev')
-                    ->pattern([
-                        '^/_profiler/',
-                        '^/_wdt/',
-                        '^/css/',
-                        '^/images/',
-                        '^/js/',
-                    ])
-                    ->security(false)
-                ;
-
-                // ...
-            };
+            return App::config([
+                'security' => [
+                    // ...
+                    'firewalls' => [
+                        'dev' => [
+                            'pattern' => [
+                                '^/_profiler/',
+                                '^/_wdt/',
+                                '^/css/',
+                                '^/images/',
+                                '^/js/',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
 
 A firewall can have many modes of authentication, in other words, it enables many
 ways to ask the question "Who are you?". Often, the user is unknown (i.e. not logged in)
@@ -700,19 +716,23 @@ Then, enable the ``FormLoginAuthenticator`` using the ``form_login`` setting:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            $mainFirewall = $security->firewall('main');
-
-            // "app_login" is the name of the route created previously
-            $mainFirewall->formLogin()
-                ->loginPath('app_login')
-                ->checkPath('app_login')
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'form_login' => [
+                            // "app_login" is the name of the route created previously
+                            'login_path' => 'app_login',
+                            'check_path' => 'app_login',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -862,17 +882,19 @@ First, you need to enable CSRF on the form login:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->formLogin()
-                // ...
-                ->enableCsrf(true)
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'secured_area' => [
+                        'form_login' => [
+                            'enable_csrf' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. _csrf-login-template:
 
@@ -932,16 +954,20 @@ Enable the authenticator using the ``json_login`` setting:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->jsonLogin()
-                ->checkPath('api_login')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'json_login' => [
+                            // api_login is a route we will create below
+                            'check_path' => 'api_login',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -1080,14 +1106,19 @@ authentication:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->httpBasic()
-                ->realm('Secured Area')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'http_basic' => [
+                            'realm' => 'Secured Area',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 That's it! Whenever an unauthenticated user tries to visit a protected
 page, Symfony will inform the browser that it needs to start HTTP basic
@@ -1205,14 +1236,19 @@ Then, enable the X.509 authenticator using ``x509`` on your firewall:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->x509()
-                ->provider('your_user_provider')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'x509' => [
+                            'provider' => 'your_user_provider',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 By default, Symfony extracts the email address from the DN in two different
 ways:
@@ -1254,14 +1290,19 @@ Enable remote user authentication using the ``remote_user`` key:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $mainFirewall = $security->firewall('main');
-            $mainFirewall->remoteUser()
-                ->provider('your_user_provider')
-            ;
-        };
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'remote_user' => [
+                            'provider' => 'your_user_provider',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. tip::
 
@@ -1313,19 +1354,29 @@ Then, enable this feature using the ``login_throttling`` setting:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->enableAuthenticatorManager(true);
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        // by default, the feature allows 5 login attempts per minute
+                        'login_throttling' => null,
 
-            $mainFirewall = $security->firewall('main');
+                        // configure the maximum login attempts
+                        'login_throttling' => [
+                            'max_attempts' => 3, // per minute ...
+                            'interval' => '15 minutes', // ... or in a custom period
+                        ],
 
-            // by default, the feature allows 5 login attempts per minute
-            $mainFirewall->loginThrottling()
-                // ->maxAttempts(3)         // Optional: You can configure the maximum attempts ...
-                // ->interval('15 minutes') // ... and the period of time.
-            ;
-        };
+                        // use a custom rate limiter via its service ID
+                        'login_throttling' => [
+                            'limiter' => 'app.my_login_rate_limiter',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 
@@ -1395,43 +1446,53 @@ and set the ``limiter`` option to its service ID:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Component\DependencyInjection\ContainerBuilder;
-        use Symfony\Component\DependencyInjection\Reference;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
-        use Symfony\Config\FrameworkConfig;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (ContainerBuilder $container, FrameworkConfig $framework, SecurityConfig $security): void {
-            $framework->rateLimiter()
-                ->limiter('username_ip_login')
-                    ->policy('token_bucket')
-                    ->limit(5)
-                    ->rate()
-                        ->interval('5 minutes')
-            ;
-
-            $framework->rateLimiter()
-                ->limiter('ip_login')
-                    ->policy('sliding_window')
-                    ->limit(50)
-                    ->interval('15 minutes')
-            ;
-
-            $container->register('app.login_rate_limiter', DefaultLoginRateLimiter::class)
-                ->setArguments([
-                    // 1st argument is the limiter for IP
-                    new Reference('limiter.ip_login'),
-                    // 2nd argument is the limiter for username+IP
-                    new Reference('limiter.username_ip_login'),
-                    // 3rd argument is the app secret
-                    param('kernel.secret'),
-                ]);
-
-            $security->firewall('main')
-                ->loginThrottling()
-                    ->limiter('app.login_rate_limiter')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'rate_limiter' => [
+                    // define 2 rate limiters (one for username+IP, the other for IP)
+                    'username_ip_login' => [
+                        'policy' => 'token_bucket',
+                        'limit' => 5,
+                        'rate' => ['interval' => '5 minutes'],
+                    ],
+                    'ip_login' => [
+                        'policy' => 'sliding_window',
+                        'limit' => 50,
+                        'interval' => '15 minutes',
+                    ],
+                ],
+            ],
+            new ServicesConfig(
+                services: [
+                    // our custom login rate limiter
+                    'app.login_rate_limiter' => [
+                        'class' => DefaultLoginRateLimiter::class,
+                        'arguments' => [
+                            // globalFactory is the limiter for IP
+                            '$globalFactory' => service('limiter.ip_login'),
+                            // localFactory is the limiter for username+IP
+                            '$localFactory' => service('limiter.username_ip_login'),
+                            // secret is the app secret
+                            '$secret' => param('kernel.secret'),
+                        ],
+                    ],
+                ],
+            ),
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        // use a custom rate limiter via its service ID
+                        'login_throttling' => [
+                            'limiter' => 'app.login_rate_limiter',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Customize Successful and Failed Authentication Behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1520,20 +1581,22 @@ To enable logging out, activate the  ``logout`` config parameter under your fire
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'logout' => [
+                            'path' => '/logout',
 
-            $mainFirewall = $security->firewall('main');
-            // ...
-            $mainFirewall->logout()
-                ->path('/logout')
-
-                // where to redirect after logout
-                // ->target('app_any_route')
-            ;
-        };
+                            // where to redirect after logout
+                            // 'target' => 'app_any_route',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
 Symfony will then un-authenticate users navigating to the configured ``path``,
 and redirect them to the configured ``target``.
@@ -1558,11 +1621,14 @@ you have imported the logout route loader in your routes:
     .. code-block:: php
 
         // config/routes/security.php
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return static function (RoutingConfigurator $routes): void {
-            $routes->import('security.route_loader.logout', 'service');
-        };
+        return Routes::config([
+            '_symfony_logout' => [
+                'resource' => 'security.route_loader.logout',
+                'type' => 'service',
+            ],
+        ]);
 
 Logout programmatically
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1618,7 +1684,7 @@ to execute custom logic::
 
         public static function getSubscribedEvents(): array
         {
-            return [LogoutEvent::class => 'onLogout'];
+            return App::config([LogoutEvent::class => 'onLogout'];
         }
 
         public function onLogout(LogoutEvent $event): void
@@ -1662,16 +1728,17 @@ current locale). In that case, you have to create this route yourself:
     .. code-block:: php
 
         // config/routes.php
-        use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return function (RoutingConfigurator $routes): void {
-            $routes->add('app_logout', [
-                'en' => '/logout',
-                'fr' => '/deconnexion',
-            ])
-                ->methods(['GET'])
-            ;
-        };
+        return Routes::config([
+            'app_logout' => [
+                'path' => [
+                    'en' => '/logout',
+                    'fr' => '/deconnexion',
+                ],
+                'methods' => ['GET'],
+            ],
+        ]);
 
 Then, pass the route name to the ``path`` option:
 
@@ -1692,17 +1759,19 @@ Then, pass the route name to the ``path`` option:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\Routing\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $mainFirewall = $security->firewall('main');
-            // ...
-            $mainFirewall->logout()
-                ->path('app_logout')
-            ;
-        };
+        return [
+            Routes::config([
+                'firewalls' => [
+                    'main' => [
+                        'logout' => [
+                            'path' => 'app_logout',
+                        ],
+                    ],
+                ],
+            ]),
+        ];
 
 .. _retrieving-the-user-object:
 
@@ -1850,14 +1919,16 @@ rules by creating a role hierarchy:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-
-            $security->roleHierarchy('ROLE_ADMIN', ['ROLE_USER']);
-            $security->roleHierarchy('ROLE_SUPER_ADMIN', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
-        };
+        return App::config([
+            'security' => [
+                'role_hierarchy' => [
+                    'ROLE_ADMIN' => ['ROLE_USER'],
+                    'ROLE_SUPER_ADMIN' => ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'],
+                ],
+            ],
+        ]);
 
 Users with the ``ROLE_ADMIN`` role will also have the ``ROLE_USER`` role.
 Users with ``ROLE_SUPER_ADMIN``, will automatically have ``ROLE_ADMIN``,
@@ -1943,32 +2014,28 @@ start with ``/admin``, you can:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->enableAuthenticatorManager(true);
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        // ...
+                    ],
+                ],
+                'access_control' => [
+                    // require ROLE_ADMIN for /admin*
+                    ['path' => '^/admin', 'roles' => 'ROLE_ADMIN'],
 
-            // ...
-            $security->firewall('main')
-            // ...
-            ;
+                    // or require ROLE_ADMIN or IS_AUTHENTICATED_FULLY for /admin*
+                    ['path' => '^/admin', 'roles' => ['IS_AUTHENTICATED_FULLY', 'ROLE_ADMIN']],
 
-            // require ROLE_ADMIN for /admin*
-            $security->accessControl()
-                ->path('^/admin')
-                ->roles(['ROLE_ADMIN']);
-
-            // require ROLE_ADMIN or IS_AUTHENTICATED_FULLY for /admin*
-            $security->accessControl()
-                ->path('^/admin')
-                ->roles(['ROLE_ADMIN', 'IS_AUTHENTICATED_FULLY']);
-
-            // the 'path' value can be any valid regular expression
-            // (this one will match URLs like /api/post/7298 and /api/comment/528491)
-            $security->accessControl()
-                ->path('^/api/(post|comment)/\d+$')
-                ->roles(['ROLE_USER']);
-        };
+                    // the 'path' value can be any valid regular expression
+                    // (this one will match URLs like /api/post/7298 and /api/comment/528491)
+                    ['path' => '^/api/(post|comment)/\d+$', 'roles' => 'ROLE_USER'],
+                ],
+            ],
+        ]);
 
 You can define as many URL patterns as you need - each is a regular expression.
 **BUT**, only **one** will be matched per request: Symfony starts at the top of
@@ -1992,19 +2059,21 @@ the list and stops when it finds the first match:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
+        return App::config([
+            'security' => [
+                // ...
 
-            $security->accessControl()
-                ->path('^/admin/users')
-                ->roles(['ROLE_SUPER_ADMIN']);
+                'access_control' => [
+                    // matches /admin/users/*
+                    ['path' => '^/admin/users', 'roles' => 'ROLE_SUPER_ADMIN'],
 
-            $security->accessControl()
-                ->path('^/admin')
-                ->roles(['ROLE_ADMIN']);
-        };
+                    // matches /admin/* except for anything matching the above rule
+                    ['path' => '^/admin', 'roles' => 'ROLE_ADMIN'],
+                ],
+            ],
+        ]);
 
 Prepending the path with ``^`` means that only URLs *beginning* with the
 pattern are matched. For example, a path of ``/admin`` (without the ``^``)
@@ -2298,25 +2367,20 @@ the login page):
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->enableAuthenticatorManager(true);
-            // ....
+        return App::config([
+            'security' => [
+                // ...
+                'access_control' => [
+                    // allow unauthenticated users to access the login form
+                    ['path' => '^/admin/login', 'roles' => 'PUBLIC_ACCESS'],
 
-            // allow unauthenticated users to access the login form
-            $security->accessControl()
-                ->path('^/admin/login')
-                ->roles([AuthenticatedVoter::PUBLIC_ACCESS])
-            ;
-
-            // but require authentication for all other admin routes
-            $security->accessControl()
-                ->path('^/admin')
-                ->roles(['ROLE_ADMIN'])
-            ;
-        };
+                    // but require authentication for all other admin routes
+                    ['path' => '^/admin', 'roles' => 'ROLE_ADMIN'],
+                ],
+            ],
+        ]);
 
 Granting Anonymous Users Access in a Custom Voter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2496,14 +2560,15 @@ for these events.
 
             use App\EventListener\LogoutSubscriber;
 
-            return function(ContainerConfigurator $container): void {
-                $services = $container->services();
-
-                $services->set(LogoutSubscriber::class)
-                    ->tag('kernel.event_subscriber', [
-                        'dispatcher' => 'security.event_dispatcher.main',
-                    ]);
-            };
+            return [
+                'services' => [
+                    LogoutSubscriber::class => [
+                        'tags' => [
+                            ['kernel.event_subscriber' => ['dispatcher' => 'security.event_dispatcher.main']],
+                        ],
+                    ],
+                ],
+            ]);
 
 Authentication Events
 ~~~~~~~~~~~~~~~~~~~~~

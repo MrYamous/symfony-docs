@@ -100,20 +100,20 @@ configuration files, even if they use a different format:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->import('legacy_config.php');
+        return App::config([
+            'imports' => [
+                ['resource' => 'legacy_config.php'],
 
-            // glob expressions are also supported to load multiple files
-            $container->import('/etc/myapp/*.yaml');
+                // glob expressions are also supported to load multiple files
+                ['resource' => '/etc/myapp/*.yaml'],
 
-            // the third optional argument of import() is 'ignore_errors'
-            // 'ignore_errors' set to 'not_found' silently discards errors if the loaded file doesn't exist
-            $container->import('my_config_file.yaml', null, 'not_found');
-            // 'ignore_errors' set to true silently discards all errors (including invalid code and not found)
-            $container->import('my_config_file.yaml', null, true);
-        };
+                // ignore_errors: not_found silently discards errors if the loaded file doesn't exist
+                ['resource' => 'my_config_file.xml', 'ignore_errors' => 'not_found'],
 
-        // ...
+                // ignore_errors: true silently discards all errors (including invalid code and not found)
+                ['resource' => 'my_other_config_file.xml', 'ignore_errors' => true],
+            ],
+        ]);
 
 .. _config-parameter-intro:
 .. _config-parameters-yml:
@@ -125,7 +125,7 @@ Configuration Parameters
 Sometimes the same configuration value is used in several configuration files.
 Instead of repeating it, you can define it as a "parameter", which is like a
 reusable configuration value. By convention, parameters are defined under the
-``parameters`` key in the ``config/services.yaml`` file:
+``parameters`` key:
 
 .. configuration-block::
 
@@ -163,30 +163,29 @@ reusable configuration value. By convention, parameters are defined under the
         use App\Entity\BlogPost;
         use App\Enum\PostState;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->parameters()
+        return App::config([
+            'parameters' => [
                 // the parameter name is an arbitrary string (the 'app.' prefix is recommended
                 // to better differentiate your parameters from Symfony parameters).
-                ->set('app.admin_email', 'something@example.com')
+                'app.admin_email' => 'something@example.com',
 
                 // boolean parameters
-                ->set('app.enable_v2_protocol', true)
+                'app.enable_v2_protocol' => true,
 
                 // array/collection parameters
-                ->set('app.supported_locales', ['en', 'es', 'fr'])
+                'app.supported_locales' => ['en', 'es', 'fr'],
 
-                // binary content parameters (use the PHP escape sequences)
-                ->set('app.some_parameter', 'This is a Bell char: \x07')
+                // binary content parameters (encode the contents with base64_encode())
+                'app.some_parameter' => base64_decode('VGhpcyBpcyBhIEJlbGwgY2hhciAA'),
 
                 // PHP constants as parameter values
-                ->set('app.some_constant', GLOBAL_CONSTANT)
-                ->set('app.another_constant', BlogPost::MAX_ITEMS)
+                'app.some_constant' => GLOBAL_CONSTANT,
+                'app.another_constant' => BlogPost::MAX_ITEMS,
 
                 // Enum case as parameter values
-                ->set('app.some_enum', PostState::Published);
-        };
-
-        // ...
+                'app.some_enum' => PostState::Published,
+            ],
+        ]);
 
 Once defined, you can reference this parameter value from any other
 configuration file using a special syntax: wrap the parameter name in two ``%``
@@ -205,10 +204,9 @@ configuration file using a special syntax: wrap the parameter name in two ``%``
 
         // config/packages/some_package.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->extension('some_package', [
+        return App::config([
+            'some_package' => [
                 // when using the param() function, you only have to pass the parameter name...
                 'email_address' => param('app.admin_email'),
 
@@ -216,8 +214,8 @@ configuration file using a special syntax: wrap the parameter name in two ``%``
                 // surrounded by two % (same as in YAML format) and Symfony will
                 // replace it by that parameter value
                 'email_address' => '%app.admin_email%',
-            ]);
-        };
+            ],
+        ]);
 
 .. note::
 
@@ -239,10 +237,11 @@ configuration file using a special syntax: wrap the parameter name in two ``%``
             // config/services.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (ContainerConfigurator $container): void {
-                $container->parameters()
-                    ->set('url_pattern', 'http://symfony.com/?foo=%%s&amp;bar=%%d');
-            };
+            return App::config([
+                'parameters' => [
+                    'url_pattern' => 'http://symfony.com/?foo=%%s&amp;bar=%%d',
+                ],
+            ]);
 
 .. include:: /components/dependency_injection/_imports-parameters-note.rst.inc
 
@@ -356,27 +355,30 @@ files directly in the ``config/packages/`` directory.
 
         .. code-block:: php
 
-            // config/packages/framework.php
-            use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-            use Symfony\Config\WebpackEncoreConfig;
+            // config/packages/webpack_encore.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (WebpackEncoreConfig $webpackEncore, ContainerConfigurator $container): void {
-                $webpackEncore
-                    ->outputPath('%kernel.project_dir%/public/build')
-                    ->strictMode(true)
-                    ->cache(false)
-                ;
+            return [
+                'webpack_encore' => [
+                    'output_path' => '%kernel.project_dir%/public/build',
+                    'strict_mode' => true,
+                    'cache' => false,
+                ],
 
                 // cache is enabled only in the "prod" environment
-                if ('prod' === $container->env()) {
-                    $webpackEncore->cache(true);
-                }
+                'when@prod' => [
+                    'webpack_encore' => [
+                        'cache' => true,
+                    ],
+                ],
 
                 // disable strict mode only in the "test" environment
-                if ('test' === $container->env()) {
-                    $webpackEncore->strictMode(false);
-                }
-            };
+                'when@test' => [
+                    'webpack_encore' => [
+                        'strict_mode' => false,
+                    ],
+                ],
+            ],
 
 .. seealso::
 
@@ -479,12 +481,12 @@ This example shows how you could configure the application secret using an env v
         // config/packages/framework.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->extension('framework', [
+        return App::config([
+            'framework' => [
                 // by convention the env var names are always uppercase
-                'secret' => '%env(APP_SECRET)%',
-            ]);
-        };
+                'secret' => env('APP_SECRET'),
+            ],
+        ]);
 
 .. note::
 
@@ -517,7 +519,7 @@ To do so, define a parameter with the same name as the env var using this syntax
 
     .. code-block:: yaml
 
-        # config/packages/framework.yaml
+        # config/services.yaml
         parameters:
             # if the SECRET env var value is not defined anywhere, Symfony uses this value
             env(SECRET): 'some_secret'
@@ -526,22 +528,18 @@ To do so, define a parameter with the same name as the env var using this syntax
 
     .. code-block:: php
 
-        // config/packages/framework.php
+        // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        use Symfony\Component\DependencyInjection\ContainerBuilder;
-        use Symfony\Config\FrameworkConfig;
-
-        return static function (ContainerBuilder $container, FrameworkConfig $framework) {
-            // if the SECRET env var value is not defined anywhere, Symfony uses this value
-            $container->setParameter('env(SECRET)', 'some_secret');
-
-            // ...
-        };
+        return App::config([
+            'parameters' => [
+                'env(SECRET)' => 'some_secret',
+            ],
+        ]);
 
 .. tip::
 
-    Some hosts - like Upsun - offer easy `utilities to manage env vars`_
+    Some hosts - like Upsun.com - offer easy `utilities to manage env vars`_
     in production.
 
 .. note::
@@ -987,14 +985,18 @@ doesn't work for parameters:
 
         use App\Service\MessageGenerator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->parameters()
-                ->set('app.contents_dir', '...');
-
-            $container->services()
-                ->get(MessageGenerator::class)
-                    ->arg('$contentsDir', '%app.contents_dir%');
-        };
+        return App::config([
+            'parameters' => [
+                'app.contents_dir' => '...',
+            ],
+            'services' => [
+                MessageGenerator::class => [
+                    'arguments' => [
+                        '$contentsDir' => param('app.contents_dir'),
+                    ],
+                ],
+            ],
+        ]);
 
 If you inject the same parameters over and over again, use the
 ``services._defaults.bind`` option instead. The arguments defined in that option are
@@ -1022,15 +1024,17 @@ whenever a service/controller defines a ``$projectDir`` argument, use this:
         // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->services()
-                ->defaults()
-                    // pass this value to any $projectDir argument for any service
-                    // that's created in this file (including controller arguments)
-                    ->bind('$projectDir', '%kernel.project_dir%');
-
-            // ...
-        };
+        return App::config([
+            'services' => [
+                '_defaults' => [
+                    'bind' => [
+                        // pass this value to any $projectDir argument for any service
+                        // that's created in this file (including controller arguments)
+                        '$projectDir' => param('kernel.project_dir'),
+                    ],
+                ],
+            ],
+        ]);
 
 .. seealso::
 

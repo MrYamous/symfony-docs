@@ -59,18 +59,18 @@ for more information):
         # config/packages/framework.yaml
         framework:
             # ...
-            csrf_protection: ~
+            csrf_protection: true
 
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->csrfProtection()
-                ->enabled(true)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'csrf_protection' => true,
+            ],
+        ]);
 
 By default, the tokens used for CSRF protection are stored in the session.
 That's why a session is started automatically as soon as you render a form
@@ -132,14 +132,18 @@ Globally, you can configure it under the ``framework.form`` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework) {
-            $framework->form()->csrfProtection()
-                ->enabled(true)
-                ->fieldName('custom_token_name')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'form' => [
+                    'csrf_protection' => [
+                        'enabled' => true,
+                        'field_name' => 'custom_token_name',
+                    ],
+                ],
+            ],
+        ]);
 
 .. _form-csrf-configuration:
 
@@ -351,13 +355,15 @@ in applications using :ref:`Symfony Flex <symfony-flex>`.
     .. code-block:: php
 
         // config/packages/csrf.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->csrfProtection()
-                ->statelessTokenIds(['submit', 'authenticate', 'logout'])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'csrf_protection' => [
+                    'stateless_token_ids' => ['submit', 'authenticate', 'logout'],
+                ],
+            ],
+        ]);
 
 Stateless CSRF tokens provide protection without relying on the session. This
 allows you to fully cache pages while still protecting against CSRF attacks.
@@ -398,14 +404,17 @@ own services), and it sets ``submit`` as their default token identifier:
     .. code-block:: php
 
         // config/packages/csrf.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->form()
-                ->csrfProtection()
-                    ->tokenId('submit')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'form' => [
+                    'csrf_protection' => [
+                        'token_id' => 'submit',
+                    ],
+                ],
+            ],
+        ]);
 
 Forms configured with a token identifier listed in the above ``stateless_token_ids``
 option will use the stateless CSRF protection.

@@ -260,6 +260,7 @@ config files:
 
     .. code-block:: yaml
 
+        # config/services.yaml
         parameters:
             # ...
             mailer.transport: sendmail
@@ -275,27 +276,30 @@ config files:
 
     .. code-block:: php
 
+        // config/services.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (ContainerConfigurator $container): void {
-            $container->parameters()
+        use App\Mailer;
+        use App\NewsletterManager;
+
+        return App::config([
+            'parameters' => [
                 // ...
-                ->set('mailer.transport', 'sendmail')
-            ;
-
-            $services = $container->services();
-            $services->set('mailer', 'Mailer')
-                ->args(['%mailer.transport%'])
-            ;
-
-            $services->set('mailer', 'Mailer')
-                ->args([param('mailer.transport')])
-            ;
-
-            $services->set('newsletter_manager', 'NewsletterManager')
-                ->call('setMailer', [service('mailer')])
-            ;
-        };
+                'mailer.transport' => 'sendmail',
+            ],
+            'services' => [
+                'mailer' => [
+                    'class' => Mailer::class,
+                    'arguments' => [param('mailer.transport')],
+                ],
+                'newsletter_manager' => [
+                    'class' => NewsletterManager::class,
+                    'calls' => [
+                        'setMailer' => [service('mailer')],
+                    ],
+                ],
+            ],
+        ]);
 
 Learn More
 ----------

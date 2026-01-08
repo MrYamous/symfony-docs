@@ -25,20 +25,23 @@ listener:
             firewalls:
                 main:
                     # ...
-                    switch_user: true
+                    switch_user: []
 
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
+        return App::config([
+            'security' => [
                 // ...
-                ->switchUser()
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'switch_user' => [],
+                    ],
+                ],
+            ],
+        ]);
 
 To switch to another user, add a query string with the ``_switch_user``
 parameter and the username (or whatever field our user provider uses to load users)
@@ -74,15 +77,20 @@ as the value to the current URL:
         .. code-block:: php
 
             // config/packages/security.php
-            use Symfony\Config\SecurityConfig;
-            return static function (SecurityConfig $security): void {
-                // ...
-                $security->firewall('main')
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'security' => [
                     // ...
-                    ->switchUser()
-                        ->parameter('X-Switch-User')
-                ;
-            };
+                    'firewalls' => [
+                        'main' => [
+                            'switch_user' => [
+                                'parameter' => 'X-Switch-User',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
 
 To switch back to the original user, use the special ``_exit`` username:
 
@@ -172,17 +180,18 @@ also adjust the query parameter name via the ``parameter`` setting:
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
+        return App::config([
+            'security' => [
             // ...
-            $security->firewall('main')
-                // ...
-                ->switchUser()
-                    ->role('ROLE_ADMIN')
-                    ->parameter('_want_to_be_this_user')
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'switch_user' => ['role' => 'ROLE_ADMIN', 'parameter' => '_want_to_be_this_user'],
+                    ],
+                ],
+            ],
+        ]);
 
 Redirecting to a Specific Target Route
 --------------------------------------
@@ -209,16 +218,18 @@ This feature allows you to control the redirection target route via ``target_rou
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
+        return App::config([
+            'security' => [
                 // ...
-                ->switchUser()
-                    ->targetRoute('app_user_dashboard')
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'switch_user' => ['target_route' => 'app_user_dashboard'],
+                    ],
+                ],
+            ],
+        ]);
 
 Limiting User Switching
 -----------------------
@@ -244,16 +255,18 @@ be called):
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ...
-            $security->firewall('main')
+        return App::config([
+            'security' => [
                 // ...
-                ->switchUser()
-                    ->role('CAN_SWITCH_USER')
-            ;
-        };
+                'firewalls' => [
+                    'main' => [
+                        'switch_user' => ['role' => 'CAN_SWITCH_USER'],
+                    ],
+                ],
+            ],
+        ]);
 
 Then, create a voter class that responds to this role and includes whatever custom
 logic you want::
@@ -351,10 +364,10 @@ switch users, add an event subscriber on this event::
 
         public static function getSubscribedEvents(): array
         {
-            return [
+            return App::config([
                 // constant for security.switch_user
                 SecurityEvents::SWITCH_USER => 'onSwitchUser',
-            ];
+            ]);
         }
     }
 

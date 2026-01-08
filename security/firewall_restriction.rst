@@ -41,16 +41,20 @@ if the request path matches the configured ``pattern``.
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ....
-
-            $security->firewall('secured_area')
-                ->pattern('^/admin')
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+
+                'firewalls' => [
+                    'secured_area' => [
+                        'pattern' => '^/admin',
+                        // ...
+                    ],
+                ],
+            ],
+        ]);
 
 The ``pattern`` is a regular expression. In this example, the firewall will only be
 activated if the path starts (due to the ``^`` regex character) with ``/admin``. If
@@ -80,16 +84,20 @@ only initialize if the host from the request matches against the configuration.
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ....
-
-            $security->firewall('secured_area')
-                ->host('^admin\.example\.com$')
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+
+                'firewalls' => [
+                    'secured_area' => [
+                        'host' => '^admin\.example\.com$',
+                    ],
+                    // ...
+                ],
+            ],
+        ]);
 
 The ``host`` (like the ``pattern``) is a regular expression. In this example,
 the firewall will only be activated if the host is equal exactly (due to
@@ -120,16 +128,19 @@ the provided HTTP methods.
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            // ....
-
-            $security->firewall('secured_area')
-                ->methods(['GET', 'POST'])
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+
+                'firewalls' => [
+                    'secured_area' => [
+                        'methods' => ['GET', 'POST'],
+                    ],
+                ],
+            ],
+        ]);
 
 In this example, the firewall will only be activated if the HTTP method of the
 request is either ``GET`` or ``POST``. If the method is not in the array of the
@@ -158,14 +169,17 @@ If the above options don't fit your needs you can configure any service implemen
     .. code-block:: php
 
         // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Security\CustomRequestMatcher;
-        use Symfony\Config\SecurityConfig;
 
-        return static function (SecurityConfig $security): void {
-            // ....
-
-            $security->firewall('secured_area')
-                ->requestMatcher(CustomRequestMatcher::class)
+        return App::config([
+            'security' => [
                 // ...
-            ;
-        };
+                'firewalls' => [
+                    'secured_area' => [
+                        'request_matcher' => CustomRequestMatcher::class,
+                    ],
+                ],
+            ],
+        ]);

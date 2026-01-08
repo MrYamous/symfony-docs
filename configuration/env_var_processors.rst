@@ -26,15 +26,13 @@ processor to turn the value of the ``HTTP_PORT`` env var into an integer:
         // config/packages/framework.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        use Symfony\Config\FrameworkConfig;
-
-        return static function (FrameworkConfig $framework): void {
-            $framework->router()
-                ->httpPort('%env(int:HTTP_PORT)%')
-                // or
-                ->httpPort(env('HTTP_PORT')->int())
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'router' => [
+                    'http_port' => env('HTTP_PORT')->int(),
+                ],
+            ],
+        ]);
 
 Built-In Environment Variable Processors
 ----------------------------------------
@@ -59,13 +57,14 @@ Symfony provides the following env var processors:
             // config/packages/framework.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\FrameworkConfig;
-
-            return static function (ContainerBuilder $container, FrameworkConfig $framework): void {
-                $container->setParameter('env(SECRET)', 'some_secret');
-                $framework->secret(env('SECRET')->string());
-            };
+            return App::config([
+                'parameters' => [
+                    'env(SECRET)' => 'some_secret',
+                ],
+                'framework' => [
+                    'secret' => env('SECRET')->string(),
+                ],
+            ]);
 
 ``env(bool:FOO)``
     Casts ``FOO`` to a bool (``true`` values are ``'true'``, ``'on'``, ``'yes'``,
@@ -87,13 +86,14 @@ Symfony provides the following env var processors:
             // config/packages/framework.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\FrameworkConfig;
-
-            return static function (ContainerBuilder $container, FrameworkConfig $framework): void {
-                $container->setParameter('env(HTTP_METHOD_OVERRIDE)', 'true');
-                $framework->httpMethodOverride(env('HTTP_METHOD_OVERRIDE')->bool());
-            };
+            return App::config([
+                'parameters' => [
+                    'env(HTTP_METHOD_OVERRIDE)' => 'true',
+                ],
+                'framework' => [
+                    'http_method_override' => env('HTTP_METHOD_OVERRIDE')->bool(),
+                ],
+            ]);
 
 ``env(not:FOO)``
     Casts ``FOO`` to a bool (just as ``env(bool:...)`` does) except it returns the inverted value
@@ -110,7 +110,13 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
-            $container->setParameter('safe_for_production', '%env(not:APP_DEBUG)%');
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'safe_for_production' => env('APP_DEBUG')->not(),
+                ],
+            ]);
 
 ``env(int:FOO)``
     Casts ``FOO`` to an int.
@@ -135,15 +141,18 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/packages/security.php
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\SecurityConfig;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (ContainerBuilder $container, SecurityConfig $security): void {
-                $container->setParameter('env(HEALTH_CHECK_METHOD)', 'Symfony\Component\HttpFoundation\Request::METHOD_HEAD');
-                $security->accessControl()
-                    ->path('^/health-check$')
-                    ->methods([env('HEALTH_CHECK_METHOD')->const()]);
-            };
+            return App::config([
+                'parameters' => [
+                    'env(HEALTH_CHECK_METHOD)' => 'Symfony\Component\HttpFoundation\Request::METHOD_HEAD',
+                ],
+                'security' => [
+                    'access_control' => [
+                        ['path' => '^/health-check$', 'methods' => env('HEALTH_CHECK_METHOD')->const()],
+                    ],
+                ],
+            ]);
 
 ``env(base64:FOO)``
     Decodes the content of ``FOO``, which is a base64 encoded string.
@@ -156,23 +165,22 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/services.yaml
             parameters:
                 env(ALLOWED_LANGUAGES): '["en","de","es"]'
                 app_allowed_languages: '%env(json:ALLOWED_LANGUAGES)%'
 
         .. code-block:: php
 
-            // config/packages/framework.php
+            // config/services.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\FrameworkConfig;
-
-            return static function (ContainerBuilder $container): void {
-                $container->setParameter('env(ALLOWED_LANGUAGES)', '["en","de","es"]');
-                $container->setParameter('app_allowed_languages', '%env(json:ALLOWED_LANGUAGES)%');
-            };
+            return App::config([
+                'parameters' => [
+                    'env(ALLOWED_LANGUAGES)' => '["en","de","es"]',
+                    'app_allowed_languages' => env('ALLOWED_LANGUAGES')->json(),
+                ],
+            ]);
 
 ``env(resolve:FOO)``
     If the content of ``FOO`` includes container parameters (with the syntax
@@ -192,10 +200,16 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/packages/sentry.php
-            $container->setParameter('sentry_host', '10.0.0.1');
-            $container->setParameter('env(SENTRY_DSN)', 'http://%sentry_host%/project');
-            $container->loadFromExtension('sentry', [
-                'dsn' => '%env(resolve:SENTRY_DSN)%',
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'sentry_host' => '10.0.0.1',
+                    'env(SENTRY_DSN)' => 'http://%sentry_host%/project',
+                ],
+                'sentry' => [
+                    'dsn' => env('SENTRY_DSN')->resolve(),
+                ],
             ]);
 
 ``env(csv:FOO)``
@@ -205,23 +219,22 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/services.yaml
             parameters:
                 env(ALLOWED_LANGUAGES): "en,de,es"
                 app_allowed_languages: '%env(csv:ALLOWED_LANGUAGES)%'
 
         .. code-block:: php
 
-            // config/packages/framework.php
+            // config/services.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\FrameworkConfig;
-
-            return static function (ContainerBuilder $container): void {
-                $container->setParameter('env(ALLOWED_LANGUAGES)', 'en,de,es');
-                $container->setParameter('app_allowed_languages', '%env(csv:ALLOWED_LANGUAGES)%');
-            };
+            return App::config([
+                'parameters' => [
+                    'env(ALLOWED_LANGUAGES)' => 'en,de,es',
+                    'app_allowed_languages' => env('ALLOWED_LANGUAGES')->csv(),
+                ],
+            ]);
 
 ``env(shuffle:FOO)``
     Randomly shuffles values of the ``FOO`` env var, which must be an array.
@@ -230,7 +243,7 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/services.yaml
             parameters:
                 env(REDIS_NODES): "127.0.0.1:6380,127.0.0.1:6381"
             services:
@@ -241,12 +254,19 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
-            use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return static function (ContainerConfigurator $containerConfigurator): void {
-                $container = $containerConfigurator->services()
-                    ->set(\RedisCluster::class, \RedisCluster::class)->args([null, '%env(shuffle:csv:REDIS_NODES)%']);
-            };
+            return App::config([
+                'parameters' => [
+                    'env(REDIS_NODES)' => '127.0.0.1:6380,127.0.0.1:6381',
+                ],
+                'services' => [
+                    \RedisCluster::class => [
+                        'class' => \RedisCluster::class,
+                        'arguments' => [null, env('REDIS_NODES')->csv()->shuffle()],
+                    ],
+                ],
+            ]);
 
 ``env(file:FOO)``
     Returns the contents of a file whose path is the value of the ``FOO`` env var:
@@ -255,7 +275,7 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/packages/google.yaml
             parameters:
                 env(AUTH_FILE): '%kernel.project_dir%/config/auth.json'
             google:
@@ -263,10 +283,16 @@ Symfony provides the following env var processors:
 
         .. code-block:: php
 
-            // config/packages/framework.php
-            $container->setParameter('env(AUTH_FILE)', '../config/auth.json');
-            $container->loadFromExtension('google', [
-                'auth' => '%env(file:AUTH_FILE)%',
+            // config/packages/google.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'env(AUTH_FILE)' => '../config/auth.json',
+                ],
+                'google' => [
+                    'auth' => env('AUTH_FILE')->file(),
+                ],
             ]);
 
 ``env(require:FOO)``
@@ -277,18 +303,24 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/packages/google.yaml
             parameters:
                 env(PHP_FILE): '%kernel.project_dir%/config/.runtime-evaluated.php'
-            app:
+            google:
                 auth: '%env(require:PHP_FILE)%'
 
         .. code-block:: php
 
-            // config/packages/framework.php
-            $container->setParameter('env(PHP_FILE)', '../config/.runtime-evaluated.php');
-            $container->loadFromExtension('app', [
-                'auth' => '%env(require:PHP_FILE)%',
+            // config/packages/google.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'env(PHP_FILE)' => '../config/.runtime-evaluated.php',
+                ],
+                'google' => [
+                    'auth' => env('PHP_FILE')->require(),
+                ],
             ]);
 
 ``env(trim:FOO)``
@@ -300,7 +332,7 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/packages/google.yaml
             parameters:
                 env(AUTH_FILE): '%kernel.project_dir%/config/auth.json'
             google:
@@ -308,10 +340,16 @@ Symfony provides the following env var processors:
 
         .. code-block:: php
 
-            // config/packages/framework.php
-            $container->setParameter('env(AUTH_FILE)', '../config/auth.json');
-            $container->loadFromExtension('google', [
-                'auth' => '%env(trim:file:AUTH_FILE)%',
+            // config/packages/google.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'env(AUTH_FILE)' => '../config/auth.json',
+                ],
+                'google' => [
+                    'auth' => env('AUTH_FILE')->file()->trim(),
+                ],
             ]);
 
 ``env(key:FOO:BAR)``
@@ -331,8 +369,15 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
-            $container->setParameter('env(SECRETS_FILE)', '/opt/application/.secrets.json');
-            $container->setParameter('database_password', '%env(key:database_password:json:file:SECRETS_FILE)%');
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'env(SECRETS_FILE)' => '/opt/application/.secrets.json',
+                    'database_password' => env('SECRETS_FILE')->file()->json()->key('database_password'),
+                    // if SECRETS_FILE contents are: {"database_password": "secret"} it returns "secret"
+                ],
+            ]);
 
 ``env(default:fallback_param:BAR)``
     Retrieves the value of the parameter ``fallback_param`` when the ``BAR`` env
@@ -351,10 +396,15 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            // if PRIVATE_KEY is not a valid file path, the content of raw_key is returned
-            $container->setParameter('private_key', '%env(default:raw_key:file:PRIVATE_KEY)%');
-            $container->setParameter('raw_key', '%env(PRIVATE_KEY)%');
+            return App::config([
+                'parameters' => [
+                    // if PRIVATE_KEY is not a valid file path, the content of raw_key is returned
+                    'private_key' => env('PRIVATE_KEY')->file()->default('raw_key'),
+                    'raw_key' => env('PRIVATE_KEY'),
+                ],
+            ]);
 
     When the fallback parameter is omitted (e.g. ``env(default::API_KEY)``), then the
     returned value is ``null``.
@@ -371,34 +421,44 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/services.yaml
-            services:
-                # ...
-
-                some_service:
-                    arguments:
-                        $host: '%env(string:key:host:url:DATABASE_URL)%'
-                        $port: '%env(int:key:port:url:DATABASE_URL)%'
-                        $username: '%env(string:key:user:url:DATABASE_URL)%'
-                        $password: '%env(string:key:pass:url:DATABASE_URL)%'
-                        $database_name: '%env(key:path:url:DATABASE_URL)%'
+            # config/packages/doctrine_mongodb.yaml
+            doctrine_mongodb:
+                clients:
+                    default:
+                        hosts:
+                            - { host: '%env(string:key:host:url:MONGODB_URL)%', port: '%env(int:key:port:url:MONGODB_URL)%' }
+                        username: '%env(string:key:user:url:MONGODB_URL)%'
+                        password: '%env(string:key:pass:url:MONGODB_URL)%'
+                connections:
+                    default:
+                        database_name: '%env(key:path:url:MONGODB_URL)%'
 
         .. code-block:: php
 
-            // config/services.php
+            // config/packages/doctrine_mongodb.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return function(ContainerConfigurator $container): void {
-                // ...
-
-                $services->set(SomeService::class)
-                    ->arg('$host', '%env(string:key:host:url:DATABASE_URL)%')
-                    ->arg('$port', '%env(int:key:port:url:DATABASE_URL)%')
-                    ->arg('$username', '%env(string:key:user:url:DATABASE_URL)%')
-                    ->arg('$password', '%env(string:key:pass:url:DATABASE_URL)%')
-                    ->arg('$database_name', '%env(key:path:url:DATABASE_URL)%')
-                ;
-            };
+            return App::config([
+                'doctrine_mongodb' => [
+                    'clients' => [
+                        'default' => [
+                            'hosts' => [
+                                [
+                                    'host' => env('MONGODB_URL')->url()->key('host')->string(),
+                                    'port' => env('MONGODB_URL')->url()->key('port')->int(),
+                                ],
+                            ],
+                            'username' => env('MONGODB_URL')->url()->key('user')->string(),
+                            'password' => env('MONGODB_URL')->url()->key('pass')->string(),
+                        ],
+                    ],
+                    'connections' => [
+                        'default' => [
+                            'database_name' => env('MONGODB_URL')->url()->key('path'),
+                        ],
+                    ],
+                ],
+            ]);
 
     .. warning::
 
@@ -418,28 +478,28 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/services.yaml
-            services:
-                # ...
-
-                some_service:
-                    arguments:
-                        $serverVersion: '%env(string:key:serverVersion:query_string:DATABASE_URL)%'
-                        $charset: '%env(string:key:charset:query_string:DATABASE_URL)%'
+            # config/packages/doctrine_mongodb.yaml
+            doctrine_mongodb:
+                clients:
+                    default:
+                        # ...
+                        connectTimeoutMS: '%env(int:key:timeout:query_string:MONGODB_URL)%'
 
         .. code-block:: php
 
-            // config/services.php
+            // config/packages/doctrine_mongodb.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            return function(ContainerConfigurator $container): void {
-                // ...
-
-                $services->set(SomeService::class)
-                    ->arg('$serverVersion', '%env(string:key:serverVersion:query_string:DATABASE_URL)%')
-                    ->arg('$charset', '%env(int:string:charset:query_string:DATABASE_URL)%')
-                ;
-            };
+            return App::config([
+                'doctrine_mongodb' => [
+                    'clients' => [
+                        'default' => [
+                            // ...
+                            'connectTimeoutMS' => env('MONGODB_URL')->queryString()->key('timeout')->int(),
+                        ],
+                    ],
+                ],
+            ]);
 
 ``env(enum:FooEnum:BAR)``
     Tries to convert an environment variable to an actual ``\BackedEnum`` value.
@@ -465,7 +525,15 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
-            $container->setParameter('suit', '%env(enum:App\Enum\Suit:CARD_SUIT)%');
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            use App\Enum\Suit;
+
+            return App::config([
+                'parameters' => [
+                    'suit' => env('CARD_SUIT')->enum(Suit::class),
+                ],
+            ]);
 
     The value stored in the ``CARD_SUIT`` env var would be a string (e.g. ``'spades'``)
     but the application will use the enum value (e.g. ``Suit::Spades``).
@@ -485,7 +553,13 @@ Symfony provides the following env var processors:
         .. code-block:: php
 
             // config/services.php
-            $container->setParameter('typed_env', '%env(defined:FOO)%');
+            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+            return App::config([
+                'parameters' => [
+                    'typed_env' => env('FOO')->defined(),
+                ],
+            ]);
 
 .. _urlencode_environment_variable_processor:
 
@@ -498,23 +572,22 @@ Symfony provides the following env var processors:
 
         .. code-block:: yaml
 
-            # config/packages/framework.yaml
+            # config/services.yaml
             parameters:
                 env(DATABASE_URL): 'mysql://db_user:foo@b$r@127.0.0.1:3306/db_name'
                 encoded_database_url: '%env(urlencode:DATABASE_URL)%'
 
         .. code-block:: php
 
-            // config/packages/framework.php
+            // config/services.php
             namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-            use Symfony\Component\DependencyInjection\ContainerBuilder;
-            use Symfony\Config\FrameworkConfig;
-
-            return static function (ContainerBuilder $container): void {
-                $container->setParameter('env(DATABASE_URL)', 'mysql://db_user:foo@b$r@127.0.0.1:3306/db_name');
-                $container->setParameter('encoded_database_url', '%env(urlencode:DATABASE_URL)%');
-            };
+            return App::config([
+                'parameters' => [
+                    'env(DATABASE_URL)' => 'mysql://db_user:foo@b$r@127.0.0.1:3306/db_name',
+                    'encoded_database_url' => env('DATABASE_URL')->urlencode(),
+                ],
+            ]);
 
 It is also possible to combine any number of processors:
 
@@ -522,7 +595,7 @@ It is also possible to combine any number of processors:
 
     .. code-block:: yaml
 
-        # config/packages/framework.yaml
+        # config/packages/google.yaml
         parameters:
             env(AUTH_FILE): "%kernel.project_dir%/config/auth.json"
         google:
@@ -534,14 +607,20 @@ It is also possible to combine any number of processors:
 
     .. code-block:: php
 
-        // config/packages/framework.php
-        $container->setParameter('env(AUTH_FILE)', '%kernel.project_dir%/config/auth.json');
-        // 1. gets the value of the AUTH_FILE env var
-        // 2. replaces the values of any config param to get the config path
-        // 3. gets the content of the file stored in that path
-        // 4. JSON-decodes the content of the file and returns it
-        $container->loadFromExtension('google', [
-            'auth' => '%env(json:file:resolve:AUTH_FILE)%',
+        // config/packages/google.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'parameters' => [
+                'env(AUTH_FILE)' => '%kernel.project_dir%/config/auth.json',
+            ],
+            'google' => [
+                // 1. gets the value of the AUTH_FILE env var
+                // 2. replaces the values of any config param to get the config path
+                // 3. gets the content of the file stored in that path
+                // 4. JSON-decodes the content of the file and returns it
+                'auth' => env('AUTH_FILE')->resolve()->file()->json(),
+            ],
         ]);
 
 Custom Environment Variable Processors
@@ -564,9 +643,9 @@ create a class that implements
 
         public static function getProvidedTypes(): array
         {
-            return [
+            return App::config([
                 'lowercase' => 'string',
-            ];
+            ]);
         }
     }
 

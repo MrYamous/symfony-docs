@@ -81,12 +81,19 @@ Or set the ``command`` attribute on the ``console.command`` tag in your service 
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
         use App\Command\SunshineCommand;
 
-        // ...
-        $container->register(SunshineCommand::class)
-            ->addTag('console.command', ['command' => 'app:sunshine'])
-        ;
+        return App::config([
+            'services' => [
+                SunshineCommand::class => [
+                    'tags' => [
+                        ['console.command' => ['command' => 'app:sunshine']],
+                    ],
+                ],
+            ],
+        ]);
 
 .. note::
 

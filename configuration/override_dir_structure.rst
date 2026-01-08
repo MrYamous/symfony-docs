@@ -170,17 +170,18 @@ for multiple directories):
 
         # config/packages/twig.yaml
         twig:
-            # ...
             default_path: "%kernel.project_dir%/resources/views"
 
     .. code-block:: php
 
         // config/packages/twig.php
-        use Symfony\Config\TwigConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (TwigConfig $twig): void {
-            $twig->defaultPath('%kernel.project_dir%/resources/views');
-        };
+        return App::config([
+            'twig' => [
+                'default_path' => '%kernel.project_dir%/resources/views',
+            ],
+        ]);
 
 Override the Translations Directory
 -----------------------------------
@@ -202,13 +203,15 @@ configuration option to define your own translations directory (use :ref:`framew
     .. code-block:: php
 
         // config/packages/translation.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->translator()
-                ->defaultPath('%kernel.project_dir%/i18n')
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'translator' => [
+                    'default_path' => '%kernel.project_dir%/i18n',
+                ],
+            ],
+        ]);
 
 .. _override-web-dir:
 .. _override-the-web-directory:

@@ -369,13 +369,13 @@ to register your class as a service and tag it with
 
         use App\Serializer\NeonEncoder;
 
-        return function(ContainerConfigurator $container) {
-            // ...
-
-            $services->set(NeonEncoder::class)
-                ->tag('serializer.encoder')
-            ;
-        };
+        return App::config([
+            'services' => [
+                NeonEncoder::class => [
+                    'tags' => ['serializer.encoder'],
+                ],
+            ],
+        ]);
 
 Now you'll be able to serialize and deserialize NEON!
 

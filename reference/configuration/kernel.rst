@@ -141,9 +141,13 @@ achieve a strict reproducible build:
     .. code-block:: php
 
         // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        // ...
-        $container->setParameter('kernel.container_build_time', '1234567890');
+        return App::config([
+            'parameters' => [
+                'kernel.container_build_time' => '1234567890',
+            ],
+        ]);
 
 ``kernel.container_class``
 --------------------------
