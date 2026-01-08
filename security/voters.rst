@@ -247,6 +247,37 @@ that's done automatically for you! When you
 :ref:`call isGranted() with view/edit and pass a Post object <how-to-use-the-voter-in-a-controller>`,
 your voter will be called and you can control access.
 
+.. _security-voter-priority:
+
+Setting the Voter Priority
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``#[AsTaggedItem]`` attribute can be used to define voter priority
+    starting from Symfony 8.1.
+
+Voters are called according to their service priority, with higher priority
+voters being called first. By default, this priority is ``0``. When using the
+:ref:`priority strategy <security-voters-change-strategy>`, use the
+``#[AsTaggedItem]`` attribute to define the execution order::
+
+    // src/Security/PostVoter.php
+    namespace App\Security;
+
+    use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+    use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+    #[AsTaggedItem(priority: 10)]
+    class PostVoter extends Voter
+    {
+        // ...
+    }
+
+This is the recommended way to handle voter priority because it integrates
+with autoconfiguration to set the priority without re-declaring the
+``security.voter`` tag.
+
 Checking for Roles inside a Voter
 ---------------------------------
 
@@ -416,7 +447,7 @@ There are four strategies available:
 
 ``priority``
     This grants or denies access by the first voter that does not abstain,
-    based on their service priority;
+    based on their service priority (see :ref:`security-voter-priority`);
 
 Regardless the chosen strategy, if all voters abstained from voting, the
 decision is based on the ``allow_if_all_abstain`` config option (which
