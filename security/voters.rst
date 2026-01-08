@@ -254,13 +254,13 @@ Setting the Voter Priority
 
 .. versionadded:: 8.1
 
-    The ``#[AsTaggedItem]`` attribute can be used to define voter priority
-    starting from Symfony 8.1.
+    Support for defining the priority of voters with the ``#[AsTaggedItem]``
+    attribute was introduced in Symfony 8.1.
 
-Voters are called according to their service priority, with higher priority
+Voters are called according to their service priority, with higher-priority
 voters being called first. By default, this priority is ``0``. When using the
 :ref:`priority strategy <security-voters-change-strategy>`, use the
-``#[AsTaggedItem]`` attribute to define the execution order::
+``#[AsTaggedItem]`` attribute to define the order in which voters are executed::
 
     // src/Security/PostVoter.php
     namespace App\Security;
@@ -275,7 +275,7 @@ voters being called first. By default, this priority is ``0``. When using the
     }
 
 This is the recommended way to handle voter priority because it integrates
-with autoconfiguration to set the priority without re-declaring the
+with autoconfiguration and sets the priority without re-declaring the
 ``security.voter`` tag.
 
 Checking for Roles inside a Voter
