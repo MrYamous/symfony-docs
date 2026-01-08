@@ -812,10 +812,6 @@ The :class:`Symfony\\Component\\HttpFoundation\\EventStreamResponse` class
 allows you to implement `Server-Sent Events (SSE)`_, a standard for pushing
 real-time updates from the server to the client over HTTP.
 
-.. versionadded:: 7.3
-
-    The ``EventStreamResponse`` and ``ServerEvent`` classes were introduced in Symfony 7.3.
-
 Basic usage with a generator::
 
     use Symfony\Component\HttpFoundation\EventStreamResponse;
