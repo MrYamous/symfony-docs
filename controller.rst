@@ -945,10 +945,6 @@ to the client over a single HTTP connection. It provides an efficient way to
 send real-time updates from the server to the browser, such as live notifications,
 progress updates, or data feeds.
 
-.. versionadded:: 7.3
-
-    The ``EventStreamResponse`` and ``ServerEvent`` classes were introduced in Symfony 7.3.
-
 The :class:`Symfony\\Component\\HttpFoundation\\EventStreamResponse` class
 allows you to stream events to the client using the SSE protocol. It automatically
 sets the required headers (``Content-Type: text/event-stream``, ``Cache-Control: no-cache``,
