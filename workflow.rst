@@ -865,11 +865,11 @@ workflow leaves a place::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 LeaveEvent::getName('blog_publishing') => 'onLeave',
                 // if you prefer, you can write the event name manually like this:
                 // 'workflow.blog_publishing.leave' => 'onLeave',
-            ]);
+            ];
         }
     }
 
@@ -958,9 +958,9 @@ missing a title::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 'workflow.blog_publishing.guard.to_review' => ['guardReview'],
-            ]);
+            ];
         }
     }
 
@@ -1183,9 +1183,9 @@ place::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 'workflow.blog_publishing.guard.publish' => ['guardPublish'],
-            ]);
+            ];
         }
     }
 

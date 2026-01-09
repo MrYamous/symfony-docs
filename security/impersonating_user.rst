@@ -364,10 +364,10 @@ switch users, add an event subscriber on this event::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 // constant for security.switch_user
                 SecurityEvents::SWITCH_USER => 'onSwitchUser',
-            ]);
+            ];
         }
     }
 

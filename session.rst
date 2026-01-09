@@ -1193,10 +1193,10 @@ can determine the correct locale however you want::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 // must be registered before (i.e. with a higher priority than) the default Locale listener
                 KernelEvents::REQUEST => [['onKernelRequest', 20]],
-            ]);
+            ];
         }
     }
 
@@ -1305,9 +1305,9 @@ event::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 LoginSuccessEvent::class => 'onLoginSuccess',
-            ]);
+            ];
         }
     }
 
