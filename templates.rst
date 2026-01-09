@@ -604,9 +604,9 @@ a block to render::
         #[Template('product.html.twig', block: 'price_block')]
         public function price(): array
         {
-            return App::config([
+            return [
                 // ...
-            ]);
+            ];
         }
     }
 
@@ -1493,10 +1493,10 @@ callable defined in ``getFilters()``::
     {
         public function getFilters(): array
         {
-            return App::config([
+            return [
                 // the logic of this filter is now implemented in a different class
                 new TwigFilter('price', [AppRuntime::class, 'formatPrice']),
-            ]);
+            ];
         }
     }
 

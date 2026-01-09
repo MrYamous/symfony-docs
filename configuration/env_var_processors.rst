@@ -643,9 +643,9 @@ create a class that implements
 
         public static function getProvidedTypes(): array
         {
-            return App::config([
+            return [
                 'lowercase' => 'string',
-            ]);
+            ];
         }
     }
 

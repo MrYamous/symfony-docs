@@ -348,9 +348,9 @@ name (FQCN) of the corresponding event class::
     {
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 RequestEvent::class => 'onKernelRequest',
-            ]);
+            ];
         }
 
         public function onKernelRequest(RequestEvent $event): void
@@ -558,9 +558,9 @@ event subscribers, you can learn more about :ref:`how to use them <events-subscr
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 KernelEvents::CONTROLLER => 'onKernelController',
-            ]);
+            ];
         }
     }
 
@@ -633,10 +633,10 @@ header on the response if it's found::
 
     public static function getSubscribedEvents(): array
     {
-        return App::config([
+        return [
             KernelEvents::CONTROLLER => 'onKernelController',
             KernelEvents::RESPONSE => 'onKernelResponse',
-        ]);
+        ];
     }
 
 That's it! The ``TokenSubscriber`` is now notified before every controller is
@@ -772,9 +772,9 @@ could listen to the ``mailer.post_send`` event and change the method's return va
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([
+            return [
                 'mailer.post_send' => 'onMailerPostSend',
-            ]);
+            ];
         }
     }
 
