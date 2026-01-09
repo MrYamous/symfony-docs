@@ -88,7 +88,7 @@ the ``list()`` method of the ``BlogController`` class.
 
 The route name (``blog_list``) is not important for now, but it will be
 essential later when :ref:`generating URLs <routing-generating-urls>`. You only
-have to keep in mind that each route name must be unique in the application.
+have to remember that each route name must be unique in the application.
 
 Creating Routes in YAML or PHP Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,7 +407,7 @@ You can also use these functions:
         // Or without alias:
         #[Route(condition: "service('App\\\Service\\\RouteChecker').check(request)")]
 
-Behind the scenes, expressions are compiled down to raw PHP. Because of this,
+Internally, expressions are compiled down to raw PHP. Because of this,
 using the ``condition`` key causes no extra overhead beyond the time it takes
 for the underlying PHP to execute.
 
