@@ -1684,7 +1684,7 @@ to execute custom logic::
 
         public static function getSubscribedEvents(): array
         {
-            return App::config([LogoutEvent::class => 'onLogout'];
+            return [LogoutEvent::class => 'onLogout'];
         }
 
         public function onLogout(LogoutEvent $event): void

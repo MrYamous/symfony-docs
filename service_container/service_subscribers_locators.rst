@@ -86,10 +86,10 @@ in the service subscriber::
 
         public static function getSubscribedServices(): array
         {
-            return App::config([
+            return [
                 'App\FooCommand' => FooHandler::class,
                 'App\BarCommand' => BarHandler::class,
-            ]);
+            ];
         }
 
         public function handle(Command $command): mixed
@@ -146,10 +146,10 @@ service locator::
 
     public static function getSubscribedServices(): array
     {
-        return App::config([
+        return [
             // ...
             LoggerInterface::class,
-        ]);
+        ];
     }
 
 Service types can also be keyed by a service name for internal use::
@@ -158,10 +158,10 @@ Service types can also be keyed by a service name for internal use::
 
     public static function getSubscribedServices(): array
     {
-        return App::config([
+        return [
             // ...
             'logger' => LoggerInterface::class,
-        ]);
+        ];
     }
 
 When extending a class that also implements ``ServiceSubscriberInterface``,
@@ -192,10 +192,10 @@ errors if there's no matching service found in the service container::
 
     public static function getSubscribedServices(): array
     {
-        return App::config([
+        return [
             // ...
             '?'.LoggerInterface::class,
-        ]);
+        ];
     }
 
 .. note::
@@ -270,7 +270,7 @@ This is done by having ``getSubscribedServices()`` return an array of
 
     public static function getSubscribedServices(): array
     {
-        return App::config([
+        return [
             // ...
             new SubscribedService('logger', LoggerInterface::class, attributes: new Autowire(service: 'monolog.logger.event')),
 
@@ -285,7 +285,7 @@ This is done by having ``getSubscribedServices()`` return an array of
 
             // AutowireLocator
             new SubscribedService('handlers', ContainerInterface::class, attributes: new AutowireLocator('handler.tag')),
-        ]);
+        ];
     }
 
 .. note::

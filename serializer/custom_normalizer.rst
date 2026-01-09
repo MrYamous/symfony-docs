@@ -55,9 +55,9 @@ normalization process::
 
         public function getSupportedTypes(?string $format): array
         {
-            return App::config([
+            return [
                 Topic::class => true,
-            ]);
+            ];
         }
     }
 
@@ -141,11 +141,11 @@ Here is an example of how to use the ``getSupportedTypes()`` method::
 
         public function getSupportedTypes(?string $format): array
         {
-            return App::config([
+            return [
                 'object' => null,             // doesn't support any classes or interfaces
                 '*' => false,                 // supports any other types, but the decision is not cacheable
                 MyCustomClass::class => true, // supports MyCustomClass and decision is cacheable
-            ]);
+            ];
         }
     }
 
