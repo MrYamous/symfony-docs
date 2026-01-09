@@ -1144,7 +1144,7 @@ To force HTTP/2 for ``http`` URLs, you need to enable it explicitly via the
 
         $client = HttpClient::create(['http_version' => '2.0']);
 
-Support for HTTP/2 PUSH works out of the box when using a compatible client:
+Support for HTTP/2 PUSH works automatically when using a compatible client:
 pushed responses are put into a temporary cache and are used when a
 subsequent request is triggered for the corresponding URLs.
 
