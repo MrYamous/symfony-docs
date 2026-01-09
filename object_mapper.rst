@@ -114,6 +114,7 @@ Configuring Mapping with Attributes
 
 ObjectMapper uses PHP attributes to configure how properties are mapped.
 The primary attribute is :class:`Symfony\\Component\\ObjectMapper\\Attribute\\Map`.
+You can use this attribute in source class (that should be mapped to a target) or in the target class (that should be mapped from a source).
 
 Defining the Default Target Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,6 +137,43 @@ Apply ``#[Map]`` to the source class to define its default mapping target::
     // now you can call map() without the second argument if ProductInput is the source:
     $mapper = new ObjectMapper();
     $product = $mapper->map($productInput); // Maps to Product automatically
+
+Defining the Default Source Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Apply ``#[Map]`` to the target class toe defined its default mapping source::
+
+    // src/Dto/ProductOutput.php
+    namespace App\Dto;
+
+    use App\Entity\Product;
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(source: Product::class)]
+    class ProductOutput
+    {
+        public string $name = '';
+        public string $sku = '';
+    }
+
+    // You should provide a reverse class map array
+    $classMap = [
+        Product::class => ProductOutput::class,
+    ];
+
+    // now you can call map() without the second argument if ProductOutput is the target:
+    $mapper = new ObjectMapper(
+        new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            $classMap,
+        )
+    );
+    $productOutput = $mapper->map($product); // Maps to ProductOutput automatically
+
+.. tip::
+
+    When using ObjectMapper with Symfony Framework, you juste have to use the
+    :class:`Symfony\\Component\\ObjectMapper\\ObjectMapperInterface`.
+    Symfony will handle everything for you
 
 Configuring Property Mapping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
