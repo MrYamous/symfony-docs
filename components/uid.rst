@@ -550,6 +550,14 @@ ULID objects created with the ``Ulid`` class can use the following methods::
     // checking if a given value is valid as ULID
     $isValid = Ulid::isValid($ulidValue); // true or false
 
+    // validating ULIDs in a specific format
+    $isValid = Ulid::isValid($ulidValue, Ulid::FORMAT_BASE_32);
+    $isValid = Ulid::isValid($ulidValue, Ulid::FORMAT_RFC_4122);
+
+    By default, ``Ulid::isValid()`` validates ULIDs in the canonical Base32 format.
+    Use the optional ``$format`` argument to validate ULIDs in other representations,
+    such as RFC 4122, binary or Base58 formats.
+
     // getting the ULID datetime
     $ulid1->getDateTime(); // returns a \DateTimeImmutable instance
 
