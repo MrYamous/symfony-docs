@@ -3212,7 +3212,7 @@ be protected by signature validation::
     // src/Controller/SecureController.php
     // ...
 
-    use App\Security\Attribute\IsSignatureValid;
+    use Symfony\Component\HttpKernel\Attribute\IsSignatureValid;
 
     #[IsSignatureValid]
     class SecureController extends AbstractController
