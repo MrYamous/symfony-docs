@@ -2671,7 +2671,7 @@ a ``SignedUriException`` will be thrown::
     // src/Controller/SomeController.php
     // ...
 
-    use App\Security\Attribute\IsSignatureValid;
+    use Symfony\Component\HttpKernel\Attribute\IsSignatureValid;
 
     #[IsSignatureValid]
     public function someAction(): Response
@@ -2703,7 +2703,7 @@ be protected by signature validation::
     // src/Controller/SecureController.php
     // ...
 
-    use App\Security\Attribute\IsSignatureValid;
+    use Symfony\Component\HttpKernel\Attribute\IsSignatureValid;
 
     #[IsSignatureValid]
     class SecureController extends AbstractController
