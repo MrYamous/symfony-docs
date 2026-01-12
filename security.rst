@@ -2317,7 +2317,7 @@ permission in :ref:`your custom security voters <creating-the-custom-voter>`::
         public function generateReport(): void
         {
             $voterDecision = $this->security->getAccessDecision('ROLE_SALES_ADMIN');
-            if ($voterDecision->isGranted('ROLE_SALES_ADMIN')) {
+            if ($voterDecision->isGranted) {
                 // ...
             } else {
                 // do something with $voterDecision->getMessage()
