@@ -543,10 +543,10 @@ to define the template to render::
             // when using the #[Template] attribute, you only need to return
             // an array with the parameters to pass to the template (the attribute
             // is the one which will create and return the Response object).
-            return App::config([
+            return [
                 'category' => '...',
                 'promotions' => ['...', '...'],
-            ]);
+            ];
         }
     }
 
