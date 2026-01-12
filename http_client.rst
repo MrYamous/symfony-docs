@@ -1312,6 +1312,22 @@ response and get remaining contents that might come back in a new timeout, etc.
 
     Use the ``max_duration`` option to limit the time a full request/response can last.
 
+    To specifically limit the time spent establishing the connection (DNS resolution,
+    TCP connection and TLS handshake), use the ``max_connect_duration`` option::
+
+        $response = $client->request('GET', 'https://...', [
+            // fail fast if the connection cannot be established quickly
+            'max_connect_duration' => 0.5,
+            'timeout' => 10,
+        ]);
+
+    A value lower than or equal to ``0`` means unlimited, as long as the ``timeout``
+    option is respected.
+    
+    .. versionadded:: 8.1
+    
+        The ``max_connect_duration`` was introduced in Symfony 8.1.
+
 .. _http-client_network-errors:
 
 Dealing with Network Errors
