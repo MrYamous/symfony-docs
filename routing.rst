@@ -2549,6 +2549,8 @@ defined as attributes:
     :doc:`another way to enforce HTTP or HTTPS </security/force_https>`
     via the ``requires_channel`` setting.
 
+.. _routing-signing-uris:
+
 Signing URIs
 ~~~~~~~~~~~~
 
