@@ -1888,9 +1888,11 @@ the mailer configuration file (e.g. in the ``dev`` or ``test`` environments):
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
         return App::config([
-            'framework' => [
-                'mailer' => [
-                    'dsn' => 'null://null',
+            'when@dev' => [
+                'framework' => [
+                    'mailer' => [
+                        'dsn' => 'null://null',
+                    ],
                 ],
             ],
         ]);
@@ -1923,10 +1925,12 @@ a specific address, instead of the *real* address:
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
         return App::config([
-            'framework' => [
-                'mailer' => [
-                    'envelope' => [
-                        'recipients' => ['youremail@example.com'],
+            'when@dev' => [
+                'framework' => [
+                    'mailer' => [
+                        'envelope' => [
+                            'recipients' => ['youremail@example.com'],
+                        ],
                     ],
                 ],
             ],
@@ -1957,14 +1961,16 @@ address(es) defined in ``recipients``, as with all other emails:
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
         return App::config([
-            'framework' => [
-                'mailer' => [
-                    'envelope' => [
-                        'recipients' => ['youremail@example.com'],
-                        'allowed_recipients' => [
-                            'internal@example.com',
-                            // you can also use regular expression to define allowed recipients
-                            'internal-.*@example.(com|fr)',
+            'when@dev' => [
+                'framework' => [
+                    'mailer' => [
+                        'envelope' => [
+                            'recipients' => ['youremail@example.com'],
+                            'allowed_recipients' => [
+                                'internal@example.com',
+                                // you can also use regular expression to define allowed recipients
+                                'internal-.*@example.(com|fr)',
+                            ],
                         ],
                     ],
                 ],
