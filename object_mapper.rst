@@ -245,6 +245,8 @@ from a given source object, and can be used as an alternative to
     use Symfony\Component\ObjectMapper\Condition\TargetClass;
 
     // this User entity can be mapped to two different DTOs
+    // note: conditions are not required here because the target is explicitly
+    // specified when calling map() (see usage below)
     #[Map(target: PublicUserProfile::class)]
     #[Map(target: AdminUserProfile::class)]
     class User
@@ -282,6 +284,7 @@ from a given source object, and can be used as an alternative to
     $user = new User();
     $mapper = new ObjectMapper();
 
+    // explicitly specify target, so no class-level conditions needed
     $publicProfile = $mapper->map($user, PublicUserProfile::class);
     // no IP address available
 
@@ -451,9 +454,19 @@ Mapping Multiple Targets
 ------------------------
 
 A source class can be configured to map to multiple different target classes.
-Apply the ``#[Map]`` attribute multiple times at the class level, typically
-using the ``if`` condition to determine which target is appropriate based on the
-source object's state or other logic::
+Apply the ``#[Map]`` attribute multiple times at the class level. When using
+multiple targets, you **must** add an ``if`` condition to each ``#[Map]``
+attribute to determine which target is appropriate based on the source object's
+state or other logic.
+
+.. note::
+
+    Without conditions, the ObjectMapper cannot determine which target to use and
+    will throw an "Ambiguous mapping" exception. Conditions are **required** for
+    multiple targets, especially when objects with multiple mappings are nested
+    inside other objects.
+
+Example::
 
     // src/Dto/EventInput.php
     namespace App\Dto;
@@ -491,6 +504,12 @@ source object's state or other logic::
     $eventInput->type = 'physical';
     $mapper = new ObjectMapper();
     $event = $mapper->map($eventInput); // automatically maps to PhysicalEvent
+
+.. tip::
+
+    If you're explicitly specifying the target when calling ``map()``, you don't
+    need conditions. For example: ``$mapper->map($role, RoleResourceV1::class)``
+    works even if ``Role`` has multiple ``#[Map]`` attributes without conditions.
 
 Mapping Based on Target Properties (Source Mapping)
 ---------------------------------------------------
