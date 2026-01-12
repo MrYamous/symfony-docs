@@ -463,7 +463,7 @@ Mapping Multiple Targets
 
 A source class can be configured to map to multiple different target classes.
 Apply the ``#[Map]`` attribute multiple times at the class level. When using
-multiple targets, you **must** use the ``if`` condition on each ``#[Map]``
+multiple targets, you **must** add an ``if`` condition to each ``#[Map]``
 attribute to determine which target is appropriate based on the source object's
 state or other logic.
 
@@ -472,7 +472,7 @@ state or other logic.
     Without conditions, the ObjectMapper cannot determine which target to use and
     will throw an "Ambiguous mapping" exception. Conditions are **required** for
     multiple targets, especially when objects with multiple mappings are nested
-    within other objects.
+    inside other objects.
 
 Example::
 
