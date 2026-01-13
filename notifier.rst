@@ -116,7 +116,7 @@ Service
                     **Webhook support**: No
 `LOX24`_            **Install**: ``composer require symfony/lox24-notifier`` \
                     **DSN**: ``lox24://USER:TOKEN@default?from=FROM`` \
-                    **Webhook support**: No
+                    **Webhook support**: Yes
 `Mailjet`_          **Install**: ``composer require symfony/mailjet-notifier`` \
                     **DSN**: ``mailjet://TOKEN@default?from=FROM`` \
                     **Webhook support**: No
@@ -129,8 +129,6 @@ Service
 `Mobyt`_            **Install**: ``composer require symfony/mobyt-notifier`` \
                     **DSN**: ``mobyt://USER_KEY:ACCESS_TOKEN@default?from=FROM`` \
                     **Webhook support**: No
-`Nexmo`_            **Install**: ``composer require symfony/nexmo-notifier`` \
-                    Abandoned in favor of Vonage (see below) \
 `Octopush`_         **Install**: ``composer require symfony/octopush-notifier`` \
                     **DSN**: ``octopush://USERLOGIN:APIKEY@default?from=FROM&type=TYPE`` \
                     **Webhook support**: No
@@ -1305,7 +1303,6 @@ is dispatched. Listeners receive a
 .. _`MessageMedia`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/MessageMedia/README.md
 .. _`MicrosoftTeams`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/MicrosoftTeams/README.md
 .. _`Mobyt`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/Mobyt/README.md
-.. _`Nexmo`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/Nexmo/README.md
 .. _`Novu`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/Novu/README.md
 .. _`Ntfy`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/Ntfy/README.md
 .. _`Octopush`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Notifier/Bridge/Octopush/README.md
