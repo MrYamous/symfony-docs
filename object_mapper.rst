@@ -573,6 +573,80 @@ When using source-based mapping, the ``ObjectMapper`` will automatically use the
 target's ``#[Map(source: ...)]`` attributes if no mapping is defined on the
 source class.
 
+Mapping Nested Objects to the Same Target
+-----------------------------------------
+
+.. versionadded:: 8.1
+
+    The ability to merge nested properties when mapping to the same target class
+    was introduced in Symfony 8.1.
+
+When a property of the source object contains another object that maps to the
+same target class as the parent, the properties of that nested object are
+merged into the current target instance. This is useful for flattening nested
+DTO structures into a single resource.
+
+Consider the following example where ``UserInput`` contains a ``UserAddressInput``,
+and both map to ``User``::
+
+    // src/Dto/UserInput.php
+    namespace App\Dto;
+
+    use App\Entity\User;
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(target: User::class)]
+    class UserInput
+    {
+        public string $name = '';
+        public UserAddressInput $address;
+    }
+
+    // src/Dto/UserAddressInput.php
+    namespace App\Dto;
+
+    use App\Entity\User;
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(target: User::class)]
+    class UserAddressInput
+    {
+        #[Map(target: 'streetAddress')]
+        public string $street = '';
+
+        #[Map(target: 'city')]
+        public string $city = '';
+    }
+
+    // src/Entity/User.php
+    namespace App\Entity;
+
+    class User
+    {
+        public string $name = '';
+        public string $streetAddress = '';
+        public string $city = '';
+    }
+
+When mapping ``UserInput``, the mapper will automatically process the ``$address``
+property and map its fields (``street``, ``city``) to the same ``User`` instance
+created for the parent::
+
+    $addressInput = new UserAddressInput();
+    $addressInput->street = '123 Main St';
+    $addressInput->city = 'Springfield';
+
+    $userInput = new UserInput();
+    $userInput->name = 'John Doe';
+    $userInput->address = $addressInput;
+
+    $mapper = new ObjectMapper();
+    $user = $mapper->map($userInput, User::class);
+
+    // $user->name === 'John Doe'
+    // $user->streetAddress === '123 Main St' (mapped from the nested UserAddressInput)
+    // $user->city === 'Springfield'
+
 Handling Recursion
 ------------------
 
