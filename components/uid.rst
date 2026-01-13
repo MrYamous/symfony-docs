@@ -545,13 +545,11 @@ ULID objects created with the ``Ulid`` class can use the following methods::
     // checking if a given value is valid as ULID
     $isValid = Ulid::isValid($ulidValue); // true or false
 
-    // validating ULIDs in a specific format
+    // use the optional format argument to validate ULIDs in a
+    // specific representation (default is Base32)
     $isValid = Ulid::isValid($ulidValue, Ulid::FORMAT_BASE_32);
+    $isValid = Ulid::isValid($ulidValue, Ulid::FORMAT_BASE_58);
     $isValid = Ulid::isValid($ulidValue, Ulid::FORMAT_RFC_4122);
-
-    By default, ``Ulid::isValid()`` validates ULIDs in the canonical Base32 format.
-    Use the optional ``$format`` argument to validate ULIDs in other representations,
-    such as RFC 4122, binary or Base58 formats.
 
     // getting the ULID datetime
     $ulid1->getDateTime(); // returns a \DateTimeImmutable instance
@@ -560,6 +558,10 @@ ULID objects created with the ``Ulid`` class can use the following methods::
     $ulid1->equals($ulid2); // false
     // this method returns $ulid1 <=> $ulid2
     $ulid1->compare($ulid2); // e.g. int(-1)
+
+.. versionadded:: 8.1
+
+    Support for validating ULIDs in different formats was introduced in Symfony 8.1.
 
 Storing ULIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
