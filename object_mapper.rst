@@ -629,7 +629,7 @@ and both map to ``User``::
     }
 
 When mapping ``UserInput``, the mapper will automatically process the ``$address``
-property and map its fields (``street``, ``city``) to the same ``User`` instance
+property and map its fields (``street``, ``city``) onto the same ``User`` instance
 created for the parent::
 
     $addressInput = new UserAddressInput();
