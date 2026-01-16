@@ -65,7 +65,7 @@ Validation of arrays is possible using the ``Collection`` constraint::
         ],
     ];
 
-    $groups = new Assert\GroupSequence(['Default', 'custom']);
+    $groups = new Assert\GroupSequence(groups: ['Default', 'custom']);
 
     $constraint = new Assert\Collection(fields: [
         // the keys correspond to the keys in the input array
