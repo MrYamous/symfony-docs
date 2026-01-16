@@ -146,4 +146,49 @@ You can also reference a specific named lock resource using ``lock://name``:
 
     The ``LockStore`` was introduced in Symfony 8.1.
 
+Serializing Semaphores
+----------------------
+
+The :class:`Symfony\\Component\\Semaphore\\Key` contains the state of the
+:class:`Symfony\\Component\\Semaphore\\Semaphore` and can be serialized. This
+allows acquiring a semaphore in one process and releasing it in another -
+useful for workflows, message queues, or any scenario where the acquire and
+release happen in different contexts.
+
+First, create the semaphore and acquire a slot::
+
+    use Symfony\Component\Semaphore\Key;
+
+    $key = new Key('pdf-generation', 5);  // 5 concurrent slots available
+    $semaphore = $factory->createSemaphoreFromKey(
+        $key,
+        300,   // ttl
+        false  // autoRelease
+    );
+
+    if ($semaphore->acquire()) {
+        // dispatch to worker, passing $key
+        $this->bus->dispatch(new GeneratePdfMessage($document, $key));
+    }
+
+Then in the worker, reconstruct and release::
+
+    $semaphore = $factory->createSemaphoreFromKey($key, 300, false);
+
+    try {
+        // do work
+    } finally {
+        $semaphore->release();
+    }
+
+.. note::
+
+    Don't forget to set the ``autoRelease`` argument to ``false`` in the
+    ``Semaphore`` instantiation to avoid releasing the lock when the destructor is
+    called.
+
+Semaphores can be serialized using both the native PHP serialization system
+and its :phpfunction:`serialize` function, or using the Serializer
+component.
+
 .. _`semaphores`: https://en.wikipedia.org/wiki/Semaphore_(programming)
