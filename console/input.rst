@@ -55,10 +55,6 @@ The ``Argument`` attribute accepts the following parameters:
     An array or a callable that provides :ref:`suggested values for the argument <console-input-completion>`.
     For example: ``#[Argument(suggestedValues: ['Alice', 'Bob'])]``.
 
-.. versionadded:: 7.3
-
-    The ``#[Argument]`` and ``#[Option]`` attributes were introduced in Symfony 7.3.
-
 The argument mode (required, optional, array) is inferred from the parameter type:
 
 * **Required**: Parameters without a default value and not nullable (e.g. ``string $name``);
