@@ -98,12 +98,12 @@ be injected with this parameter via the extension as follows::
         }
     }
 
-And set it in the constructor of ``Configuration`` via the ``Extension`` class::
+And set it in the constructor of ``Configuration`` via the :class:`Symfony\\Component\\DependencyInjection\\Extension\\Extension` class::
 
     namespace App\DependencyInjection;
 
     use Symfony\Component\DependencyInjection\ContainerBuilder;
-    use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+    use Symfony\Component\DependencyInjection\Extension\Extension;
 
     class AppExtension extends Extension
     {
@@ -114,6 +114,10 @@ And set it in the constructor of ``Configuration`` via the ``Extension`` class::
             return new Configuration($container->getParameter('kernel.debug'));
         }
     }
+
+.. deprecated:: 8.1
+
+    The ``Symfony\Component\HttpKernel\DependencyInjection\Extension`` class was deprecated in Symfony 8.1 and replaced by ``Symfony\Component\DependencyInjection\Extension\Extension``.
 
 .. tip::
 
