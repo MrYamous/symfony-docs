@@ -117,7 +117,9 @@ And set it in the constructor of ``Configuration`` via the :class:`Symfony\\Comp
 
 .. deprecated:: 8.1
 
-    The ``Symfony\Component\HttpKernel\DependencyInjection\Extension`` class was deprecated in Symfony 8.1 and replaced by ``Symfony\Component\DependencyInjection\Extension\Extension``.
+    In Symfony versions prior to 8.1, the ``Extension`` class was in
+    ``Symfony\Component\HttpKernel\DependencyInjection\Extension``. It was deprecated in Symfony
+    8.1 and replaced by ``Symfony\Component\DependencyInjection\Extension\Extension``.
 
 .. tip::
 
