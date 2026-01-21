@@ -305,20 +305,6 @@ exception. To avoid this, configure Symfony's PropertyAccess component in
             property_access:
                 exception_on_invalid_property_path: false
 
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd">
-
-            <framework:config>
-                <framework:property-access exception-on-invalid-property-path="false"/>
-            </framework:config>
-        </container>
-
     .. code-block:: php
 
         // config/services.php
