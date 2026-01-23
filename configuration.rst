@@ -507,7 +507,8 @@ This example shows how you could configure the application secret using an env v
 
 .. versionadded:: 8.1
 
-    Support for environment variables containing ``.`` was added in Symfony 8.1
+    Support for ``.`` in environment variable names (e.g. ``FOO.BAR``) was
+    introduced in Symfony 8.1.
 
 To define the value of an env var, you have several options:
 
