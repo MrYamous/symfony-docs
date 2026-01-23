@@ -505,6 +505,10 @@ This example shows how you could configure the application secret using an env v
     :doc:`env var processors </configuration/env_var_processors>` to transform
     their contents (e.g. to turn a string value into an integer).
 
+.. versionadded:: 8.1
+
+    Support for environment variables containing ``.`` was added in Symfony 8.1
+
 To define the value of an env var, you have several options:
 
 * :ref:`Add the value to a .env file <config-dot-env>`;
