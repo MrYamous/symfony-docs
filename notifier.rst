@@ -971,36 +971,38 @@ entirely. You can do this by forcing Notifier to use the ``NullTransport`` for
 all configured texter and chatter transports only in the ``dev`` (and/or
 ``test``) environment:
 
-.. code-block:: yaml
+.. configuration-block::
 
-    # config/packages/notifier.yaml
-    when@dev:
-        framework:
-            notifier:
-                texter_transports:
-                    twilio: 'null://null'
-                chatter_transports:
-                    slack: 'null://null'
+    .. code-block:: yaml
 
-.. code-block:: php
+        # config/packages/notifier.yaml
+        when@dev:
+            framework:
+                notifier:
+                    texter_transports:
+                        twilio: 'null://null'
+                    chatter_transports:
+                        slack: 'null://null'
 
-    // config/packages/notifier.php
-    namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+    .. code-block:: php
 
-    return App::config([
-        'when@dev' => [
-            'framework' => [
-                'notifier' => [
-                    'texter_transports' => [
-                        'twilio' => 'null://null',
-                    ],
-                    'chatter_transports' => [
-                        'slack' => 'null://null',
+        // config/packages/notifier.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'when@dev' => [
+                'framework' => [
+                    'notifier' => [
+                        'texter_transports' => [
+                            'twilio' => 'null://null',
+                        ],
+                        'chatter_transports' => [
+                            'slack' => 'null://null',
+                        ],
                     ],
                 ],
             ],
-        ],
-    ]);
+        ]);
 
 .. _notifier-events:
 
