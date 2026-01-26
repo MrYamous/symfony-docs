@@ -392,6 +392,155 @@ You need to combine ``VALUE_IS_ARRAY`` with ``VALUE_REQUIRED`` or
         )
     ;
 
+Mapping Input to Objects
+------------------------
+
+When a command has many arguments and options, the ``__invoke()`` method can
+become cluttered. To better organize the input, you can use the
+:class:`Symfony\\Component\\Console\\Attribute\\MapInput` attribute to group
+arguments and options into a dedicated class (a Data Transfer Object, or DTO)::
+
+    // src/Console/Input/CreateUserInput.php
+    namespace App\Console\Input;
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\Option;
+
+    class CreateUserInput
+    {
+        #[Argument]
+        public string $email;
+
+        #[Argument]
+        public string $password;
+
+        #[Option]
+        public bool $admin = false;
+    }
+
+Then, use the ``#[MapInput]`` attribute in your command to receive this DTO::
+
+    // src/Console/CreateUserCommand.php
+    namespace App\Console;
+
+    use App\Console\Input\CreateUserInput;
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\MapInput;
+
+    #[AsCommand(name: 'app:create-user', description: 'Creates a new user')]
+    class CreateUserCommand
+    {
+        public function __invoke(#[MapInput] CreateUserInput $input): int
+        {
+            // access input values as object properties
+            $email = $input->email;
+            $password = $input->password;
+            $isAdmin = $input->admin;
+
+            // ...
+
+            return 0;
+        }
+    }
+
+.. versionadded:: 7.4
+
+    The ``#[MapInput]`` attribute was introduced in Symfony 7.4.
+
+The DTO class must have at least one public property with an ``#[Argument]``
+or ``#[Option]`` attribute. Private, protected, and static properties are
+ignored. The same rules for argument and option types described earlier in
+this article apply to DTO properties.
+
+.. note::
+
+    DTOs are instantiated without calling their constructor and values are
+    assigned directly to public properties. This means any logic in the
+    constructor (such as initialization) will not run. If you need to
+    transform or validate input values, use :ref:`property hooks <console-input-dto-property-hooks>` instead.
+
+Nesting Input DTOs
+~~~~~~~~~~~~~~~~~~
+
+You can compose input classes by nesting DTOs. This is useful when you want
+to group related arguments and options, or reuse common input definitions
+across multiple commands::
+
+    // src/Console/Input/PaginationInput.php
+    namespace App\Console\Input;
+
+    use Symfony\Component\Console\Attribute\Option;
+
+    class PaginationInput
+    {
+        #[Option(description: 'Number of items per page')]
+        public int $limit = 10;
+
+        #[Option(description: 'Page number')]
+        public int $page = 1;
+    }
+
+    // src/Console/Input/ListUsersInput.php
+    namespace App\Console\Input;
+
+    use Symfony\Component\Console\Attribute\MapInput;
+    use Symfony\Component\Console\Attribute\Option;
+
+    class ListUsersInput
+    {
+        #[Option(description: 'Filter by role')]
+        public ?string $role = null;
+
+        #[MapInput]
+        public PaginationInput $pagination;
+    }
+
+Then, access nested properties in your command::
+
+    #[AsCommand(name: 'app:list-users')]
+    class ListUsersCommand
+    {
+        public function __invoke(#[MapInput] ListUsersInput $input): int
+        {
+            $role = $input->role;
+            $limit = $input->pagination->limit;
+            $page = $input->pagination->page;
+
+            // ...
+
+            return 0;
+        }
+    }
+
+.. _console-input-dto-property-hooks:
+
+Using Property Hooks for Normalization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PHP provides `property hooks`_, which you can use to normalize input values as
+they are assigned to the DTO::
+
+    class CreateUserInput
+    {
+        #[Argument]
+        public string $email {
+            set(string $value) {
+                $this->email = strtolower(trim($value));
+            }
+        }
+
+        #[Option]
+        public array $roles = [] {
+            set(array $value) {
+                $this->roles = array_map('strtoupper', $value);
+            }
+        }
+    }
+
+
+With this setup, when the command input is resolved, the email is lowercased
+and trimmed, and roles are uppercased.
+
 Options with optional arguments
 -------------------------------
 
@@ -659,3 +808,4 @@ When using the ``FrameworkBundle``, two more options are predefined:
 So your custom commands can use them too out-of-the-box.
 
 .. _`docopt standard`: http://docopt.org/
+.. _`property hooks`: https://php.net/language.oop5.property-hooks.php
