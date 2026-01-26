@@ -2274,9 +2274,9 @@ handler is registered. The ``HandleTrait`` can be used in any class that has a
     {
         use HandleTrait;
 
-        public function __construct(
-            private MessageBusInterface $messageBus,
-        ) {
+        public function __construct(MessageBusInterface $queryBus)
+        {
+            $this->messageBus = $queryBus;
         }
 
         public function __invoke(): void
@@ -2309,9 +2309,9 @@ wherever you need a query bus behavior instead of the ``MessageBusInterface``::
     {
         use HandleTrait;
 
-        public function __construct(
-            private MessageBusInterface $messageBus,
-        ) {
+        public function __construct(MessageBusInterface $queryBus)
+        {
+            $this->messageBus = $queryBus;
         }
 
         /**
