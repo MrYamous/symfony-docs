@@ -400,9 +400,9 @@ Mapping Input to Objects
 ------------------------
 
 When a command has many arguments and options, the ``__invoke()`` method can
-become cluttered. To organize the input better, you can use the
+become cluttered. To better organize the input, you can use the
 :class:`Symfony\\Component\\Console\\Attribute\\MapInput` attribute to group
-arguments and options into a dedicated class (a Data Transfer Object or DTO)::
+arguments and options into a dedicated class (a Data Transfer Object, or DTO)::
 
     // src/Console/Input/CreateUserInput.php
     namespace App\Console\Input;
@@ -521,8 +521,8 @@ Then, access nested properties in your command::
 Using Property Hooks for Normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PHP 8.4 introduced `property hooks`_, which you can use to normalize input
-values as they are assigned to the DTO::
+PHP provides `property hooks`_, which you can use to normalize input values as
+they are assigned to the DTO::
 
     class CreateUserInput
     {
@@ -541,8 +541,9 @@ values as they are assigned to the DTO::
         }
     }
 
-With this setup, the email is automatically lowercased and trimmed, and roles
-are uppercased when the command input is resolved.
+
+With this setup, when the command input is resolved, the email is lowercased
+and trimmed, and roles are uppercased.
 
 Options with optional arguments
 -------------------------------
@@ -820,4 +821,4 @@ When using the ``FrameworkBundle``, two more options are predefined:
 So your custom commands can use them too out-of-the-box.
 
 .. _`docopt standard`: http://docopt.org/
-.. _`property hooks`: https://www.php.net/manual/en/language.oop5.property-hooks.php
+.. _`property hooks`: https://php.net/language.oop5.property-hooks.php
