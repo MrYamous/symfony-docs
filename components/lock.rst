@@ -724,9 +724,9 @@ This store does not support blocking, and expects a TTL to avoid stalled locks::
     $store = new DynamoDbStore($dynamoDbClientOrDSN);
 
 The table where values are stored is created automatically on the first call to
-the :method:`Symfony\\Component\\Lock\\Bridge\\DynamoDb\\DynamoDbStore::save` method.
+the :method:`Symfony\\Component\\Lock\\Bridge\\DynamoDb\\Store\\DynamoDbStore::save` method.
 You can also create this table explicitly by calling the
-:method:`Symfony\\Component\\Lock\\Bridge\\DynamoDb\\DynamoDbStore::createTable` method in
+:method:`Symfony\\Component\\Lock\\Bridge\\DynamoDb\\Store\\DynamoDbStore::createTable` method in
 your code.
 
 Reliability
