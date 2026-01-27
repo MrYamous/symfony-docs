@@ -3121,6 +3121,47 @@ are a variety of different stamps for different purposes and they're used intern
 to track information about a message - like the message bus that's handling it
 or if it's being retried after failure.
 
+Default Stamps on Messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 7.4
+
+    Symfony Messenger now lets a message class provide its own default stamps
+    when dispatched by implementing
+    :class:`Symfony\\Component\\Messenger\\Message\\DefaultStampsProviderInterface`.
+
+This can be useful when the same stamps (for example a delay stamp or routing
+stamp) are required every time this message is dispatched. Instead of having
+to provide them at each call site, the message itself can declare them.
+
+Example::
+
+    use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
+    use Symfony\Component\Messenger\Stamp\DelayStamp;
+
+    class ExportReportMessage implements DefaultStampsProviderInterface
+    {
+        public function getDefaultStamps(): array
+        {
+            // This stamp will be added automatically on dispatch
+            return [new DelayStamp(1000)];
+        }
+    }
+
+When dispatching the message::
+
+    // DelayStamp(1000) is added by default
+    $bus->dispatch(new ExportReportMessage());
+
+    // DelayStamp(500) overrides the default one
+    $bus->dispatch(
+        new ExportReportMessage(),
+        [new DelayStamp(500)]
+    );
+
+Note that default stamps are added *only if no stamp of the same class*
+already exists on the envelope.
+
 .. _messenger_middleware:
 
 Middleware
