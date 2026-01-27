@@ -961,6 +961,30 @@ Add an ``extra.curl`` option in your configuration to pass those extra options::
     Some cURL options are impossible to override (e.g. because of thread safety)
     and you'll get an exception when trying to override them.
 
+Persistent cURL connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    ``CurlHttpClient`` supports persistent cURL handles when running on PHP 8.5
+    or later.
+
+Persistent connections can be enabled using the
+``extra.use_persistent_connections`` option::
+
+    use Symfony\Component\HttpClient\CurlHttpClient;
+
+    $client = new CurlHttpClient([
+        'extra' => [
+            'use_persistent_connections' => true,
+        ],
+    ]);
+
+When enabled, DNS cache, SSL sessions and connection data can be reused across
+requests, reducing connection overhead.
+
+When disabled (default), non-persistent cURL handles are used.
+
 HTTP Compression
 ~~~~~~~~~~~~~~~~
 
@@ -1323,9 +1347,9 @@ response and get remaining contents that might come back in a new timeout, etc.
 
     A value lower than or equal to ``0`` means unlimited, as long as the ``timeout``
     option is respected.
-    
+
     .. versionadded:: 8.1
-    
+
         The ``max_connect_duration`` was introduced in Symfony 8.1.
 
 .. _http-client_network-errors:
