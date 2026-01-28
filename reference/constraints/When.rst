@@ -253,7 +253,8 @@ applied but the constraints defined in ``otherwise`` option (if provided) will b
                     - When:
                         expression: "value == 'percent'"
                         constraints:
-                            - Callback: doComplexValidation
+                            - Callback:
+                                callback: doComplexValidation
 
     .. code-block:: xml
 
