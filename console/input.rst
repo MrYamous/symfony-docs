@@ -443,10 +443,6 @@ Then, use the ``#[MapInput]`` attribute in your command to receive this DTO::
         }
     }
 
-.. versionadded:: 7.4
-
-    The ``#[MapInput]`` attribute was introduced in Symfony 7.4.
-
 The DTO class must have at least one public property with an ``#[Argument]``
 or ``#[Option]`` attribute. Private, protected, and static properties are
 ignored. The same rules for argument and option types described earlier in
