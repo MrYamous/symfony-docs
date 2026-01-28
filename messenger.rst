@@ -2274,8 +2274,10 @@ handler is registered. The ``HandleTrait`` can be used in any class that has a
     {
         use HandleTrait;
 
+        // the parameter must be named $queryBus to trigger autowiring of the 'query.bus' service
         public function __construct(MessageBusInterface $queryBus)
         {
+            // HandleTrait requires a property named $messageBus
             $this->messageBus = $queryBus;
         }
 
@@ -2309,8 +2311,10 @@ wherever you need a query bus behavior instead of the ``MessageBusInterface``::
     {
         use HandleTrait;
 
+        // the parameter must be named $queryBus to trigger autowiring of the 'query.bus' service
         public function __construct(MessageBusInterface $queryBus)
         {
+            // HandleTrait requires a property named $messageBus
             $this->messageBus = $queryBus;
         }
 
