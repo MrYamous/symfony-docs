@@ -49,6 +49,13 @@ which makes creating a voter even easier::
         abstract protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool;
     }
 
+.. note::
+
+    The Voter class also implements
+    :class:`Symfony\\Component\\Security\\Core\\Authorization\\Voter\\CacheableVoterInterface`
+    with methods used to improve :ref:`voting performance <voter-improve-performance>`
+    thanks to caching.
+
 .. _how-to-use-the-voter-in-a-controller:
 
 Setup: Checking for Access in a Controller
@@ -336,6 +343,8 @@ with ``ROLE_SUPER_ADMIN``::
 If you're using the :ref:`default services.yaml configuration <service-container-services-load-example>`,
 you're done! Symfony will automatically pass the ``security.helper``
 service when instantiating your voter (thanks to autowiring).
+
+.. _voter-improve-performance:
 
 Improving Voter Performance
 ---------------------------
