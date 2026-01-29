@@ -149,6 +149,31 @@ achieve a strict reproducible build:
             ],
         ]);
 
+Using the ``SOURCE_DATE_EPOCH`` environment variable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to the ``kernel.container_build_time`` parameter, Symfony also
+supports the standardized ``SOURCE_DATE_EPOCH`` environment variable.
+
+When defined, its value (a Unix timestamp) is used as the container build
+time::
+
+    export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+    php bin/console cache:clear
+
+This is especially useful to generate reproducible builds based on a version
+control timestamp.
+
+If the ``kernel.container_build_time`` parameter is defined, it always takes
+precedence over ``SOURCE_DATE_EPOCH``.
+
+If ``SOURCE_DATE_EPOCH`` is missing or invalid, Symfony falls back to the
+current system time.
+
+.. versionadded:: 8.1
+
+    Support for the ``SOURCE_DATE_EPOCH`` environment variable was added.
+
 ``kernel.container_class``
 --------------------------
 
