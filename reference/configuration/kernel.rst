@@ -149,30 +149,33 @@ achieve a strict reproducible build:
             ],
         ]);
 
-Using the ``SOURCE_DATE_EPOCH`` environment variable
+Using the ``SOURCE_DATE_EPOCH`` Environment Variable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In addition to the ``kernel.container_build_time`` parameter, Symfony also
-supports the standardized ``SOURCE_DATE_EPOCH`` environment variable.
+Symfony supports the standardized `SOURCE_DATE_EPOCH`_ environment variable
+as an alternative way to set a reproducible container build time. When this
+environment variable is defined, Symfony uses its value (a Unix timestamp) as
+the container build time:
 
-When defined, its value (a Unix timestamp) is used as the container build
-time::
+.. code-block:: terminal
 
+    # set the build time to the timestamp of the last Git commit
     export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
     php bin/console cache:clear
 
-This is especially useful to generate reproducible builds based on a version
-control timestamp.
+This is particularly useful for generating reproducible builds based on
+version control timestamps.
 
-If the ``kernel.container_build_time`` parameter is defined, it always takes
-precedence over ``SOURCE_DATE_EPOCH``.
+.. note::
 
-If ``SOURCE_DATE_EPOCH`` is missing or invalid, Symfony falls back to the
-current system time.
+    If both ``SOURCE_DATE_EPOCH`` and the ``kernel.container_build_time`` parameter
+    are defined, the parameter takes precedence. If ``SOURCE_DATE_EPOCH`` is not
+    set or contains an invalid value, Symfony falls back to the current system time.
 
 .. versionadded:: 8.1
 
-    Support for the ``SOURCE_DATE_EPOCH`` environment variable was added.
+    Support for the ``SOURCE_DATE_EPOCH`` environment variable was introduced
+    in Symfony 8.1.
 
 ``kernel.container_class``
 --------------------------
@@ -394,3 +397,4 @@ This parameter stores the value of
 .. _`character encoding`: https://en.wikipedia.org/wiki/Character_encoding
 .. _`reproducible builds`: https://en.wikipedia.org/wiki/Reproducible_builds
 .. _`FrankenPHP`: https://frankenphp.dev
+.. _`SOURCE_DATE_EPOCH`: https://reproducible-builds.org/docs/source-date-epoch/
