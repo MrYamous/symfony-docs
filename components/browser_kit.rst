@@ -102,15 +102,16 @@ When fetching HTML fragments that are not valid standalone documents
 (e.g. ``<tr>`` or ``<td>`` elements), the native HTML5 parser may drop or
 rewrite those elements because they lack proper context.
 
-To solve this, BrowserKit allows wrapping the response content before it
-is parsed, using the :method:`Symfony\\Component\\BrowserKit\\AbstractBrowser::wrapContent` method.
+To solve this, BrowserKit allows wrapping the response content before it is
+parsed, using the :method:`Symfony\\Component\\BrowserKit\\AbstractBrowser::wrapContent`
+method.
 
 For example, when a controller returns an HTML fragment like this::
 
     <tr><td>Cell content</td></tr>
 
-Parsing it directly may remove the ``tr`` and ``td`` elements. You can
-wrap the fragment in a valid parent structure::
+Parsing it directly may remove the ``<tr>`` and ``<td>`` elements. You can wrap
+the fragment in a valid parent structure::
 
     use Acme\Client;
 
