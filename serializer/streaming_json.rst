@@ -337,6 +337,63 @@ structure::
 
     $catShelter = $jsonStreamReader->read($json, $type); // will be populated with Cat instances
 
+Default Options
+---------------
+
+You can configure default options for both the stream writer and reader using
+the ``framework.json_streamer.default_options`` configuration:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/framework.yaml
+        framework:
+            json_streamer:
+                default_options:
+                    include_null_properties: true
+
+    .. code-block:: xml
+
+        <!-- config/packages/framework.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony
+                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:json-streamer>
+                    <framework:default-option key="include_null_properties">true</framework:default-option>
+                </framework:json-streamer>
+            </framework:config>
+        </container>
+
+    .. code-block:: php
+
+        // config/packages/framework.php
+        use Symfony\Config\FrameworkConfig;
+
+        return static function (FrameworkConfig $framework): void {
+            $framework->jsonStreamer()
+                ->defaultOption('include_null_properties', true)
+            ;
+        };
+
+The ``include_null_properties`` option controls whether properties with ``null``
+values are included in the encoded JSON output. When set to ``true``, properties
+with ``null`` values are included; when ``false`` (the default), they are omitted.
+
+You can also pass custom options that will be available in your value transformers
+via the ``$options`` argument.
+
+.. versionadded:: 8.1
+
+    The ``default_options`` configuration was introduced in Symfony 8.1.
+
 Configuring Encoding/Decoding
 -----------------------------
 
