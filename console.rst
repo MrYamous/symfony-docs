@@ -493,6 +493,36 @@ call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``
 
 .. tip::
 
+    You can simplify the above code by using the
+    :method:`Symfony\\Bundle\\FrameworkBundle\\Test\\KernelTestCase::executeCommand`
+    shortcut::
+
+        // tests/Command/CreateUserCommandTest.php
+        namespace App\Tests\Command;
+
+        use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+        class CreateUserCommandTest extends KernelTestCase
+        {
+            public function testExecute(): void
+            {
+                $commandTester = static::executeCommand('app:create-user', [
+                    'username' => 'Wouter',
+                ]);
+
+                $commandTester->assertCommandIsSuccessful();
+
+                $output = $commandTester->getDisplay();
+                $this->assertStringContainsString('Username: Wouter', $output);
+            }
+        }
+
+.. versionadded:: 8.1
+
+    The ``executeCommand()`` method was introduced in Symfony 8.1.
+
+.. tip::
+
     You can also test a whole console application by using
     :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`.
 
