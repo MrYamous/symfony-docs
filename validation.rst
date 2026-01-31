@@ -562,6 +562,39 @@ You can't change this behavior, but you can overcome it by defining the parent
 and the child constraints in different :doc:`validation groups </validation/groups>`
 and then select the appropriate group when validating each object.
 
+.. _validation-extends-validation:
+
+Extending Validation for a Class
+--------------------------------
+
+Sometimes you may want to define validation constraints that will be applied in
+another class. Typically this can be used to override third party classes
+built-in validation.
+
+Let's suppose you are using a third party class ``Product`` whith a constraint
+on ``name`` property validating the minimum length is 2 but you want to enforce
+at least 10 characters.
+You can define your own class and use the ``#[ExtendsValidationFor]`` attribute to
+define the target class to extends::
+
+    use Symfony\Component\Validator\Attribute\ExtendsValidationFor;
+    use Symfony\Component\Validator\Constraints as Assert;
+
+    #[ExtendsValidationFor(Product::class)]
+    abstract class SourceClass
+    {
+        #[Assert\NotBlank(groups: ['my_app'])]
+        #[Assert\Length(min: 10, groups: ['my_app'])]
+        public string $name = '';
+    }
+
+You can define constraints only for properties which exists in your target
+class, otherwise a ``MappingException`` is thrown.
+
+.. versionadded:: 7.4
+
+    The ``#[ExtendsValidationFor]`` attribute was introduced in Symfony 7.4.
+
 Debugging the Constraints
 -------------------------
 
