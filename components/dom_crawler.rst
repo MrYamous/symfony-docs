@@ -636,6 +636,27 @@ the whole form or specific field(s)::
     $form->disableValidation();
     $form['country']->select('Invalid value');
 
+Adding Choices to Select Fields
+...............................
+
+When testing JavaScript-powered forms (e.g., autocomplete fields), you may need
+to add new choices dynamically to a select field. Use the ``addChoice()`` method
+to add options to a choice field::
+
+    // adds a new choice to a select field
+    $form['country']->addChoice('new_country_code');
+
+    // adds a new choice and selects it
+    $form['country']->addChoice('new_country_code', true);
+
+This is particularly useful when testing forms that use JavaScript to dynamically
+populate select options (such as autocomplete or dependent dropdowns), where the
+options are not present in the initial HTML.
+
+.. versionadded:: 8.1
+
+    The ``addChoice()`` method for single select fields was introduced in Symfony 8.1.
+
 Resolving a URI
 ~~~~~~~~~~~~~~~
 
