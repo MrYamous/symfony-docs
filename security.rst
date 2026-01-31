@@ -1966,6 +1966,41 @@ Users with ``ROLE_SUPER_ADMIN``, will automatically have ``ROLE_ADMIN``,
 
     You can then open the ``roles.svg`` file to see the generated graph.
 
+Programmatic Access to Role Hierarchy
+"""""""""""""""""""""""""""""""""""""
+
+You can inject the :class:`Symfony\\Component\\Security\\Core\\Role\\RoleHierarchyInterface`
+service to programmatically access the role hierarchy. This is useful when you need
+to retrieve all reachable roles (child roles) or parent roles for a given set of roles::
+
+    use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+
+    class RoleService
+    {
+        public function __construct(
+            private RoleHierarchyInterface $roleHierarchy,
+        ) {
+        }
+
+        public function getAccessibleRoles(array $roles): array
+        {
+            // Get all child roles (roles that are inherited by the given roles)
+            // e.g., ['ROLE_ADMIN'] returns ['ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_USER' => 'ROLE_USER']
+            return $this->roleHierarchy->getReachableRoleNames($roles);
+        }
+
+        public function getParentRoles(array $roles): array
+        {
+            // Get all parent roles (roles that inherit the given roles)
+            // e.g., ['ROLE_USER'] returns ['ROLE_USER' => 'ROLE_USER', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN']
+            return $this->roleHierarchy->getParentRoleNames($roles);
+        }
+    }
+
+.. versionadded:: 8.1
+
+    The ``getParentRoleNames()`` method was introduced in Symfony 8.1.
+
 .. _security-role-authorization:
 
 Add Code to Deny Access
