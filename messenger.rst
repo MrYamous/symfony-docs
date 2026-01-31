@@ -1604,6 +1604,8 @@ The Redis transport DSN may looks like this:
     MESSENGER_TRANSPORT_DSN=redis://password@localhost:6379/messages/symfony/consumer?auto_setup=true&serializer=1&stream_max_entries=0&dbindex=0
     # Redis Cluster Example
     MESSENGER_TRANSPORT_DSN=redis://host-01:6379,redis://host-02:6379,redis://host-03:6379,redis://host-04:6379
+    # Redis Cluster with automatic node discovery
+    MESSENGER_TRANSPORT_DSN=redis://localhost:6379/messages?redis_cluster=true
     # Unix Socket Example
     MESSENGER_TRANSPORT_DSN=redis:///var/run/redis.sock
     # TLS Example
@@ -1682,6 +1684,15 @@ under the transport in ``messenger.yaml``:
 
 ``redis_sentinel`` (default: ``null``)
     An alias of the ``sentinel_master`` option
+
+``redis_cluster`` (default: ``false``)
+    If ``true``, forces the use of ``RedisCluster`` instead of ``Redis``. This is
+    useful when connecting to a Redis Cluster and you want automatic node discovery
+    instead of listing all cluster nodes in the DSN.
+
+    .. versionadded:: 8.1
+
+        The ``redis_cluster`` option was introduced in Symfony 8.1.
 
 ``ssl`` (default: ``null``)
     Map of `SSL context options`_ for the TLS channel. This is useful for example
