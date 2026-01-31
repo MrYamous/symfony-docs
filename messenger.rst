@@ -450,6 +450,30 @@ The first argument is the receiver's name (or service id if you routed to a
 custom service). By default, the command will run forever: looking for new messages
 on your transport and handling them. This command is called your "worker".
 
+You can also use regular expressions as the receiver's name to match multiple
+transports at once. This is useful when you have multiple transports with
+similar names (e.g. prefix matching):
+
+.. code-block:: terminal
+
+    # match all transports starting with "scheduler_"
+    $ php bin/console messenger:consume scheduler_.*
+
+    # match multiple transports using multiple patterns or specific names
+    $ php bin/console messenger:consume "(?i)THIRD.*" second.* normal
+
+When a regular expression matches multiple transports, they are consumed in the order they
+are defined in your configuration. If you specify multiple receiver names or
+regular expressions, they are processed in the order you provided them in the command.
+
+.. versionadded:: 8.1
+
+    The ability to use regular expressions as the receiver's name was introduced in Symfony 8.1.
+
+.. note::
+
+    Regular expression matching only works when the command is not run in interactive mode.
+
 If you want to consume messages from all available receivers, you can use the
 command with the ``--all`` option:
 

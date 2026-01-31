@@ -138,6 +138,11 @@ on a particular schedule::
 
 .. tip::
 
+    You can consume all your scheduler transports at once by using a regular expression
+    with the ``messenger:consume`` command (e.g. ``php bin/console messenger:consume scheduler_.*``).
+
+.. tip::
+
     `Memoizing`_ your schedule is a good practice to prevent unnecessary reconstruction
     if the ``getSchedule()`` method is checked by another service.
 
