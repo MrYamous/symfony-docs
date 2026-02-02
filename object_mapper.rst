@@ -411,6 +411,31 @@ Then, use this service to format the mapped property::
         public string $lastName = '';
     }
 
+Invalid transform or condition callables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ObjectMapper throws a ``NoSuchCallableException`` when a ``transform`` or
+    ``if`` callable is invalid.
+
+An exception is thrown when:
+* the value is not callable;
+* the callable is resolved from the container but does not implement the expected
+  interface (``TransformCallableInterface`` or ``ConditionCallableInterface``).
+
+Example of an invalid configuration::
+
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    class InvalidConfiguration
+    {
+        public function __construct(
+            #[Map(transform: 'wrongMethod')]
+            public readonly string $value,
+        ) {}
+    }
+
 Class-Level Transformation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
