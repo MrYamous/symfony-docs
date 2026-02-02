@@ -307,7 +307,7 @@ exception. To avoid this, configure Symfony's PropertyAccess component in
         # config/packages/framework.yaml
         framework:
             property_access:
-                exception_on_invalid_property_path: false
+                throw_exception_on_invalid_property_path: false
 
     .. code-block:: xml
 
@@ -333,7 +333,7 @@ exception. To avoid this, configure Symfony's PropertyAccess component in
         return function(ContainerConfigurator $container): void {
             $container->extension('framework', [
                 'property_access' => [
-                    'exception_on_invalid_property_path' => false,
+                    'throw_exception_on_invalid_property_path' => false,
                 ],
             ]);
         };
