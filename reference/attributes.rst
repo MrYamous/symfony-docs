@@ -143,6 +143,7 @@ Each validation constraint comes with a PHP attribute. See
 :doc:`/reference/constraints` for a full list of validation constraints.
 
 * :doc:`HasNamedArguments </validation/custom_constraint>`
+* :ref:`ExtendsValidationFor <validation-extends-validation>`
 
 Workflow
 ~~~~~~~~
