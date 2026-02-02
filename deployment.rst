@@ -214,6 +214,7 @@ setup:
 * :ref:`Building and minifying your assets <how-do-i-deploy-my-encore-assets>` with Webpack Encore
 * :ref:`Compile your assets <asset-mapper-deployment>` if you're using the AssetMapper component
 * Pushing assets to a CDN
+* :ref:`Dumping error pages as static HTML files <dumping-error-pages-as-static-html-files>`
 * On a shared hosting platform using the Apache web server, you may need to
   install the `symfony/apache-pack`_ package
 * etc.
