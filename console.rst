@@ -463,12 +463,7 @@ console::
     {
         public function testExecute(): void
         {
-            self::bootKernel();
-            $application = new Application(self::$kernel);
-
-            $command = $application->find('app:create-user');
-            $commandTester = new CommandTester($command);
-            $commandTester->execute([
+            $commandTester = static::executeCommand('app:create-user', [
                 // pass arguments to the helper
                 'username' => 'Wouter',
 
@@ -477,6 +472,13 @@ console::
                 // use brackets for testing array value,
                 // e.g: '--some-option' => ['option_value'],
             ]);
+
+            // this code is equivalent to run commands and was used in previous Symfony versions:
+            // self::bootKernel();
+            // $application = new Application(self::$kernel);
+            // $command = $application->find('app:create-user');
+            // $commandTester = new CommandTester($command);
+            // $commandTester->execute(['username' => 'Wouter']);
 
             $commandTester->assertCommandIsSuccessful();
 
@@ -494,41 +496,15 @@ console::
 
 .. versionadded:: 8.1
 
+    The ``executeCommand()`` method was introduced in Symfony 8.1.
+
+.. versionadded:: 8.1
+
     The ``assertCommandFailed()`` and ``assertCommandIsInvalid()`` methods were
     introduced in Symfony 8.1.
 
 If you are using a :doc:`single-command application </components/console/single_command_tool>`,
 call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``.
-
-.. tip::
-
-    You can simplify the above code by using the
-    :method:`Symfony\\Bundle\\FrameworkBundle\\Test\\KernelTestCase::executeCommand`
-    shortcut::
-
-        // tests/Command/CreateUserCommandTest.php
-        namespace App\Tests\Command;
-
-        use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-
-        class CreateUserCommandTest extends KernelTestCase
-        {
-            public function testExecute(): void
-            {
-                $commandTester = static::executeCommand('app:create-user', [
-                    'username' => 'Wouter',
-                ]);
-
-                $commandTester->assertCommandIsSuccessful();
-
-                $output = $commandTester->getDisplay();
-                $this->assertStringContainsString('Username: Wouter', $output);
-            }
-        }
-
-.. versionadded:: 8.1
-
-    The ``executeCommand()`` method was introduced in Symfony 8.1.
 
 .. tip::
 
