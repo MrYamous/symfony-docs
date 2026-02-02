@@ -405,6 +405,39 @@ The properties are fetched from the user object using the
     ``requestLoginLink()`` controller, you can invalidate all login links
     whenever a user requests a new link.
 
+.. versionadded:: 8.1
+
+    Signature properties can be enum values (both ``UnitEnum`` and backed enums).
+    Changing the enum case automatically invalidates existing login links.
+
+A common use case is to invalidate all existing login links when a user's
+security-related state changes (for example after requesting a password reset).
+
+For example, you can include an enum value in the signature properties::
+
+    enum LoginState: string
+    {
+        case ACTIVE = 'active';
+        case PASSWORD_RESET = 'password_reset';
+    }
+
+    class User
+    {
+        private LoginState $loginState;
+
+
+        public function getLoginLinkSignatureProperties(): array
+        {
+            return [
+                'login_state' => $this->loginState,
+            ];
+        }
+    }
+
+
+When the ``LoginState`` changes (e.g. from ``ACTIVE`` to ``PASSWORD_RESET``),
+all previously generated login links for that user become invalid automatically.
+
 Configure a Maximum Use of a Link
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
