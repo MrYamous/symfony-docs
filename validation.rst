@@ -569,29 +569,35 @@ and then select the appropriate group when validating each object.
 Extending Validation for a Class
 --------------------------------
 
-Sometimes you may want to define validation constraints that will be applied in
-another class. Typically this can be used to override third party classes
-built-in validation.
+Sometimes you may want to add or override validation constraints on a class you
+cannot modify (for example, a model coming from a third party library or a
+bundle).
 
-Let's suppose you are using a third party class ``Product`` whith a constraint
-on ``name`` property validating the minimum length is 2 but you want to enforce
-at least 10 characters.
-You can define your own class and use the ``#[ExtendsValidationFor]`` attribute to
-define the target class to extends::
+Suppose you use a third party ``Product`` class that validates the ``name``
+property with a minimum length of 2, but in your application you want to enforce
+a minimum of 10 characters.
+
+To do this, create a separate class and use the ``#[ExtendsValidationFor]``
+attribute to tell the Validator which class should receive these constraints.
+Your new class name is irrelevant and the class is typically made ``abstract`` to
+make it clear it is never instantiated::
 
     use Symfony\Component\Validator\Attribute\ExtendsValidationFor;
     use Symfony\Component\Validator\Constraints as Assert;
 
     #[ExtendsValidationFor(Product::class)]
-    abstract class SourceClass
+    abstract class MyProductValidation
     {
         #[Assert\NotBlank(groups: ['my_app'])]
         #[Assert\Length(min: 10, groups: ['my_app'])]
         public string $name = '';
     }
 
-You can define constraints only for properties which exists in your target
-class, otherwise a ``MappingException`` is thrown.
+The constraints defined in this class are applied to the target class (``Product``)
+as if they were defined there.
+
+You can only define constraints for properties that exist on the target class.
+Otherwise, a ``MappingException`` is thrown.
 
 .. versionadded:: 7.4
 
