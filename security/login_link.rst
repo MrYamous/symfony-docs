@@ -405,13 +405,10 @@ The properties are fetched from the user object using the
     ``requestLoginLink()`` controller, you can invalidate all login links
     whenever a user requests a new link.
 
-.. versionadded:: 8.1
-
-    Signature properties can be enum values (both ``UnitEnum`` and backed enums).
-    Changing the enum case automatically invalidates existing login links.
-
-A common use case is to invalidate all existing login links when a user's
-security-related state changes (for example after requesting a password reset).
+Signature properties can be **enum values** (both ``UnitEnum`` and backed enums).
+Changing the enum case automatically invalidates existing login links. A common
+use case is to invalidate all existing login links when a user's security-related
+state changes (for example after requesting a password reset).
 
 For example, you can include an enum value in the signature properties::
 
@@ -434,9 +431,12 @@ For example, you can include an enum value in the signature properties::
         }
     }
 
-
 When the ``LoginState`` changes (e.g. from ``ACTIVE`` to ``PASSWORD_RESET``),
 all previously generated login links for that user become invalid automatically.
+
+.. versionadded:: 8.1
+
+    Support for enums in login links was introduced in Symfony 8.1.
 
 Configure a Maximum Use of a Link
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
