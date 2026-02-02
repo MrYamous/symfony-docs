@@ -599,10 +599,6 @@ as if they were defined there.
 You can only define constraints for properties that exist on the target class.
 Otherwise, a ``MappingException`` is thrown.
 
-.. versionadded:: 7.4
-
-    The ``#[ExtendsValidationFor]`` attribute was introduced in Symfony 7.4.
-
 Debugging the Constraints
 -------------------------
 
