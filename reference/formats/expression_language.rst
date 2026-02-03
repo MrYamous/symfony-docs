@@ -119,7 +119,7 @@ operator)::
 Use the ``?.[]`` syntax to safely access array elements when the array or object
 might be ``null``::
 
-    // this will throw an exception when `fruit.items` is `null`
+    // this will throw an exception when `fruit.getItems()` is `null`
     $expressionLanguage->evaluate('fruit.getItems()[0]', ['fruit' => '...'])
 
     // this will return `null` if `fruit.getItems()` is `null`
