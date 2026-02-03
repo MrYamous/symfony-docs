@@ -266,6 +266,34 @@ Before defining the children of an array node, you can provide options like:
     Allows extra config keys to be specified under an array without
     throwing an exception.
 
+``acceptAndWrap()``
+    Declares which alternative scalar types (e.g., ``string``, ``int``, ``bool``)
+    should be accepted at an array node level and automatically wrapped into arrays.
+    This is particularly useful for generating more precise type hints in config
+    builder classes instead of falling back to ``mixed``::
+
+        $rootNode
+            ->children()
+                ->arrayNode('connections')
+                    ->acceptAndWrap('string')
+                    ->scalarPrototype()->end()
+                ->end()
+            ->end()
+        ;
+
+    With this configuration, users can provide either an array of strings or a
+    single string that will be automatically wrapped into an array:
+
+    .. code-block:: yaml
+
+        # Both configurations are valid:
+        connections: ['mysql', 'sqlite']
+        connections: 'mysql'  # automatically wrapped as ['mysql']
+
+    .. versionadded:: 7.4
+
+        The ``acceptAndWrap()`` method was introduced in Symfony 7.4.
+
 A basic prototyped array configuration can be defined as follows::
 
     $node

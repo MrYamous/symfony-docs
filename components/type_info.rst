@@ -114,6 +114,69 @@ PHP package required for string resolving. Then, follow these steps::
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'id')); // returns an "int" Type
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'tags')); // returns a collection with "int" as key and "string" as values Type
 
+Type Aliases
+~~~~~~~~~~~~
+
+The TypeInfo component supports type aliases defined via PHPDoc annotations. This
+allows you to define complex types once and reuse them across your codebase::
+
+    /**
+     * @phpstan-type UserData = array{name: string, email: string, age: int}
+     */
+    class UserService
+    {
+        /**
+         * @var UserData
+         */
+        public mixed $userData;
+
+        /**
+         * @param UserData $data
+         */
+        public function process(mixed $data): void
+        {
+            // ...
+        }
+    }
+
+    $typeResolver = TypeResolver::create();
+    $typeResolver->resolve(new \ReflectionProperty(UserService::class, 'userData'));
+    // returns an array Type with the shape defined in UserData
+
+The component supports both PHPStan and Psalm annotation formats:
+
+* ``@phpstan-type`` and ``@psalm-type`` for defining type aliases
+* ``@phpstan-import-type`` and ``@psalm-import-type`` for importing type aliases from other classes
+
+You can also import type aliases defined in other classes::
+
+    /**
+     * @phpstan-type Address = array{street: string, city: string, zip: string}
+     */
+    class Location
+    {
+    }
+
+    /**
+     * @phpstan-import-type Address from Location
+     */
+    class Company
+    {
+        /**
+         * @var Address
+         */
+        public mixed $headquarters;
+    }
+
+.. note::
+
+    Both syntax variations are supported: with an equals sign
+    (``@phpstan-type TypeAlias = Type``) or without (``@phpstan-type TypeAlias Type``).
+
+.. versionadded:: 7.3
+
+    The type alias support was introduced in Symfony 7.3.
+
 Object Shapes
 .............
 
