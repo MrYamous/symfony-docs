@@ -119,13 +119,15 @@ You can validate each of these constraints sequentially to solve these issues:
 
             public static function loadValidatorMetadata(ClassMetadata $metadata): void
             {
-                $metadata->addPropertyConstraint('address', new Assert\Sequentially([
-                    new Assert\NotNull(),
-                    new Assert\Type('string'),
-                    new Assert\Length(min: 10),
-                    new Assert\Regex(self::ADDRESS_REGEX),
-                    new AcmeAssert\Geolocalizable(),
-                ]));
+                $metadata->addPropertyConstraint('address', new Assert\Sequentially(
+                    constraints: [
+                        new Assert\NotNull(),
+                        new Assert\Type('string'),
+                        new Assert\Length(min: 10),
+                        new Assert\Regex(self::ADDRESS_REGEX),
+                        new AcmeAssert\Geolocalizable(),
+                    ],
+                ));
             }
         }
 
