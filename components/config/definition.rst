@@ -290,10 +290,6 @@ Before defining the children of an array node, you can provide options like:
         connections: ['mysql', 'sqlite']
         connections: 'mysql'  # automatically wrapped as ['mysql']
 
-    .. versionadded:: 7.4
-
-        The ``acceptAndWrap()`` method was introduced in Symfony 7.4.
-
 A basic prototyped array configuration can be defined as follows::
 
     $node
