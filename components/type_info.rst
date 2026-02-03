@@ -114,6 +114,43 @@ PHP package required for string resolving. Then, follow these steps::
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'id')); // returns an "int" Type
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'tags')); // returns a collection with "int" as key and "string" as values Type
 
+Object Shapes
+.............
+
+TypeInfo can resolve object shapes, which describe the structure of anonymous
+objects with specific properties and their types. Use the ``object{...}`` syntax
+in PHPDoc annotations::
+
+    use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+
+    class Dummy
+    {
+        /**
+         * @var object{name: string, age: int, email?: string}
+         */
+        public object $person;
+    }
+
+    $typeResolver = TypeResolver::create();
+    $type = $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'person'));
+    // returns an ObjectShapeType with "name" (string), "age" (int), and optional "email" (string)
+
+The ``?`` suffix marks a property as optional (e.g. ``email?``).
+
+You can also create object shapes manually using the ``Type::objectShape()`` method::
+
+    use Symfony\Component\TypeInfo\Type;
+
+    $type = Type::objectShape([
+        'name' => Type::string(),
+        'age' => Type::int(),
+        'email' => Type::nullable(Type::string()),
+    ]);
+
+.. versionadded:: 8.1
+
+    The support for object shapes was introduced in Symfony 8.1.
+
 Advanced Usages
 ~~~~~~~~~~~~~~~
 
