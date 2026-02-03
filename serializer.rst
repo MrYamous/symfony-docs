@@ -2386,6 +2386,62 @@ context option::
 This context makes the deserialization process behave like the
 :phpfunction:`filter_var` function with the ``FILTER_VALIDATE_BOOL`` flag.
 
+.. _serializer-extends-serialization-for:
+
+Extending Serialization for a Class
+-----------------------------------
+
+Sometimes you may want to add or override serialization metadata on a class you
+cannot modify, for example a model coming from a third party library or a
+vendor package. Traditionally, you would have to create YAML or XML mapping
+files to configure serialization for these classes. The ``#[ExtendsSerializationFor]``
+attribute provides a more convenient alternative.
+
+Suppose you use a third party ``Product`` class and you want to expose different
+serialized field names or groups without modifying the original class.
+
+To do this, create a separate class and use the ``#[ExtendsSerializationFor]``
+attribute to tell the Serializer which class should receive this metadata. Your
+new class name is irrelevant and the class is typically made ``abstract`` to make
+it clear it is never instantiated::
+
+    // src/Serializer/VendorProductExtension.php
+    namespace App\Serializer;
+
+    use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
+    use Symfony\Component\Serializer\Attribute\Groups;
+    use Symfony\Component\Serializer\Attribute\MaxDepth;
+    use Symfony\Component\Serializer\Attribute\SerializedName;
+    use Vendor\Library\Product;
+
+    #[ExtendsSerializationFor(Product::class)]
+    abstract class MyProductSerialization
+    {
+        #[Groups(['api'])]
+        #[SerializedName('product_name')]
+        public string $name = '';
+
+        #[Groups(['api', 'admin'])]
+        public float $price = 0;
+
+        #[Groups(['admin'])]
+        #[MaxDepth(1)]
+        public $category;
+    }
+
+The serialization metadata defined in this class is applied to the target class
+(``Product``) as if it were defined directly on it.
+
+You can only define metadata for properties that exist on the target class.
+Otherwise, a ``MappingException`` is thrown during container compilation.
+
+You can use any serialization attribute on the source class properties, including
+``#[Groups]``, ``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, and others.
+
+.. versionadded:: 7.4
+
+    The ``#[ExtendsSerializationFor]`` attribute was introduced in Symfony 7.4.
+
 .. _serializer-enabling-metadata-cache:
 
 Configuring the Metadata Cache
