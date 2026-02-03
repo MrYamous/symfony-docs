@@ -791,6 +791,11 @@ the number, the earlier the tagged service will be located in the collection:
             ],
         ]);
 
+.. deprecated:: 8.1
+
+    The ``getDefaultPriority()`` method is deprecated since Symfony 8.1.
+    Use the :ref:`#[AsTaggedItem] attribute <tags_as-tagged-item>` instead.
+
 Another option, which is particularly useful when using autoconfiguring
 tags, is to implement the static ``getDefaultPriority()`` method on the
 service itself::
@@ -805,6 +810,11 @@ service itself::
             return 3;
         }
     }
+
+.. deprecated:: 8.1
+
+    The ``default_priority_method`` option is deprecated since Symfony 8.1.
+    Use the :ref:`#[AsTaggedItem] attribute <tags_as-tagged-item>` instead.
 
 If you want to have another method defining the priority
 (e.g. ``getPriority()`` rather than ``getDefaultPriority()``),
@@ -950,8 +960,18 @@ Symfony applies this fallback process:
    (in this example, ``getDefaultKeyName()``), call it and use the returned value;
 #. Otherwise, fall back to the default behavior and use the service ID.
 
+.. deprecated:: 8.1
+
+    The ``getDefault<CamelCase index_by value>Name()`` method convention is
+    deprecated since Symfony 8.1. Use the :ref:`#[AsTaggedItem] attribute <tags_as-tagged-item>` instead.
+
 The ``default_index_method`` Option
 ...................................
+
+.. deprecated:: 8.1
+
+    The ``default_index_method`` option is deprecated since Symfony 8.1.
+    Use the :ref:`#[AsTaggedItem] attribute <tags_as-tagged-item>` instead.
 
 This option defines the name of the service class method that will be called to
 get the value used to index the services:
