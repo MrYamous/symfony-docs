@@ -121,4 +121,69 @@ Now, log messages will be shown on the console based on the log levels and verbo
 By default (normal verbosity level), warnings and higher will be shown. But in
 :doc:`full verbosity mode </console/verbosity>`, all messages will be shown.
 
+Limiting Output to Interactive Mode
+-----------------------------------
+
+In automated environments like CI/CD pipelines or cron jobs, console log output
+may interfere with command output or create unnecessary clutter. You can configure
+the console handler to only output logs when the console is interactive:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/dev/monolog.yaml
+        monolog:
+            handlers:
+                console:
+                    type: console
+                    process_psr_3_messages: false
+                    channels: ['!event', '!doctrine', '!console']
+                    interactive_only: true
+
+    .. code-block:: xml
+
+        <!-- config/packages/dev/monolog.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:monolog="http://symfony.com/schema/dic/monolog"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <monolog:config>
+                <monolog:handler name="console" type="console" process-psr-3-messages="false" interactive-only="true">
+                    <monolog:channels>
+                        <monolog:channel>!event</monolog:channel>
+                        <monolog:channel>!doctrine</monolog:channel>
+                        <monolog:channel>!console</monolog:channel>
+                    </monolog:channels>
+                </monolog:handler>
+            </monolog:config>
+        </container>
+
+    .. code-block:: php
+
+        // config/packages/dev/monolog.php
+        use Symfony\Config\MonologConfig;
+
+        return static function (MonologConfig $monolog): void {
+            $monolog->handler('console')
+                ->type('console')
+                ->processPsr3Messages(false)
+                ->interactiveOnly(true)
+                ->channels()->elements(['!event', '!doctrine', '!console'])
+            ;
+        };
+
+When ``interactive_only`` is set to ``true``, the console handler will only
+output logs and prevent propagation to other handlers when the command is
+running in an interactive terminal. In non-interactive mode (e.g., when using
+the ``--no-interaction`` option or in automated scripts), logs will be
+propagated to other handlers instead.
+
+.. versionadded:: 7.4
+
+    The ``interactive_only`` option was introduced in Symfony 7.4.
+
 .. _MonologBridge: https://github.com/symfony/monolog-bridge
