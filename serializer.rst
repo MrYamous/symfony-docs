@@ -2563,6 +2563,63 @@ context option::
 This context makes the deserialization process behave like the
 :phpfunction:`filter_var` function with the ``FILTER_VALIDATE_BOOL`` flag.
 
+.. _serializer-extends-serialization-for:
+
+Extending Serialization for Third-Party Classes
+-----------------------------------------------
+
+When working with third-party classes (e.g., from vendor packages), you cannot
+add serialization attributes directly to the source code. Traditionally, you
+would have to create YAML or XML mapping files to configure serialization for
+these classes.
+
+The ``#[ExtendsSerializationFor]`` attribute provides a more convenient way to
+add serialization metadata to third-party classes using PHP attributes. You create
+a source class that mirrors the properties you want to configure and apply the
+attribute to link it to the target class::
+
+    // src/Serializer/VendorProductExtension.php
+    namespace App\Serializer;
+
+    use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
+    use Symfony\Component\Serializer\Attribute\Groups;
+    use Symfony\Component\Serializer\Attribute\MaxDepth;
+    use Symfony\Component\Serializer\Attribute\SerializedName;
+    use Vendor\Library\Product;
+
+    #[ExtendsSerializationFor(Product::class)]
+    abstract class VendorProductExtension
+    {
+        #[Groups(['api'])]
+        #[SerializedName('product_name')]
+        public string $name = '';
+
+        #[Groups(['api', 'admin'])]
+        public float $price = 0;
+
+        #[Groups(['admin'])]
+        #[MaxDepth(1)]
+        public $category;
+    }
+
+The source class (``VendorProductExtension``) should be ``abstract`` to prevent
+accidental instantiation. Each property in the source class must exist on the
+target class (``Product``), and the serialization attributes you add will be
+applied when serializing/deserializing the target class.
+
+.. tip::
+
+    The ``#[ExtendsSerializationFor]`` attribute validates that all declared
+    properties exist on the target class during container compilation. If a
+    property doesn't exist, a ``MappingException`` is thrown.
+
+You can use any serialization attribute on the source class properties, including
+``#[Groups]``, ``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, and others.
+
+.. versionadded:: 7.4
+
+    The ``#[ExtendsSerializationFor]`` attribute was introduced in Symfony 7.4.
+
 .. _serializer-enabling-metadata-cache:
 
 Configuring the Metadata Cache
