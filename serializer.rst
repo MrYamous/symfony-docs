@@ -2565,18 +2565,22 @@ This context makes the deserialization process behave like the
 
 .. _serializer-extends-serialization-for:
 
-Extending Serialization for Third-Party Classes
------------------------------------------------
+Extending Serialization for a Class
+-----------------------------------
 
-When working with third-party classes (e.g., from vendor packages), you cannot
-add serialization attributes directly to the source code. Traditionally, you
-would have to create YAML or XML mapping files to configure serialization for
-these classes.
+Sometimes you may want to add or override serialization metadata on a class you
+cannot modify, for example a model coming from a third party library or a
+vendor package. Traditionally, you would have to create YAML or XML mapping
+files to configure serialization for these classes. The ``#[ExtendsSerializationFor]``
+attribute provides a more convenient alternative.
 
-The ``#[ExtendsSerializationFor]`` attribute provides a more convenient way to
-add serialization metadata to third-party classes using PHP attributes. You create
-a source class that mirrors the properties you want to configure and apply the
-attribute to link it to the target class::
+Suppose you use a third party ``Product`` class and you want to expose different
+serialized field names or groups without modifying the original class.
+
+To do this, create a separate class and use the ``#[ExtendsSerializationFor]``
+attribute to tell the Serializer which class should receive this metadata. Your
+new class name is irrelevant and the class is typically made ``abstract`` to make
+it clear it is never instantiated::
 
     // src/Serializer/VendorProductExtension.php
     namespace App\Serializer;
@@ -2588,7 +2592,7 @@ attribute to link it to the target class::
     use Vendor\Library\Product;
 
     #[ExtendsSerializationFor(Product::class)]
-    abstract class VendorProductExtension
+    abstract class MyProductSerialization
     {
         #[Groups(['api'])]
         #[SerializedName('product_name')]
@@ -2602,16 +2606,11 @@ attribute to link it to the target class::
         public $category;
     }
 
-The source class (``VendorProductExtension``) should be ``abstract`` to prevent
-accidental instantiation. Each property in the source class must exist on the
-target class (``Product``), and the serialization attributes you add will be
-applied when serializing/deserializing the target class.
+The serialization metadata defined in this class is applied to the target class
+(``Product``) as if it were defined directly on it.
 
-.. tip::
-
-    The ``#[ExtendsSerializationFor]`` attribute validates that all declared
-    properties exist on the target class during container compilation. If a
-    property doesn't exist, a ``MappingException`` is thrown.
+You can only define metadata for properties that exist on the target class.
+Otherwise, a ``MappingException`` is thrown during container compilation.
 
 You can use any serialization attribute on the source class properties, including
 ``#[Groups]``, ``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, and others.
