@@ -2014,6 +2014,39 @@ on a case-by-case basis via the :class:`Symfony\\Component\\Messenger\\Stamp\\Se
     provides that control. See `SymfonyCasts' message serializer tutorial`_ for
     details.
 
+Customizing the Type Header
+...........................
+
+When communicating with non-Symfony applications or when the message class
+structure differs between applications, you may need to customize the ``type``
+header of serialized messages. By default, this header contains the fully
+qualified class name (FQCN) of the message class.
+
+Use the ``serializedTypeName`` option of the
+:class:`Symfony\\Component\\Messenger\\Attribute\\AsMessage` attribute to define
+a custom type name::
+
+    // src/Message/OrderPlaced.php
+    namespace App\Message;
+
+    use Symfony\Component\Messenger\Attribute\AsMessage;
+
+    #[AsMessage(serializedTypeName: 'order.placed')]
+    class OrderPlaced
+    {
+        public function __construct(
+            public string $orderId,
+        ) {
+        }
+    }
+
+When this message is serialized, the ``type`` header will contain ``order.placed``
+instead of ``App\Message\OrderPlaced``.
+
+.. versionadded:: 8.1
+
+    The ``serializedTypeName`` option was introduced in Symfony 8.1.
+
 Closing Connections
 ~~~~~~~~~~~~~~~~~~~
 
