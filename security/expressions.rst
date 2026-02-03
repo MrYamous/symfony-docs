@@ -201,14 +201,7 @@ Inside the subject's expression, you have access to these variables:
 ``args``
     An array of controller arguments that are passed to the controller.
 ``this``
-    The controller instance itself, allowing access to its properties and methods.
-
-    .. versionadded:: 8.1
-
-        The ``this`` variable was introduced in Symfony 8.1.
-
-    This is useful when you need to access controller properties in the subject
-    expression::
+    The controller instance, allowing access to its properties and methods::
 
         use Symfony\Component\ExpressionLanguage\Expression;
         use Symfony\Component\HttpFoundation\Response;
@@ -224,6 +217,10 @@ Inside the subject's expression, you have access to these variables:
                 // ...
             }
         }
+
+    .. versionadded:: 8.1
+
+        The ``this`` variable was introduced in Symfony 8.1.
 
 Additionally to expressions, the ``#[IsGranted]`` attribute also accepts
 closures that return a boolean value. The subject can also be a closure that
