@@ -2438,10 +2438,6 @@ Otherwise, a ``MappingException`` is thrown during container compilation.
 You can use any serialization attribute on the source class properties, including
 ``#[Groups]``, ``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, and others.
 
-.. versionadded:: 7.4
-
-    The ``#[ExtendsSerializationFor]`` attribute was introduced in Symfony 7.4.
-
 .. _serializer-enabling-metadata-cache:
 
 Configuring the Metadata Cache
