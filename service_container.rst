@@ -275,11 +275,11 @@ You can limit service registration to specific environments as follows:
 
         <!-- config/services.xml -->
         <services>
-            <service id="App\Service\SomeClass" />
+            <service id="App\Service\SomeClass"/>
 
             <when env="dev">
                 <services>
-                    <service id="App\Service\AnotherClass" />
+                    <service id="App\Service\AnotherClass"/>
                 </services>
             </when>
         </services>
