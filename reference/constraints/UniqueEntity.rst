@@ -258,11 +258,11 @@ Consider this example:
 
             public static function loadValidatorMetadata(ClassMetadata $metadata): void
             {
-                $metadata->addConstraint(new UniqueEntity([
-                    'fields' => ['host', 'port'],
-                    'message' => 'This port is already in use on that host.',
-                    'errorPath' => 'port',
-                ]));
+                $metadata->addConstraint(new UniqueEntity(
+                    fields: ['host', 'port'],
+                    message: 'This port is already in use on that host.',
+                    errorPath: 'port',
+                ));
             }
         }
 

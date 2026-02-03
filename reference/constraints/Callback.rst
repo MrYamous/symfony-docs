@@ -214,10 +214,9 @@ You can then use the following configuration to invoke this validator:
         {
             public static function loadValidatorMetadata(ClassMetadata $metadata): void
             {
-                $metadata->addConstraint(new Assert\Callback([
-                    Validator::class,
-                    'validate',
-                ]));
+                $metadata->addConstraint(new Assert\Callback(
+                    callback: [Validator::class, 'validate'],
+                ));
             }
         }
 

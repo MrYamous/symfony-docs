@@ -81,11 +81,11 @@ Validation of arrays is possible using the ``Collection`` constraint::
         'tags' => new Assert\Optional(constraints: [
             new Assert\Type(type: 'array'),
             new Assert\Count(min: 1),
-            new Assert\All([
-                new Assert\Collection(constraints: [
+            new Assert\All(constraints: [
+                new Assert\Collection(fields: [
                     'slug' => [
                         new Assert\NotBlank(),
-                        new Assert\Type(['type' => 'string']),
+                        new Assert\Type(type: 'string'),
                     ],
                     'label' => [
                         new Assert\NotBlank(),
