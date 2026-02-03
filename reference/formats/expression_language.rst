@@ -112,6 +112,24 @@ operator)::
     $expressionLanguage->evaluate('fruit?.color', ['fruit' => '...'])
     $expressionLanguage->evaluate('fruit?.getStock()', ['fruit' => '...'])
 
+.. versionadded:: 8.1
+
+    The null-safe syntax for array access was introduced in Symfony 8.1.
+
+Use the ``?.[]`` syntax to safely access array elements when the array or object
+might be ``null``::
+
+    // this will throw an exception when `fruit.items` is `null`
+    $expressionLanguage->evaluate('fruit.getItems()[0]', ['fruit' => '...'])
+
+    // this will return `null` if `fruit.getItems()` is `null`
+    $expressionLanguage->evaluate('fruit.getItems()?.[0]', ['fruit' => '...'])
+
+You can chain multiple null-safe operators for both object and array access::
+
+    // safely access nested arrays and methods
+    $expressionLanguage->evaluate('order?.getItems()?.[0]?.getName()', ['order' => '...'])
+
 .. _component-expression-null-coalescing-operator:
 
 Null-Coalescing Operator
