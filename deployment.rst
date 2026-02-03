@@ -26,7 +26,8 @@ A deployment may also include other tasks, such as:
 * Tagging a particular version of your code as a release in your source control
   repository;
 * Creating a temporary staging area to build your updated setup "offline";
-* Running any tests available to ensure code and/or server stability;
+* Running any tests available and :ref:`linting Twig templates <linting-twig-templates>`
+  to ensure code and/or server stability;
 * Removal of any unnecessary files from the ``public/`` directory to keep your
   production environment clean;
 * Clearing of external cache systems (like `Memcached`_ or `Redis`_).
