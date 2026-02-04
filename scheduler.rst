@@ -1008,7 +1008,7 @@ This allows the system to retain the state of the schedule, ensuring that when a
 
 To scale your schedules more effectively, you can use multiple workers. In such
 cases, a good practice is to add a :doc:`lock </components/lock>` to prevent the
-same task more than once::
+same task running more than once::
 
     // src/Scheduler/SaleTaskProvider.php
     namespace App\Scheduler;
