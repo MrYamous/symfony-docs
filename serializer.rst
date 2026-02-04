@@ -482,10 +482,6 @@ property. For instance, to configure the datetime format:
             attributes:
                 # your IDE will now provide autocompletion here...
 
-    .. versionadded:: 7.4
-
-        The JSON schema for serializer mapping files was introduced in Symfony 7.4.
-
 You can also specify a context specific to normalization or denormalization:
 
 .. configuration-block::
