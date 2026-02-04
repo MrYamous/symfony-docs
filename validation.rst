@@ -45,7 +45,25 @@ valid. For this to work, you'll configure a list of rules (called
 :ref:`constraints <validation-constraints>`) that the object must follow in
 order to be valid. These rules are usually defined using PHP code or
 attributes but they can also be defined as ``.yaml`` or ``.xml`` files inside
-the ``config/validator/`` directory:
+the ``config/validator/`` directory.
+
+.. tip::
+
+    Symfony provides a JSON schema for validation mapping files that enables
+    autocompletion and validation in IDEs like PhpStorm. Add the following
+    ``$schema`` key at the beginning of your YAML files to enable this feature:
+
+    .. code-block:: yaml
+
+        # config/validator/validation.yaml
+        '$schema': https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.json
+        App\Entity\Author:
+            properties:
+                # your IDE will now provide autocompletion here...
+
+    .. versionadded:: 7.4
+
+        The JSON schema for validation mapping files was introduced in Symfony 7.4.
 
 For example, to indicate that the ``$name`` property must not be empty, add the
 following:

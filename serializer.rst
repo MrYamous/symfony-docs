@@ -486,6 +486,24 @@ property. For instance, to configure the datetime format:
     * All ``*.yaml`` and ``*.xml`` files in the ``Resources/config/serialization/``
       directory of a bundle.
 
+.. tip::
+
+    Symfony provides a JSON schema for serializer mapping files that enables
+    autocompletion and validation in IDEs like PhpStorm. Add the following
+    ``$schema`` key at the beginning of your YAML files to enable this feature:
+
+    .. code-block:: yaml
+
+        # config/serializer/person.yaml
+        '$schema': https://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.json
+        App\Model\Person:
+            attributes:
+                # your IDE will now provide autocompletion here...
+
+    .. versionadded:: 7.4
+
+        The JSON schema for serializer mapping files was introduced in Symfony 7.4.
+
 You can also specify a context specific to normalization or denormalization:
 
 .. configuration-block::
