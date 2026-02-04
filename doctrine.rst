@@ -620,10 +620,6 @@ the :ref:`doctrine-queries` section.
 Automatically Fetching Objects (EntityValueResolver)
 ----------------------------------------------------
 
-.. versionadded:: 2.7.1
-
-    Autowiring of the ``EntityValueResolver`` was introduced in DoctrineBundle 2.7.1.
-
 In many cases, you can use the ``EntityValueResolver`` to do the query for you
 automatically! You can simplify the controller to::
 
