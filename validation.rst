@@ -133,10 +133,6 @@ be passed to the validator service to be checked.
             properties:
                 # your IDE will now provide autocompletion here...
 
-    .. versionadded:: 7.4
-
-        The JSON schema for validation mapping files was introduced in Symfony 7.4.
-
 Using the Validator Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
