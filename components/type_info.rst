@@ -173,10 +173,6 @@ You can also import type aliases defined in other classes::
     Both syntax variations are supported: with an equals sign
     (``@phpstan-type TypeAlias = Type``) or without (``@phpstan-type TypeAlias Type``).
 
-.. versionadded:: 7.3
-
-    The type alias support was introduced in Symfony 7.3.
-
 Advanced Usages
 ~~~~~~~~~~~~~~~
 
