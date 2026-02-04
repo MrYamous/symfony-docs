@@ -12,13 +12,12 @@ Validator   :class:`Symfony\\Component\\Validator\\Constraints\\XmlValidator`
 
 .. versionadded:: 8.1
 
-    Validates that a value has valid `XML`_ syntax. Optionally, it can also
-    validate the content against an XSD schema.
+    The Xml constraint was introduced in Symfony 8.1.
 
 Basic Usage
 -----------
 
-The ``Xml`` constraint can be applied to a property or a "getter" method:
+The ``Xml`` constraint can be applied to a property or a getter method:
 
 .. configuration-block::
 
