@@ -966,11 +966,10 @@ Persistent cURL connections
 
 .. versionadded:: 8.1
 
-    ``CurlHttpClient`` supports persistent cURL handles when running on PHP 8.5
-    or later.
+    Support for persistent cURL connections was introduced in Symfony 8.1.
 
-Persistent connections can be enabled using the
-``extra.use_persistent_connections`` option::
+Persistent connections can be enabled using the ``extra.use_persistent_connections``
+option::
 
     use Symfony\Component\HttpClient\CurlHttpClient;
 
@@ -980,10 +979,13 @@ Persistent connections can be enabled using the
         ],
     ]);
 
-When enabled, DNS cache, SSL sessions and connection data can be reused across
-requests, reducing connection overhead.
+When enabled, the DNS cache, SSL sessions and connection data can be reused across
+requests, reducing connection overhead. When disabled (default), non-persistent
+cURL handles are used.
 
-When disabled (default), non-persistent cURL handles are used.
+.. note::
+
+    Using persistent cURL connections requires running PHP 8.5 or later.
 
 HTTP Compression
 ~~~~~~~~~~~~~~~~
