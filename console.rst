@@ -584,6 +584,12 @@ profile is accessible through the web page of the profiler.
     terminal supports links). If you run it in debug verbosity (``-vvv``) you'll
     also see the time and memory consumed by the command.
 
+.. versionadded:: 7.4
+
+    The collection of :doc:`dump() </components/var_dumper>` calls by the
+    profiler when using the ``--profile`` option was introduced in Symfony 7.4.
+    Without this option, dumps are displayed directly in the console output.
+
 .. warning::
 
     When profiling the ``messenger:consume`` command from the :doc:`Messenger </messenger>`
