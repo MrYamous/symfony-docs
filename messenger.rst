@@ -2805,10 +2805,6 @@ or if it's being retried after failure.
 Default Stamps on Messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 7.4
-
-    Default stamps were introduced in Symfony 7.4.
-
 Messages can define their own default stamps when dispatched by implementing
 :class:`Symfony\\Component\\Messenger\\Message\\DefaultStampsProviderInterface`.
 
