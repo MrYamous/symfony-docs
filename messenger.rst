@@ -2778,6 +2778,44 @@ are a variety of different stamps for different purposes and they're used intern
 to track information about a message - like the message bus that's handling it
 or if it's being retried after failure.
 
+Default Stamps on Messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 7.4
+
+    Default stamps were introduced in Symfony 7.4.
+
+Messages can define their own default stamps when dispatched by implementing
+:class:`Symfony\\Component\\Messenger\\Message\\DefaultStampsProviderInterface`.
+
+This is useful when a message always requires the same stamps, such as a delay
+stamp or a routing stamp. Instead of providing these stamps at every dispatch
+call site, the message itself can declare them once::
+
+    use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
+    use Symfony\Component\Messenger\Stamp\DelayStamp;
+
+    class ExportReportMessage implements DefaultStampsProviderInterface
+    {
+        public function getDefaultStamps(): array
+        {
+            // this stamp will be added automatically on dispatch
+            return [new DelayStamp(1000)];
+        }
+    }
+
+When dispatching the message, default stamps are added only if no other stamp of
+the same class already exists on the envelope::
+
+    // DelayStamp(1000) is added by default
+    $bus->dispatch(new ExportReportMessage());
+
+    // the explicit DelayStamp(500) overrides the default one
+    $bus->dispatch(
+        new ExportReportMessage(),
+        [new DelayStamp(500)]
+    );
+
 .. _messenger_middleware:
 
 Middleware
