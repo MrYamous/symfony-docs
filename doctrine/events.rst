@@ -248,11 +248,6 @@ do so, define a listener for the ``postPersist`` Doctrine event::
         }
     }
 
-.. note::
-
-    In previous Doctrine versions, instead of ``PostPersistEventArgs``, you had
-    to use ``LifecycleEventArgs``, which was deprecated in Doctrine ORM 2.14.
-
 Then, add the ``#[AsDoctrineListener]`` attribute to the class to enable it as
 a Doctrine listener in your application::
 
@@ -323,10 +318,6 @@ listener in the Symfony application by creating a new service for it and
             ],
         ]);
 
-.. versionadded:: 2.8.0
-
-    The `AsDoctrineListener`_ attribute was introduced in DoctrineBundle 2.8.0.
-
 .. tip::
 
     The value of the ``connection`` option can also be a
@@ -336,4 +327,3 @@ listener in the Symfony application by creating a new service for it and
 .. _`lifecycle events`: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/events.html#lifecycle-events
 .. _`official docs about Doctrine events`: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/events.html
 .. _`DoctrineMongoDBBundle documentation`: https://symfony.com/doc/current/bundles/DoctrineMongoDBBundle/index.html
-.. _`AsDoctrineListener`: https://github.com/doctrine/DoctrineBundle/blob/2.12.x/src/Attribute/AsDoctrineListener.php
