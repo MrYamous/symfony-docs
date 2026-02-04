@@ -353,25 +353,6 @@ the ``framework.json_streamer.default_options`` configuration:
                 default_options:
                     include_null_properties: true
 
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony
-                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-
-            <framework:config>
-                <framework:json-streamer>
-                    <framework:default-option key="include_null_properties">true</framework:default-option>
-                </framework:json-streamer>
-            </framework:config>
-        </container>
-
     .. code-block:: php
 
         // config/packages/framework.php
