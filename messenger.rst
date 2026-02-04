@@ -3130,15 +3130,14 @@ Default Stamps on Messages
 
 .. versionadded:: 7.4
 
-    Symfony Messenger now lets a message class provide its own default stamps
-    when dispatched by implementing
-    :class:`Symfony\\Component\\Messenger\\Message\\DefaultStampsProviderInterface`.
+    Default stamps were introduced in Symfony 7.4.
 
-This can be useful when the same stamps (for example a delay stamp or routing
-stamp) are required every time this message is dispatched. Instead of having
-to provide them at each call site, the message itself can declare them.
+Messages can define their own default stamps when dispatched by implementing
+:class:`Symfony\\Component\\Messenger\\Message\\DefaultStampsProviderInterface`.
 
-Example::
+This is useful when a message always requires the same stamps, such as a delay
+stamp or a routing stamp. Instead of providing these stamps at every dispatch
+call site, the message itself can declare them once::
 
     use Symfony\Component\Messenger\Message\DefaultStampsProviderInterface;
     use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -3147,24 +3146,22 @@ Example::
     {
         public function getDefaultStamps(): array
         {
-            // This stamp will be added automatically on dispatch
+            // this stamp will be added automatically on dispatch
             return [new DelayStamp(1000)];
         }
     }
 
-When dispatching the message::
+When dispatching the message, default stamps are added only if no other stamp of
+the same class already exists on the envelope::
 
     // DelayStamp(1000) is added by default
     $bus->dispatch(new ExportReportMessage());
 
-    // DelayStamp(500) overrides the default one
+    // the explicit DelayStamp(500) overrides the default one
     $bus->dispatch(
         new ExportReportMessage(),
         [new DelayStamp(500)]
     );
-
-Note that default stamps are added *only if no stamp of the same class*
-already exists on the envelope.
 
 .. _messenger_middleware:
 
