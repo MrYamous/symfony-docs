@@ -1403,12 +1403,6 @@ You can configure the cache pool or provide a
                         # or use a custom storage service (takes precedence over cache_pool)
                         # storage_service: 'app.my_custom_storage'
 
-    .. code-block:: xml
-
-        <!-- config/packages/security.xml -->
-        <login-throttling cache-pool="cache.rate_limiter"
-                          storage-service="app.my_custom_storage"/>
-
     .. code-block:: php
 
         // config/packages/security.php
@@ -1424,11 +1418,6 @@ You can configure the cache pool or provide a
                 // ->storageService('app.my_custom_storage')
             ;
         };
-
-.. versionadded:: 7.4
-
-    The ``storage_service`` and ``cache_pool`` options for ``login_throttling``
-    were introduced in Symfony 7.4.
 
 Login attempts are limited on ``max_attempts`` (default: 5)
 failed requests for ``IP address + username`` and ``5 * max_attempts``
