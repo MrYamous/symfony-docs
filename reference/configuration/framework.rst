@@ -796,6 +796,41 @@ performance a bit:
             ],
         ]);
 
+You can also use environment variables in the list of enabled locales. Empty
+values are automatically filtered out, so you can define a fixed number of
+slots and leave some of them empty:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/translation.yaml
+        framework:
+            enabled_locales:
+                - '%env(LOCALE_1)%'
+                - '%env(LOCALE_2)%'
+                - '%env(LOCALE_3)%'
+
+    .. code-block:: php
+
+        // config/packages/translation.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'enabled_locales' => [
+                    '%env(LOCALE_1)%',
+                    '%env(LOCALE_2)%',
+                    '%env(LOCALE_3)%',
+                ],
+            ],
+        ]);
+
+.. versionadded:: 8.1
+
+    Support for environment variables in ``enabled_locales`` was introduced
+    in Symfony 8.1.
+
 An added bonus of defining the enabled locales is that they are automatically
 added as a requirement of the :ref:`special _locale parameter <routing-locale-parameter>`.
 For example, if you define this value as ``['ar', 'he', 'ja', 'zh']``, the
