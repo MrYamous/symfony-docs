@@ -361,10 +361,6 @@ Pass the ``include_null_properties`` option to include them explicitly::
     // Without the option: {"name": "Garfield"}
     // With the option:    {"name": "Garfield", "color": null}
 
-.. versionadded:: 7.4
-
-    The ``include_null_properties`` option was introduced in Symfony 7.4.
-
 Configuring the Encoded Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
