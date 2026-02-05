@@ -69,6 +69,34 @@ even to change the controller entirely::
         $event->setController($myCustomController);
     }
 
+You can also use ``getAttributes()`` to retrieve PHP attributes declared on the
+controller:
+
+.. code-block:: php-attributes
+
+    use Symfony\Component\HttpKernel\Event\ControllerEvent;
+
+    public function onKernelController(ControllerEvent $event): void
+    {
+        // get all attributes, grouped by class name
+        $allAttributes = $event->getAttributes();
+
+        // get all attributes as a flat list (not grouped)
+        $flatAttributes = $event->getAttributes('*');
+
+        // get attributes of a specific class
+        $cacheAttributes = $event->getAttributes(Cache::class);
+    }
+
+Controller attributes are stored in the ``_controller_attributes`` request
+attribute, which means they can be overridden at runtime to change the behavior
+of attribute-based listeners without modifying the controller source code.
+
+.. versionadded:: 8.1
+
+    Storing controller attributes in the ``_controller_attributes`` request
+    attribute was introduced in Symfony 8.1.
+
 .. seealso::
 
     Read more on the :ref:`kernel.controller event <component-http-kernel-kernel-controller>`.
@@ -196,6 +224,30 @@ before sending it back (e.g. add/modify HTTP headers, add cookies, etc.)::
 
         // ... modify the response object
     }
+
+You can use ``getControllerAttributes()`` to retrieve PHP attributes declared
+on the controller that handled the request:
+
+.. code-block:: php-attributes
+
+    use Symfony\Component\HttpKernel\Event\ResponseEvent;
+
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        // get all controller attributes, grouped by class name
+        $allAttributes = $event->getControllerAttributes();
+
+        // get all controller attributes as a flat list (not grouped)
+        $flatAttributes = $event->getControllerAttributes('*');
+
+        // get attributes of a specific class
+        $cacheAttributes = $event->getControllerAttributes(Cache::class);
+    }
+
+.. versionadded:: 8.1
+
+    The ``ResponseEvent::getControllerAttributes()`` method was introduced in
+    Symfony 8.1.
 
 .. seealso::
 
