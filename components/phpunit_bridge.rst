@@ -584,7 +584,26 @@ you should use ``DateTime::createFromFormat('U', (string) time())`` to use the m
 To use the ``ClockMock`` class in your test, add the ``@group time-sensitive``
 annotation to its class or methods. This annotation only works when executing
 PHPUnit using the ``vendor/bin/simple-phpunit`` script or when registering the
-following listener in your PHPUnit configuration:
+bridge in your PHPUnit configuration.
+
+For PHPUnit 10+, register the extension and optionally configure the namespaces
+to mock using the ``clock-mock-namespaces`` parameter:
+
+.. code-block:: xml
+
+    <!-- phpunit.xml.dist -->
+    <!-- ... -->
+    <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="App\Util,App\Service"/>
+        </bootstrap>
+    </extensions>
+
+.. versionadded:: 7.2
+
+    The ``SymfonyExtension`` class for PHPUnit 10+ was introduced in Symfony 7.2.
+
+For older PHPUnit versions, register the listener instead:
 
 .. code-block:: xml
 
@@ -740,6 +759,19 @@ the data you expect to get for the given hosts::
             // ...
         }
     }
+
+When using PHPUnit 10+, you can also configure the namespaces to mock via the
+``dns-mock-namespaces`` parameter of the ``SymfonyExtension``:
+
+.. code-block:: xml
+
+    <!-- phpunit.xml.dist -->
+    <!-- ... -->
+    <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="dns-mock-namespaces" value="App\Validator"/>
+        </bootstrap>
+    </extensions>
 
 The ``withMockedHosts()`` method configuration is defined as an array. The keys
 are the mocked hosts and the values are arrays of DNS records in the same format
