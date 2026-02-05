@@ -98,6 +98,32 @@ a relative or absolute path to the imported file:
             ],
         ]);
 
+When importing a directory or using glob patterns, you can use the ``exclude``
+option to skip specific files or patterns:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        imports:
+            - { resource: services/, exclude: ['services/legacy_*.yaml'] }
+
+    .. code-block:: php
+
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'imports' => [
+                ['resource' => 'services/', 'exclude' => ['services/legacy_*.php']],
+            ],
+        ]);
+
+.. versionadded:: 8.1
+
+    The ``exclude`` option for ``imports`` was introduced in Symfony 8.1.
+
 When loading a configuration file, Symfony first processes all imported files in
 the order they are listed under the ``imports`` key. After all imports are processed,
 it then processes the parameters and services defined directly in the current file.

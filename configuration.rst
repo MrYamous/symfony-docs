@@ -93,6 +93,9 @@ configuration files, even if they use a different format:
             # ignore_errors: true silently discards all errors (including invalid code and not found)
             - { resource: 'my_other_config_file.php', ignore_errors: true }
 
+            # exclude specific files when using glob patterns
+            - { resource: 'services/*.yaml', exclude: ['services/legacy_*.yaml'] }
+
         # ...
 
     .. code-block:: php
@@ -112,6 +115,9 @@ configuration files, even if they use a different format:
 
                 // ignore_errors: true silently discards all errors (including invalid code and not found)
                 ['resource' => 'my_other_config_file.xml', 'ignore_errors' => true],
+
+                // exclude specific files when using glob patterns
+                ['resource' => 'services/*.php', 'exclude' => ['services/legacy_*.php']],
             ],
         ]);
 
