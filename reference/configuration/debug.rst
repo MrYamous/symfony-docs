@@ -50,7 +50,6 @@ Typically, you would set this to ``php://stderr``:
             ],
         ]);
 
-
 Configure it to ``"tcp://%env(VAR_DUMPER_SERVER)%"`` in order to use the :ref:`ServerDumper feature <var-dumper-dump-server>`.
 
 max_items
@@ -78,3 +77,11 @@ Configures the minimum tree depth until which all items are guaranteed to
 be cloned. After this depth is reached, only ``max_items`` items will be
 cloned. The default value is ``1``, which is consistent with older Symfony
 versions.
+
+theme
+~~~~~
+
+**type**: ``string`` **default**: ``dark``
+
+Changes the color of the ``dump()`` output when rendered directly on the
+templating. The value of this option can be ``dark`` or ``light``.
