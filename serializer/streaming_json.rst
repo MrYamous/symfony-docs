@@ -347,6 +347,28 @@ Configuring Encoding/Decoding
 While it's usually best not to alter the shape or values of objects during
 serialization, sometimes it's necessary.
 
+Including Null Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, properties with ``null`` values are excluded from the JSON output.
+Pass the ``include_null_properties`` option to include them explicitly::
+
+    use App\Dto\Cat;
+    use Symfony\Component\TypeInfo\Type;
+
+    // ...
+
+    $json = $jsonStreamWriter->write($cat, Type::object(Cat::class), [
+        'include_null_properties' => true,
+    ]);
+
+    // Without the option: {"name": "Garfield"}
+    // With the option:    {"name": "Garfield", "color": null}
+
+.. versionadded:: 7.4
+
+    The ``include_null_properties`` option was introduced in Symfony 7.4.
+
 Configuring the Encoded Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
