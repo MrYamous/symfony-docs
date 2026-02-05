@@ -608,6 +608,42 @@ the ``#[Target]`` attribute by passing the name of the ``$shoutyTransformer`` ar
     The reason is that thanks to `PHP constructor promotion`_ this constructor
     argument is both a parameter and a class property. You can safely ignore this error message.
 
+If you need to register named autowiring aliases from PHP code (e.g. in a
+:doc:`compiler pass </service_container/compiler_passes>` or a
+:ref:`bundle extension <bundle-load-services-extension>`), use the
+:method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerAliasForArgument`
+method::
+
+    use App\Util\TransformerInterface;
+
+    $container->registerAliasForArgument(
+        'app.uppercase_transformer',  // the service id
+        TransformerInterface::class,  // the type-hint
+        'shoutyTransformer'           // the argument name
+    );
+
+This registers the alias ``TransformerInterface $shoutyTransformer``, so any
+argument type-hinted with ``TransformerInterface`` and named ``$shoutyTransformer``
+will receive the ``app.uppercase_transformer`` service.
+
+You can also pass a fourth argument to define a distinct name for the
+``#[Target]`` attribute, separate from the argument name::
+
+    $container->registerAliasForArgument(
+        'app.uppercase_transformer',
+        TransformerInterface::class,
+        'shoutyTransformer',  // the argument name
+        'shouty'              // the #[Target] name
+    );
+
+This allows the service to be injected using ``#[Target('shouty')]`` on any
+argument, regardless of its name.
+
+.. versionadded:: 7.4
+
+    The ``$target`` argument of ``registerAliasForArgument()`` was introduced
+    in Symfony 7.4.
+
 .. _autowire-attribute:
 
 Fixing Non-Autowireable Arguments
