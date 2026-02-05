@@ -2435,28 +2435,36 @@ Forcing HTTPS on Generated URLs
 By default, generated URLs use the same HTTP scheme as the current request.
 In console commands, where there is no HTTP request, URLs use ``http`` by
 default. You can change this per command (via the router's ``getContext()``
-method) or globally with these configuration parameters:
+method) or globally with the :ref:`default_uri <config-framework-router-default-uri>`
+option:
 
 .. configuration-block::
 
     .. code-block:: yaml
 
-        # config/services.yaml
-        parameters:
-            router.request_context.scheme: 'https'
-            asset.request_context.secure: true
+        # config/packages/routing.yaml
+        framework:
+            router:
+                default_uri: 'https://example.org'
 
     .. code-block:: php
 
-        // config/services.php
+        // config/packages/routing.php
         namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
         return App::config([
-            'parameters' => [
-                'router.request_context.scheme' => 'https',
-                'asset.request_context.secure' => true,
+            'framework' => [
+                'router' => [
+                    'default_uri' => 'https://example.org',
+                ],
             ],
         ]);
+
+.. deprecated:: 8.1
+
+    The ``router.request_context.scheme`` and ``router.request_context.host``
+    container parameters were deprecated in Symfony 8.1. Use the
+    ``framework.router.default_uri`` option instead.
 
 Outside of console commands, use the ``schemes`` option to define the scheme of
 each route explicitly:
