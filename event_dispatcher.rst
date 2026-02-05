@@ -679,9 +679,14 @@ If you want to do something right before, or directly after a method is
 called, you can dispatch an event respectively at the beginning or at the
 end of the method::
 
+    use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
     class CustomMailer
     {
-        // ...
+        public function __construct(
+            private EventDispatcherInterface $dispatcher,
+        ) {
+        }
 
         public function send(string $subject, string $message): mixed
         {
@@ -708,6 +713,16 @@ In this example, two events are dispatched:
 
 #. ``mailer.pre_send``, before the method is called,
 #. and ``mailer.post_send`` after the method is called.
+
+.. tip::
+
+    When injecting the event dispatcher, type-hint one of its interfaces
+    instead of the concrete ``EventDispatcher`` class. Use
+    :class:`Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface`
+    when you only need to dispatch events, or
+    :class:`Symfony\\Component\\EventDispatcher\\EventDispatcherInterface`
+    if you also need to inspect or manage listeners (e.g. ``addListener()``,
+    ``removeListener()``).
 
 Each uses a custom Event class to communicate information to the listeners
 of the two events. For example, ``BeforeSendMailEvent`` might look like
