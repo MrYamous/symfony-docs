@@ -317,6 +317,13 @@ for usage examples.
     controller and uses it to configure :doc:`HTTP caching </http_cache>`
     on the response.
 
+    .. versionadded:: 8.1
+
+        Since Symfony 8.1, listeners like ``CacheAttributeListener`` use the
+        :ref:`controller attribute events <http-kernel-controller-attribute-events>`
+        mechanism instead of manually checking for attributes on the generic
+        kernel event.
+
     There are a few other minor listeners to the ``kernel.controller`` event in
     the Symfony Framework that deal with collecting profiler data when the
     profiler is enabled.
@@ -653,6 +660,145 @@ kernel.finish_request        ``KernelEvents::FINISH_REQUEST``        :class:`Sym
 kernel.terminate             ``KernelEvents::TERMINATE``             :class:`Symfony\\Component\\HttpKernel\\Event\\TerminateEvent`
 kernel.exception             ``KernelEvents::EXCEPTION``             :class:`Symfony\\Component\\HttpKernel\\Event\\ExceptionEvent`
 ===========================  ======================================  ========================================================================
+
+.. _http-kernel-controller-attribute-events:
+
+Controller Attribute Events
+---------------------------
+
+.. versionadded:: 8.1
+
+    The controller attribute events mechanism was introduced in Symfony 8.1.
+
+When a controller has PHP attributes (such as ``#[Cache]`` or ``#[IsGranted]``),
+the kernel automatically dispatches attribute-specific events for each attribute
+found on the controller, in addition to the regular kernel events. This allows
+listeners to target a specific attribute directly, instead of listening to a
+generic kernel event and manually checking for the presence of an attribute.
+
+Naming Convention
+~~~~~~~~~~~~~~~~~
+
+The name of each attribute event follows this pattern:
+``{kernelEvent}.{AttributeClassName}``. For example, when a controller has a
+``#[Cache]`` attribute, the following event is dispatched during the
+``kernel.controller_arguments`` phase:
+
+.. code-block:: text
+
+    kernel.controller_arguments.Symfony\Component\HttpKernel\Attribute\Cache
+
+The Event Object
+~~~~~~~~~~~~~~~~
+
+Each attribute event receives a
+:class:`Symfony\\Component\\HttpKernel\\Event\\ControllerAttributeEvent` instance,
+which provides access to:
+
+``$event->attribute``
+    The attribute instance found on the controller (e.g. an instance of ``Cache``).
+
+``$event->kernelEvent``
+    The underlying kernel event (e.g. ``ControllerArgumentsEvent``, ``ResponseEvent``,
+    etc.), giving you access to the request, response and other contextual data.
+
+Supported Kernel Events
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Attribute events are dispatched for all kernel events except ``kernel.request``
+and ``kernel.terminate``:
+
+* ``kernel.controller``
+* ``kernel.controller_arguments``
+* ``kernel.view``
+* ``kernel.response``
+* ``kernel.finish_request``
+* ``kernel.exception``
+
+Dispatch Order
+~~~~~~~~~~~~~~
+
+The order in which attributes are processed depends on the kernel event:
+
+* **"Before" events** (``kernel.controller``, ``kernel.controller_arguments``):
+  attributes are processed in the order they are declared on the controller.
+* **"After" events** (``kernel.view``, ``kernel.response``, ``kernel.exception``,
+  ``kernel.finish_request``): attributes are processed in **reverse** order,
+  following the decorator pattern (the last attribute applied is the first to
+  process the response).
+
+Example: Creating a Custom Attribute Listener
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+First, create a PHP attribute::
+
+    // src/Attribute/MyRateLimit.php
+    namespace App\Attribute;
+
+    #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
+    class MyRateLimit
+    {
+        public function __construct(
+            public int $maxRequests = 100,
+            public int $periodInSeconds = 60,
+        ) {
+        }
+    }
+
+Then, apply it to a controller::
+
+    // src/Controller/ApiController.php
+    namespace App\Controller;
+
+    use App\Attribute\MyRateLimit;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class ApiController
+    {
+        #[MyRateLimit(maxRequests: 10, periodInSeconds: 30)]
+        public function index(): Response
+        {
+            // ...
+        }
+    }
+
+Finally, create a listener that targets this specific attribute::
+
+    // src/EventListener/MyRateLimitListener.php
+    namespace App\EventListener;
+
+    use App\Attribute\MyRateLimit;
+    use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+    use Symfony\Component\HttpKernel\KernelEvents;
+
+    #[AsEventListener(event: KernelEvents::CONTROLLER_ARGUMENTS.'.'.MyRateLimit::class)]
+    class MyRateLimitListener
+    {
+        public function __invoke(object $event): void
+        {
+            // $event is a ControllerAttributeEvent instance
+            $attribute = $event->attribute; // MyRateLimit instance
+            $request = $event->kernelEvent->getRequest();
+
+            // implement rate limiting logic using $attribute->maxRequests
+            // and $attribute->periodInSeconds...
+        }
+    }
+
+This listener is only invoked when the resolved controller has the
+``#[MyRateLimit]`` attribute. There is no need to manually inspect the
+controller for attributes.
+
+Performance
+~~~~~~~~~~~
+
+The system dispatches attribute events only when there are listeners registered
+for that specific attribute event name. The
+:class:`Symfony\\Component\\HttpKernel\\EventListener\\ControllerAttributesListener`
+subscriber detects controller attributes and dispatches sub-events, while the
+:class:`Symfony\\Component\\HttpKernel\\DependencyInjection\\ControllerAttributesListenerPass`
+compiler pass optimizes this at container compilation time, ensuring that
+attribute instances are created lazily and only when a matching listener exists.
 
 .. _http-kernel-working-example:
 

@@ -421,3 +421,81 @@ their priorities:
 .. code-block:: terminal
 
     $ php bin/console debug:event-dispatcher kernel.exception
+
+.. _controller-attribute-events:
+
+Controller Attribute Events
+---------------------------
+
+.. versionadded:: 8.1
+
+    The controller attribute events mechanism was introduced in Symfony 8.1.
+
+In addition to the kernel events listed above, the HttpKernel component can
+automatically dispatch events named after PHP attributes found on the resolved
+controller. This allows you to write listeners that target a specific controller
+attribute instead of listening to a generic kernel event and manually checking
+for the attribute's presence.
+
+The event name follows the convention ``{kernelEvent}.{AttributeClassName}``.
+For example, when a controller is annotated with
+``#[Cache]``, the following event is dispatched:
+
+.. code-block:: text
+
+    kernel.controller_arguments.Symfony\Component\HttpKernel\Attribute\Cache
+
+**Event Class**: :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerAttributeEvent`
+
+The ``ControllerAttributeEvent`` provides two properties:
+
+``$event->attribute``
+    The PHP attribute instance found on the controller.
+
+``$event->kernelEvent``
+    The underlying kernel event (e.g.
+    :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerArgumentsEvent`),
+    giving access to the request, response and other contextual data.
+
+This mechanism is supported for the following kernel events:
+
+* ``kernel.controller``
+* ``kernel.controller_arguments``
+* ``kernel.view``
+* ``kernel.response``
+* ``kernel.finish_request``
+* ``kernel.exception``
+
+It is **not** supported for ``kernel.request`` (the controller is not yet
+resolved) and ``kernel.terminate``.
+
+Here is an example of a listener using this mechanism::
+
+    use App\Attribute\MyRateLimit;
+    use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+    use Symfony\Component\HttpKernel\KernelEvents;
+
+    #[AsEventListener(event: KernelEvents::CONTROLLER_ARGUMENTS.'.'.MyRateLimit::class)]
+    class MyRateLimitListener
+    {
+        public function __invoke(object $event): void
+        {
+            // $event is a ControllerAttributeEvent instance
+            $attribute = $event->attribute;
+            $request = $event->kernelEvent->getRequest();
+
+            // implement rate limiting logic...
+        }
+    }
+
+Execute this command to find out which listeners are registered for attribute
+events on a given kernel event:
+
+.. code-block:: terminal
+
+    $ php bin/console debug:event-dispatcher kernel.controller_arguments
+
+.. seealso::
+
+    Read more on the :ref:`controller attribute events <http-kernel-controller-attribute-events>`
+    in the HttpKernel component documentation.
