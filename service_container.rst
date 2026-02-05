@@ -219,6 +219,31 @@ each time you ask for it.
                 // always *replace* previous ones; add your own service configuration below
             };
 
+    .. warning::
+
+        The ``_defaults`` section only applies to services defined in the same
+        ``services`` block. If you use ``when@<env>`` blocks in the same file
+        to define environment-specific services, those blocks have their own
+        scope and do **not** inherit ``_defaults`` from the main ``services``
+        section. You must redefine ``_defaults`` in each ``when@<env>`` services
+        block where you need it:
+
+        .. code-block:: yaml
+
+            # config/services.yaml
+            services:
+                _defaults:
+                    autowire: true
+                    autoconfigure: true
+                # ...
+
+            when@prod:
+                services:
+                    _defaults:
+                        autowire: true
+                        autoconfigure: true
+                    # ...
+
     .. tip::
 
         The value of the ``resource`` and ``exclude`` options can be any valid
