@@ -1563,7 +1563,49 @@ Then, enable this feature using the ``login_throttling`` setting:
 
 Internally, Symfony uses the :doc:`Rate Limiter component </rate_limiter>`
 which by default uses Symfony's cache to store the previous login attempts.
-However, you can implement a :ref:`custom storage <rate-limiter-storage>`.
+You can configure the cache pool or provide a
+:ref:`custom storage service <rate-limiter-storage>`:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/security.yaml
+        security:
+            firewalls:
+                main:
+                    login_throttling:
+                        # use a specific cache pool for storing limiter state
+                        cache_pool: 'cache.rate_limiter'
+                        # or use a custom storage service (takes precedence over cache_pool)
+                        # storage_service: 'app.my_custom_storage'
+
+    .. code-block:: xml
+
+        <!-- config/packages/security.xml -->
+        <login-throttling cache-pool="cache.rate_limiter"
+                          storage-service="app.my_custom_storage"/>
+
+    .. code-block:: php
+
+        // config/packages/security.php
+        use Symfony\Config\SecurityConfig;
+
+        return static function (SecurityConfig $security): void {
+            $mainFirewall = $security->firewall('main');
+
+            $mainFirewall->loginThrottling()
+                // use a specific cache pool for storing limiter state
+                ->cachePool('cache.rate_limiter')
+                // or use a custom storage service (takes precedence over cache_pool)
+                // ->storageService('app.my_custom_storage')
+            ;
+        };
+
+.. versionadded:: 7.4
+
+    The ``storage_service`` and ``cache_pool`` options for ``login_throttling``
+    were introduced in Symfony 7.4.
 
 Login attempts are limited on ``max_attempts`` (default: 5)
 failed requests for ``IP address + username`` and ``5 * max_attempts``
