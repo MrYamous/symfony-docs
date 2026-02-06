@@ -487,6 +487,13 @@ If you haven't installed it yet, run this command:
 
     $ composer require web-token/jwt-library
 
+.. warning::
+
+    For production use, ensure the `GMP PHP extension`_ is installed. The
+    ``web-token/jwt-library`` depends on ``brick/math``, which silently falls
+    back to a pure PHP implementation when neither the GMP nor BCMath extensions
+    are available. This can make JWT verification **up to 780x slower**.
+
 Symfony provides a generic ``OidcTokenHandler`` that decodes the token, validates
 it, and retrieves the user information from it. Optionally, the token can be encrypted (JWE):
 
@@ -920,6 +927,7 @@ When using this strategy, you can omit the ``user_provider`` configuration
 for :ref:`stateless firewalls <reference-security-stateless>`.
 
 .. _`Central Authentication Service (CAS)`: https://en.wikipedia.org/wiki/Central_Authentication_Service
+.. _`GMP PHP extension`: https://www.php.net/manual/en/book.gmp.php
 .. _`JSON Web Tokens (JWT)`: https://datatracker.ietf.org/doc/html/rfc7519
 .. _`OpenID Connect (OIDC)`: https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC)
 .. _`OpenID Connect Specification`: https://openid.net/specs/openid-connect-core-1_0.html
