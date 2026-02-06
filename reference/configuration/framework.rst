@@ -2474,6 +2474,8 @@ To configure a ``jsonp`` format:
 router
 ~~~~~~
 
+.. _config-framework-router-default-uri:
+
 default_uri
 ...........
 
