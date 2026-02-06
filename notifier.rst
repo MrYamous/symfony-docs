@@ -351,7 +351,7 @@ Service
 `Slack`_                                 **Install**: ``composer require symfony/slack-notifier`` \
                                          **DSN**: ``slack://TOKEN@default?channel=CHANNEL``
 `Telegram`_                              **Install**: ``composer require symfony/telegram-notifier`` \
-                                         **DSN**: ``telegram://TOKEN@default?channel=CHAT_ID``
+                                         **DSN**: ``telegram://TOKEN@default?channel=CHAT_ID&sslmode=SSLMODE``
 `Twitter`_                               **Install**: ``composer require symfony/twitter-notifier`` \
                                          **DSN**: ``twitter://API_KEY:API_SECRET:ACCESS_TOKEN:ACCESS_SECRET@default``
 `Zendesk`_                               **Install**: ``composer require symfony/zendesk-notifier`` \
@@ -359,6 +359,11 @@ Service
 `Zulip`_                                 **Install**: ``composer require symfony/zulip-notifier`` \
                                          **DSN**: ``zulip://EMAIL:TOKEN@HOST?channel=CHANNEL``
 ======================================   =====================================================================================
+
+.. versionadded:: 8.1
+
+    The ``sslmode`` DSN option for the Telegram bridge was introduced in
+    Symfony 8.1.
 
 .. warning::
 
