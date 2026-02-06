@@ -801,6 +801,21 @@ Define a default value in case the environment variable is not set:
     DB_USER=
     DB_PASS=${DB_USER:-root}pass # results in DB_PASS=rootpass
 
+Wrap values with single quotes to use them as literal strings where ``$``,
+``#`` and other special characters have no special meaning:
+
+.. code-block:: bash
+
+    DB_PASS='p@ss#w$rd'
+
+With double quotes, variables are still interpolated but ``#`` and other
+characters are treated as literal:
+
+.. code-block:: bash
+
+    DB_PASS="p@ss#word"
+    DB_NAME="my_${DB_USER}_database"
+
 Embed commands via ``$()`` (not supported on Windows):
 
 .. code-block:: bash
