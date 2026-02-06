@@ -117,6 +117,14 @@ The Monolog console handler is enabled by default:
             ],
         ]);
 
+.. note::
+
+    The handler name (``console``) and the excluded channel (``!console``) are
+    independent concepts. The handler name is an arbitrary identifier for this
+    handler configuration, while ``!console`` excludes log messages from the
+    ``console`` :doc:`logging channel </logging/channels_handlers>`, which is
+    used internally by the console component itself.
+
 Now, log messages will be shown on the console based on the log levels and verbosity.
 By default (normal verbosity level), warnings and higher will be shown. But in
 :doc:`full verbosity mode </console/verbosity>`, all messages will be shown.
