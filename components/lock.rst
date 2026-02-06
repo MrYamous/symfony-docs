@@ -434,8 +434,8 @@ when the PHP process ends)::
 
 .. note::
 
-    When used inside the FrameworkBundle, the ``FlockStore`` is automatically
-    scoped to a project-specific subdirectory (based on ``kernel.project_id``)
+    When the Lock component is used in a full Symfony application, the ``FlockStore``
+    is automatically scoped to a project-specific subdirectory (based on ``kernel.project_id``)
     to prevent lock collisions between multiple applications on the same server.
 
 .. versionadded:: 8.1
