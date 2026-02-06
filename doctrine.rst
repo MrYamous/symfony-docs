@@ -68,6 +68,33 @@ The database connection information is stored as an environment variable called
     In this case you need to remove the ``resolve:`` prefix in ``config/packages/doctrine.yaml``
     to avoid errors: ``url: '%env(DATABASE_URL)%'``
 
+.. tip::
+
+    To avoid URL-encoding issues with special characters in credentials, you can
+    use separate connection parameters instead of the URL format. Define each
+    value as its own environment variable and wrap it in single quotes in the
+    ``.env`` file to prevent characters like ``$`` and ``#`` from being
+    interpreted:
+
+    .. code-block:: text
+
+        # .env
+        DATABASE_PASSWORD='p@ss$wo#rd'
+
+    Then configure Doctrine to use individual parameters:
+
+    .. code-block:: yaml
+
+        # config/packages/doctrine.yaml
+        doctrine:
+            dbal:
+                user:     '%env(DATABASE_USER)%'
+                password: '%env(DATABASE_PASSWORD)%'
+                host:     '%env(DATABASE_HOST)%'
+                port:     '%env(DATABASE_PORT)%'
+                dbname:   '%env(DATABASE_NAME)%'
+                driver:   pdo_mysql
+
 Now that your connection parameters are setup, Doctrine can create the ``db_name``
 database for you:
 
