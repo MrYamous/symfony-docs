@@ -36,6 +36,17 @@ By default, Symfony provides a :ref:`Semaphore <lock-store-semaphore>`
 when available, or a :ref:`Flock <lock-store-flock>` otherwise. You can configure
 this behavior by using the ``lock`` key like:
 
+.. note::
+
+    Since Symfony 8.1, the ``flock`` and ``semaphore`` stores are automatically
+    scoped by ``kernel.project_id``, preventing lock collisions between multiple
+    applications running on the same server.
+
+.. versionadded:: 8.1
+
+    Automatic scoping of ``flock`` and ``semaphore`` stores by
+    ``kernel.project_id`` was introduced in Symfony 8.1.
+
 .. configuration-block::
 
     .. code-block:: yaml

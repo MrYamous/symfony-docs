@@ -432,6 +432,17 @@ when the PHP process ends)::
     // if none is given, sys_get_temp_dir() is used internally.
     $store = new FlockStore('/var/stores');
 
+.. note::
+
+    When used inside the FrameworkBundle, the ``FlockStore`` is automatically
+    scoped to a project-specific subdirectory (based on ``kernel.project_id``)
+    to prevent lock collisions between multiple applications on the same server.
+
+.. versionadded:: 8.1
+
+    Automatic project-scoped lock directories for ``FlockStore`` were introduced
+    in Symfony 8.1.
+
 .. warning::
 
     Beware that some file systems (such as some types of NFS) do not support
@@ -638,6 +649,14 @@ The SemaphoreStore uses the `PHP semaphore functions`_ to create the locks::
     use Symfony\Component\Lock\Store\SemaphoreStore;
 
     $store = new SemaphoreStore();
+
+    // optionally, pass a project identifier to scope locks and avoid
+    // collisions between multiple applications on the same server
+    $store = new SemaphoreStore($projectId);
+
+.. versionadded:: 8.1
+
+    The ``$projectId`` parameter was introduced in Symfony 8.1.
 
 .. _lock-store-combined:
 
