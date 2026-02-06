@@ -492,7 +492,7 @@ If you haven't installed it yet, run this command:
     For production use, ensure the `GMP PHP extension`_ is installed. The
     ``web-token/jwt-library`` depends on ``brick/math``, which silently falls
     back to a pure PHP implementation when neither the GMP nor BCMath extensions
-    are available. This can make JWT verification **up to 780x slower**.
+    are available. This can make JWT verification **orders of magnitude slower**.
 
 Symfony provides a generic ``OidcTokenHandler`` that decodes the token, validates
 it, and retrieves the user information from it. Optionally, the token can be encrypted (JWE):
