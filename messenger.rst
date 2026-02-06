@@ -1463,11 +1463,6 @@ The AMQP transport automatically adds a
 messages when they are sent and received. This stamp tracks the AMQP message
 ID, which improves logging context when messages fail and are retried.
 
-.. versionadded:: 7.3
-
-    The ``TransportMessageIdStamp`` support in the AMQP transport was
-    introduced in Symfony 7.3.
-
 .. warning::
 
     The consumers do not show up in an admin panel as this transport does not rely on
