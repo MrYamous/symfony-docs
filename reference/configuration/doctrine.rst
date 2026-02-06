@@ -495,6 +495,12 @@ your entities cannot be found by Doctrine.
 Doctrine offers a way to alias entity namespaces to simpler, shorter names
 to be used in DQL queries or for Repository access.
 
+.. deprecated:: 8.1
+
+    Entity namespace aliases were deprecated in Symfony 8.1 because Doctrine
+    ORM 3.0 no longer supports them. Use fully qualified class names instead
+    (e.g. ``App\Entity\Post`` instead of ``App:Post``).
+
 ``is_bundle``
 .............
 
@@ -562,8 +568,7 @@ Mapping Entities Outside of a Bundle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For example, the following looks for entity classes in the ``Entity``
-namespace in the ``src/Entity`` directory and gives them an ``App`` alias
-(so you can say things like ``App:Post``):
+namespace in the ``src/Entity`` directory:
 
 .. configuration-block::
 
@@ -581,7 +586,6 @@ namespace in the ``src/Entity`` directory and gives them an ``App`` alias
                             dir: '%kernel.project_dir%/src/Entity'
                             is_bundle: false
                             prefix: App\Entity
-                            alias: App
 
     .. code-block:: php
 
@@ -597,7 +601,6 @@ namespace in the ``src/Entity`` directory and gives them an ``App`` alias
                             'dir' => '%kernel.project_dir%/src/Entity',
                             'is_bundle' => false,
                             'prefix' => 'App\Entity',
-                            'alias' => 'App',
                         ],
                     ],
                 ],
