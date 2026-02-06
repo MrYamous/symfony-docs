@@ -2905,10 +2905,6 @@ and a different instance will be created per bus.
 Message Deduplication
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 7.3
-
-    Message deduplication was introduced in Symfony 7.3.
-
 Symfony provides a middleware to prevent the same message from being
 dispatched or processed multiple times using :doc:`locks </lock>`.
 
