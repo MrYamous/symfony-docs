@@ -3043,7 +3043,7 @@ Enables support for `PHP attributes`_ in the serializer component.
 
 .. seealso::
 
-    See :ref:`the reference <reference-attributes-serializer>` for a list of supported annotations.
+    See :ref:`the reference <reference-attributes-serializer>` for a list of supported attributes.
 
 .. _reference-serializer-name_converter:
 
