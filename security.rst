@@ -2545,18 +2545,21 @@ the ``ROLE_SUPER_ADMIN`` permission:
         }
     }
 
-You can pass any controller argument to the #[IsGranted()] attribute by name:
+You can pass any controller argument as the voter subject by referencing its name.
+Symfony resolves it automatically from the controller method signature::
 
 .. code-block:: php-attributes
 
     // src/Controller/PostController.php
     // ...
 
+    use App\Entity\Post;
     use Symfony\Component\Security\Http\Attribute\IsGranted;
 
     class PostController extends AbstractController
     {
         #[Route('/posts/{id}/edit', name: 'post_edit')]
+        // 'post' refers to the $post parameter of the controller method
         #[IsGranted('edit', 'post')]
         public function edit(Post $post): Response
         {

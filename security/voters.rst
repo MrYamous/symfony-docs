@@ -77,7 +77,7 @@ code like this:
         {
             #[Route('/posts/{id}', name: 'post_show')]
             // check for "view" access: calls all voters
-            // pass the Post entity by name
+            // the second argument is the name of the controller argument passed to the voter
             #[IsGranted('view', 'post')]
             public function show(Post $post): Response
             {
@@ -86,7 +86,7 @@ code like this:
 
             #[Route('/posts/{id}/edit', name: 'post_edit')]
             // check for "edit" access: calls all voters
-            // pass the Post entity by name
+            // the second argument is the name of the controller argument passed to the voter
             #[IsGranted('edit', 'post')]
             public function edit(Post $post): Response
             {
