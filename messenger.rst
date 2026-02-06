@@ -3125,33 +3125,48 @@ Message Deduplication
 
 .. versionadded:: 7.3
 
-    Symfony provides a middleware to prevent the same message from being
-    dispatched or processed multiple times using locks.
+    Message deduplication was introduced in Symfony 7.3.
+
+Symfony provides a middleware to prevent the same message from being
+dispatched or processed multiple times using :doc:`locks </lock>`.
 
 This behavior is enabled by adding a
 :class:`Symfony\\Component\\Messenger\\Stamp\\DeduplicateStamp`
-to the message envelope. The middleware uses the stamp key to determine
-whether a message should be skipped.
-
-Example::
+to the message envelope. The middleware uses the stamp ``key`` to determine
+whether a message should be skipped::
 
     use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 
     $message = new MyMessage($projectId);
 
-    // Prevent processing multiple messages for the same project at the same time
+    // prevent processing multiple messages for the same project at the same time
     $deduplicationKey = 'my_message.project.'.$projectId;
 
     $bus->dispatch($message, [
         new DeduplicateStamp($deduplicationKey),
     ]);
 
-The deduplication key represents a **domain decision**. It does not need
-to be globally unique, but should identify when two messages should be
-considered duplicates.
+    // use the second argument to define the TTL of the lock (300 seconds by default)
+    new DeduplicateStamp($deduplicationKey, 3600),
 
-The middleware relies on the Lock component and is automatically enabled
-when the Lock component is installed.
+The deduplication key is a **business-level choice**: it encodes what "same message"
+means for your application. It does not need to be globally unique, but it should
+identify when two messages should be considered duplicates (for example, using a
+project ID, an order ID, or a combination of relevant fields).
+
+By default, deduplication applies while the message is in the queue and while
+it is being processed. The lock is released when processing finishes. If you want
+deduplication only while the message is queued, set the third argument to ``true``::
+
+    new DeduplicateStamp($deduplicationKey, 300, true)
+
+In this mode, the lock is released as soon as the worker receives the message,
+so another message with the same key can be processed concurrently.
+
+.. note::
+
+    This middleware is automatically enabled when the :doc:`Lock component </lock>`
+    is installed.
 
 .. _middleware-doctrine:
 
