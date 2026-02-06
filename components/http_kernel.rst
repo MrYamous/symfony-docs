@@ -295,6 +295,20 @@ Listeners to this event can also change the controller callable completely
 by calling :method:`ControllerEvent::setController <Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::setController>`
 on the event object that's passed to listeners on this event.
 
+The :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent` class also
+provides the :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate`
+method, which centralizes expression and closure evaluation for controller
+attributes. For ``Closure`` values, it calls the closure with the controller
+arguments, request and controller object. For ``Expression`` values, it evaluates
+the expression with ``request``, ``args`` and ``this`` as variables. Any other
+value is returned as-is. See the :doc:`kernel.controller event reference </reference/events>`
+for usage examples.
+
+.. versionadded:: 8.1
+
+    The :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate`
+    method was introduced in Symfony 8.1.
+
 .. sidebar:: ``kernel.controller`` in the Symfony Framework
 
     An interesting listener to ``kernel.controller`` in the Symfony
