@@ -3120,6 +3120,39 @@ and a different instance will be created per bus.
     If you have installed the MakerBundle, you can use the ``make:messenger-middleware``
     command to bootstrap the creation of your own messenger middleware.
 
+Message Deduplication
+~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 7.3
+
+    Symfony provides a middleware to prevent the same message from being
+    dispatched or processed multiple times using locks.
+
+This behavior is enabled by adding a
+:class:`Symfony\\Component\\Messenger\\Stamp\\DeduplicateStamp`
+to the message envelope. The middleware uses the stamp key to determine
+whether a message should be skipped.
+
+Example::
+
+    use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
+
+    $message = new MyMessage($projectId);
+
+    // Prevent processing multiple messages for the same project at the same time
+    $deduplicationKey = 'my_message.project.'.$projectId;
+
+    $bus->dispatch($message, [
+        new DeduplicateStamp($deduplicationKey),
+    ]);
+
+The deduplication key represents a **domain decision**. It does not need
+to be globally unique, but should identify when two messages should be
+considered duplicates.
+
+The middleware relies on the Lock component and is automatically enabled
+when the Lock component is installed.
+
 .. _middleware-doctrine:
 
 Middleware for Doctrine
