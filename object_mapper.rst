@@ -505,16 +505,15 @@ Mapping Collections to a Different Target Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, each item in a collection is mapped using the ObjectMapper's
-standard target resolution rules (for example, the ``#[Map(target: ...)]``
-attribute defined on the source class).
+standard target resolution rules. For example, the ``#[Map(target: ...)]``
+attribute defined on the source class.
 
-Starting from Symfony 8.1, you can override this behavior by specifying a
-``targetClass`` option on the ``MapCollection`` transform. This allows mapping
-a collection to a different target class **without adding a ``#[Map]``
-attribute on the collection items' source class**.
+You can override this behavior by specifying a ``targetClass`` option on the
+``MapCollection`` transform. This maps a collection to a different target class
+without adding a ``#[Map]`` attribute to the source class of the collection items.
 
-This is especially useful when you want to reuse source objects in different
-contexts or avoid polluting shared DTOs with mapping metadata::
+Set this option when you want to reuse source objects in different contexts or
+avoid polluting shared DTOs with mapping metadata::
 
     use Symfony\Component\ObjectMapper\Attribute\Map;
     use Symfony\Component\ObjectMapper\Transform\MapCollection;
@@ -526,17 +525,16 @@ contexts or avoid polluting shared DTOs with mapping metadata::
         public array $items = [];
     }
 
-In this example, each element of the ``items`` collection is explicitly mapped
-to ``LineItemTarget``, regardless of any mapping configuration defined on the
+In this example, each element of the ``items`` collection is mapped to
+``LineItemTarget``, regardless of any mapping configuration defined on the
 source item class.
 
-Without the ``targetClass`` option, the ObjectMapper would rely on the default
+Without the ``targetClass`` option, the ObjectMapper relies on its default
 target resolution strategy for each collection item.
 
 .. versionadded:: 8.1
 
-    The ``targetClass`` option was added to ``MapCollection`` to allow mapping
-    collection items to a specific target class.
+    The ``targetClass`` option of ``MapCollection`` was introduced in Symfony 8.1.
 
 Mapping Multiple Targets
 ------------------------
