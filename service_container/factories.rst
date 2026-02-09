@@ -84,8 +84,8 @@ create its object:
 
 .. tip::
 
-    When using PHP to configure your services, you can also use PHP's
-    `first-class callable syntax`_ to define the factory::
+    When configuring your services with PHP, you can use `first-class callable syntax`_
+    to define the factory::
 
         $services->set(NewsletterManager::class)
             ->factory(NewsletterManagerStaticFactory::createNewsletterManager(...));
@@ -95,10 +95,10 @@ create its object:
         $services->set('date', \DateTime::class)
             ->factory(\date_create(...));
 
-.. versionadded:: 7.4
+    .. versionadded:: 7.4
 
-    The support for first-class callable syntax in factory definitions was
-    introduced in Symfony 7.4.
+        Support for first-class callable syntax in factory definitions was
+        introduced in Symfony 7.4.
 
 .. note::
 
