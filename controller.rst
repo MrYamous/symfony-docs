@@ -538,7 +538,6 @@ You can also customize the validation groups used, the status code to return if
 the validation fails as well as supported payload formats::
 
     use Symfony\Component\HttpFoundation\Response;
-
     // ...
 
     public function dashboard(
@@ -554,19 +553,10 @@ the validation fails as well as supported payload formats::
 
 The default status code returned if the validation fails is 422.
 
-.. versionadded:: 8.1
-
-    The support for expressions in ``validationGroups`` was introduced in Symfony 8.1.
-
 You can also use expressions to define validation groups dynamically based on
-controller arguments. This is useful when the validation rules depend on the
-context of the request::
+controller arguments::
 
-    use App\Entity\User;
     use Symfony\Component\ExpressionLanguage\Expression;
-    use Symfony\Component\HttpFoundation\Response;
-    use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-
     // ...
 
     #[Route('/user/{id}', methods: ['PUT'])]
@@ -580,9 +570,12 @@ context of the request::
         // ...
     }
 
-In this example, the validation group is determined by the ``getType()`` method
-of the ``User`` entity. The ``args`` variable contains all controller arguments,
-allowing you to access any resolved parameter.
+In this example, the validation group is resolved from the ``User`` entity.
+The ``args`` variable provides access to all controller arguments by name.
+
+.. versionadded:: 8.1
+
+    Support for expressions in ``validationGroups`` was introduced in Symfony 8.1.
 
 .. tip::
 
