@@ -337,6 +337,18 @@ Value resolvers implement the
 and are used to resolve argument values for controllers as described here:
 :doc:`/controller/value_resolver`.
 
+controller.service_arguments
+----------------------------
+
+**Purpose**: Enable injection of services into controller action arguments
+
+This tag allows controller action methods to receive services as arguments
+without explicitly defining them as service arguments. It is automatically
+applied when using the ``#[AsController]`` attribute or when your controllers
+extend ``AbstractController``.
+
+For details, read the :doc:`/controller/service` article.
+
 data_collector
 --------------
 
