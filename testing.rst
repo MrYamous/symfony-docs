@@ -314,27 +314,31 @@ concrete one::
 No further configuration is required, as the test service container is a special one
 that allows you to interact with private services and aliases.
 
-Mocking non-shared services
+Mocking Non-Shared Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Non-shared services can be mocked in tests when using the test service container.
+:doc:`Non-shared services </service_container/shared>` are instantiated every time
+they are retrieved from the container. For this reason, in tests you must mock
+them using a ``Closure`` that acts as a factory, rather than a concrete instance::
 
-Because non-shared services are instantiated every time they are retrieved,
-they must be replaced by a *factory* instead of a concrete instance. For this
-reason, non-shared services must be mocked using a ``Closure``::
-
-    static::bootKernel();
+    self::bootKernel();
     $container = static::getContainer();
 
-    $services = [new \stdClass(), new \stdClass()];
+    $container->set(Mailer::class, function (): Mailer {
+        $mailer = $this->createMock(Mailer::class);
+        $mailer->method('send')->willReturn(true);
 
-    $container->set('non_shared_service', static function () use (&$services) {
-        return array_pop($services);
+        return $mailer;
     });
 
-The closure acts as a factory and is called each time the service is requested.
+    $newsletterGenerator = $container->get(NewsletterGenerator::class);
 
-Replacing a non-shared service with a non-callable value will throw an exception.
+In this example, each time the container resolves ``Mailer``, the closure is
+called and a new mock instance is returned
+
+.. versionadded:: 8.1
+
+    Support for mocking non-shared services was introduced in Symfony 8.1.
 
 .. _testing-databases:
 
