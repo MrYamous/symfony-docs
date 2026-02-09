@@ -119,11 +119,17 @@ The Monolog console handler is enabled by default:
 
 .. note::
 
-    The handler name (``console``) and the excluded channel (``!console``) are
-    independent concepts. The handler name is an arbitrary identifier for this
-    handler configuration, while ``!console`` excludes log messages from the
-    ``console`` :doc:`logging channel </logging/channels_handlers>`, which is
-    used internally by the console component itself.
+    In this configuration, ``console`` is an arbitrary handler name and can be
+    any string. The ``type: console`` option selects the
+    :class:`Symfony\\Bridge\\Monolog\\Handler\\ConsoleHandler`, which writes log
+    messages to the command output.
+
+    The ``channels`` option uses the ``!`` prefix to exclude specific
+    :doc:`channels </logging/channels_handlers>`. The ``console`` channel is
+    excluded to reduce noise. This is the channel where Symfony logs command
+    lifecycle events (e.g. *Command "{command}" exited with code "{code}"*).
+    Excluding this channel does **not** affect any log messages you write yourself
+    inside your commands, which use different channels and will still appear normally.
 
 Now, log messages will be shown on the console based on the log levels and verbosity.
 By default (normal verbosity level), warnings and higher will be shown. But in
