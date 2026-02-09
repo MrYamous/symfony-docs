@@ -236,27 +236,91 @@ each time you ask for it.
 Limiting Services to a specific Symfony Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use the ``#[When]`` attribute to only register the class
-as a service in some environments::
+You can limit service registration to specific environments as follows:
 
-    use Symfony\Component\DependencyInjection\Attribute\When;
+.. configuration-block::
 
-    // SomeClass is only registered in the "dev" environment
+    .. code-block:: php-attributes
 
-    #[When(env: 'dev')]
-    class SomeClass
-    {
-        // ...
-    }
+        use Symfony\Component\DependencyInjection\Attribute\When;
 
-    // you can also apply more than one When attribute to the same class
+        // SomeClass is only registered in the "dev" environment
 
-    #[When(env: 'dev')]
-    #[When(env: 'test')]
-    class AnotherClass
-    {
-        // ...
-    }
+        #[When(env: 'dev')]
+        class SomeClass
+        {
+            // ...
+        }
+
+        // you can also apply more than one When attribute to the same class
+
+        #[When(env: 'dev')]
+        #[When(env: 'test')]
+        class AnotherClass
+        {
+            // ...
+        }
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            App\Service\SomeClass: ~
+
+        when@dev:
+            services:
+                App\Service\AnotherClass: ~
+
+    .. code-block:: xml
+
+        <!-- config/services.xml -->
+        <services>
+            <service id="App\Service\SomeClass" />
+
+            <when env="dev">
+                <services>
+                    <service id="App\Service\AnotherClass" />
+                </services>
+            </when>
+        </services>
+
+    .. code-block:: php
+
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return static function (ContainerConfigurator $container): void {
+            $services = $container->services();
+
+            $services->set(App\Service\SomeClass::class);
+
+            if ('dev' === $container->env()) {
+                $services->set(App\Service\AnotherClass::class);
+            }
+        };
+
+.. warning::
+
+    The ``_defaults`` section applies only to services defined in the same
+    ``services`` block. Each ``when@<env>`` block has its own scope and does
+    not inherit ``_defaults`` from the main ``services`` section. Redefine
+    ``_defaults`` in every ``when@<env>`` block where you need it:
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            _defaults:
+                autowire: true
+                autoconfigure: true
+            # ...
+
+        when@prod:
+            services:
+                _defaults:
+                    autowire: true
+                    autoconfigure: true
+                # ...
 
 If you want to exclude a service from being registered in a specific
 environment, you can use the ``#[WhenNot]`` attribute::
