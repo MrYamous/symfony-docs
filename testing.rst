@@ -314,6 +314,28 @@ concrete one::
 No further configuration is required, as the test service container is a special one
 that allows you to interact with private services and aliases.
 
+Mocking non-shared services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Non-shared services can be mocked in tests when using the test service container.
+
+Because non-shared services are instantiated every time they are retrieved,
+they must be replaced by a *factory* instead of a concrete instance. For this
+reason, non-shared services must be mocked using a ``Closure``::
+
+    static::bootKernel();
+    $container = static::getContainer();
+
+    $services = [new \stdClass(), new \stdClass()];
+
+    $container->set('non_shared_service', static function () use (&$services) {
+        return array_pop($services);
+    });
+
+The closure acts as a factory and is called each time the service is requested.
+
+Replacing a non-shared service with a non-callable value will throw an exception.
+
 .. _testing-databases:
 
 Configuring a Database for Tests
