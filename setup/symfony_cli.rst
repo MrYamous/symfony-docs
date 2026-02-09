@@ -136,6 +136,11 @@ Now you can continue working in the terminal and run other commands:
     # stop the background server
     $ symfony server:stop
 
+.. note::
+
+    The ``server:log`` command tails the logs from the web server, PHP, and
+    your application.
+
 .. tip::
 
     On macOS, when starting the Symfony server you might see a warning dialog asking
