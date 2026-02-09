@@ -420,7 +420,7 @@ not this is allowed. If your voter isn't called, see :ref:`declaring-the-voter-a
 Events
 ------
 
-the ``security.switch_user`` event is dispatched just before the impersonation
+The ``security.switch_user`` event is dispatched just before the impersonation
 is fully completed. Your :doc:`listener or subscriber </event_dispatcher>` will
 receive a :class:`Symfony\\Component\\Security\\Http\\Event\\SwitchUserEvent`,
 which you can use to get the user that you are now impersonating.
@@ -432,8 +432,8 @@ The :ref:`locale-sticky-session` section does not update the locale when you
 impersonate a user. If you *do* want to be sure to update the locale when you
 switch users, add an event subscriber on this event::
 
-    // src/EventListener/SwitchUserSubscriber.php
-    namespace App\EventListener;
+    // src/EventSubscriber/SwitchUserSubscriber.php
+    namespace App\EventSubscriber;
 
     use Symfony\Component\EventDispatcher\EventSubscriberInterface;
     use Symfony\Component\Security\Http\Event\SwitchUserEvent;
