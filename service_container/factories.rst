@@ -80,11 +80,6 @@ create its object:
         $services->set('date', \DateTime::class)
             ->factory(\date_create(...));
 
-    .. versionadded:: 7.4
-
-        Support for first-class callable syntax in factory definitions was
-        introduced in Symfony 7.4.
-
 .. note::
 
     When using a factory to create services, the value chosen for class
