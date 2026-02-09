@@ -554,6 +554,36 @@ the validation fails as well as supported payload formats::
 
 The default status code returned if the validation fails is 422.
 
+.. versionadded:: 8.1
+
+    The support for expressions in ``validationGroups`` was introduced in Symfony 8.1.
+
+You can also use expressions to define validation groups dynamically based on
+controller arguments. This is useful when the validation rules depend on the
+context of the request::
+
+    use App\Entity\User;
+    use Symfony\Component\ExpressionLanguage\Expression;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+
+    // ...
+
+    #[Route('/user/{id}', methods: ['PUT'])]
+    public function update(
+        User $user,
+        #[MapRequestPayload(
+            validationGroups: [new Expression('args["user"].getType()')]
+        )] UpdateUserDto $dto
+    ): Response
+    {
+        // ...
+    }
+
+In this example, the validation group is determined by the ``getType()`` method
+of the ``User`` entity. The ``args`` variable contains all controller arguments,
+allowing you to access any resolved parameter.
+
 .. tip::
 
     If you build a JSON API, make sure to declare your route as using the JSON
