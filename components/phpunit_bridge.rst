@@ -595,10 +595,6 @@ to mock using the ``clock-mock-namespaces`` parameter:
         </bootstrap>
     </extensions>
 
-.. versionadded:: 7.2
-
-    The ``SymfonyExtension`` class for PHPUnit 10+ was introduced in Symfony 7.2.
-
 For older PHPUnit versions, register the listener instead:
 
 .. code-block:: xml
