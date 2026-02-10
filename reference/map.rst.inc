@@ -6,17 +6,14 @@ Ever wondered what configuration options you have available to you in
 configuration is broken down by the key (e.g. ``framework``) that defines
 each possible section of your Symfony configuration.
 
-* :doc:`framework </reference/configuration/framework>`
-* :doc:`doctrine </reference/configuration/doctrine>`
-* `doctrine_migrations`_
-* `maker`_
-* :doc:`monolog </reference/configuration/monolog>`
-* :doc:`security </reference/configuration/security>`
-* `stimulus`_
-* `turbo`_
-* :doc:`twig </reference/configuration/twig>`
-* :doc:`web_profiler </reference/configuration/web_profiler>`
-* :doc:`debug </reference/configuration/debug>`
+* :doc:`Framework </reference/configuration/framework>`
+* :doc:`Doctrine </reference/configuration/doctrine>`
+* `Doctrine Migrations`_
+* :doc:`Security </reference/configuration/security>`
+* :doc:`Twig </reference/configuration/twig>`
+* :doc:`Monolog </reference/configuration/monolog>`
+* :doc:`Web Profiler </reference/configuration/web_profiler>`
+* :doc:`Debug </reference/configuration/debug>`
 
 Forms and Validation
 --------------------
@@ -42,7 +39,4 @@ Others
 * :doc:`Symfony Attributes Overview </reference/attributes>`
 * :doc:`/reference/events`
 
-.. _`doctrine_migrations`: https://symfony.com/bundles/DoctrineMigrationsBundle/current/index.html#configuration
-.. _`maker`: https://symfony.com/bundles/SymfonyMakerBundle/current/index.html#configuration
-.. _`stimulus`: https://symfony.com/bundles/StimulusBundle/current/index.html#configuration
-.. _`turbo`: https://symfony.com/bundles/ux-turbo/current/index.html#broadcast-conventions-and-configuration
+.. _`Doctrine Migrations`: https://symfony.com/bundles/DoctrineMigrationsBundle/current/index.html#configuration
