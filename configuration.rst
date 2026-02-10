@@ -12,15 +12,20 @@ directory, which has this default structure:
     your-project/
     ├─ config/
     │  ├─ packages/
+    │  ├─ routes/
     │  ├─ bundles.php
+    │  ├─ preload.php
     │  ├─ routes.yaml
     │  └─ services.yaml
 
 * The ``routes.yaml`` file defines the :doc:`routing configuration </routing>`;
 * The ``services.yaml`` file configures the services of the :doc:`service container </service_container>`;
 * The ``bundles.php`` file enables/disables packages in your application;
+* The ``preload.php`` file defines the classes to :ref:`preload with OPcache <performance-use-preloading>`;
 * The ``config/packages/`` directory stores the configuration of every package
-  installed in your application.
+  installed in your application;
+* The ``config/routes/`` directory stores the routing configuration loaded by
+  installed packages (e.g. ``framework.yaml``).
 
 Packages (also called "bundles" in Symfony and "plugins/modules" in other
 projects) add ready-to-use features to your projects.
