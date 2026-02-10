@@ -571,6 +571,53 @@ You can also use a validator with a hidden question::
         return Command::SUCCESS;
     }
 
+Asking for a File
+-----------------
+
+.. versionadded:: 8.1
+
+    The ``FileQuestion`` class and ``InputFile`` class were introduced in Symfony 8.1.
+
+The ``FileQuestion`` class lets you ask the
+user for a file. In terminals that support image protocols (such as Kitty, Ghostty,
+iTerm2, WezTerm, etc.), users can paste images directly from their clipboard.
+In other terminals, the question falls back to asking for a file path::
+
+    // ...
+    public function __invoke(InputInterface $input, OutputInterface $output): int
+    {
+        $helper = new QuestionHelper();
+
+        $question = new FileQuestion(
+            'Provide an image:',
+            allowedMimeTypes: ['image/png', 'image/jpeg'],
+            maxFileSize: 5 * 1024 * 1024, // 5 MB (the default)
+        );
+
+        $file = $helper->ask($input, $output, $question);
+
+        $output->writeln('MIME type: '.$file->getMimeType());
+        $output->writeln('Size: '.$file->getHumanReadableSize());
+        $output->writeln('Contents length: '.strlen($file->getContents()));
+
+        // move the file to a permanent location (needed for temp files from paste)
+        if ($file->isTempFile()) {
+            $file->move('/path/to/target/directory', 'uploaded.png');
+        }
+
+        return Command::SUCCESS;
+    }
+
+The ``InputFile`` class extends
+``\SplFileInfo`` and provides additional methods for working with the received
+file:
+
+* ``getMimeType()`` - Returns the MIME type of the file
+* ``getContents()`` - Returns the file contents as a string
+* ``getHumanReadableSize()`` - Returns a human-readable file size (e.g. ``1.5 MB``)
+* ``move()`` - Moves the file to a new location
+* ``isTempFile()`` - Returns ``true`` if the file was created from pasted data (temporary files are cleaned up automatically at shutdown)
+
 Testing a Command that Expects Input
 ------------------------------------
 

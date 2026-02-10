@@ -537,6 +537,60 @@ they are assigned to the DTO::
 With this setup, when the command input is resolved, the email is lowercased
 and trimmed, and roles are uppercased.
 
+.. _console-input-file:
+
+File Input
+----------
+
+.. versionadded:: 8.1
+
+    File input support in invokable commands was introduced in Symfony 8.1.
+
+You can ask the user for a file by typing a parameter as
+:class:`Symfony\\Component\\Console\\Input\\File\\InputFile` and combining the ``#[Argument]`` and ``#[Ask]`` attributes. The console
+will automatically prompt for file input (paste or path):
+
+::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\Ask;
+    use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Style\SymfonyStyle;
+
+    // ...
+
+    #[AsCommand(name: 'app:analyze')]
+    class AnalyzeCommand
+    {
+        public function __invoke(
+            SymfonyStyle $io,
+            #[Argument(description: 'The image to analyze')]
+            #[Ask('Provide an image (paste or enter path):')]
+            InputFile $image,
+        ): int {
+            $io->writeln('MIME type: '.$image->getMimeType());
+            $io->writeln('Size: '.$image->getHumanReadableSize());
+
+            if ($image->isTempFile()) {
+                $image->move('/path/to/storage', 'image.png');
+            }
+
+            return Command::SUCCESS;
+        }
+    }
+
+In terminals that support image protocols (such as Kitty, Ghostty, iTerm2,
+WezTerm, etc.), users can paste images directly from their clipboard. In other
+terminals, the question falls back to asking for a file path. In non-interactive
+mode, file paths are accepted as regular arguments.
+
+.. seealso::
+
+    For more advanced options (e.g. restricting allowed MIME types or file
+    size), see the ``FileQuestion`` class in the
+    :doc:`QuestionHelper documentation </components/console/helpers/questionhelper>`.
+
 Options with optional arguments
 -------------------------------
 
