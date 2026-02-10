@@ -2623,7 +2623,10 @@ semaphore
 
 **type**: ``string`` | ``array``
 
-The default semaphore adapter. Store's DSN are also allowed.
+The default semaphore adapter. Store's DSN are also allowed. Use ``lock://``
+to use the :doc:`Lock component </lock>` as the semaphore backend (e.g.
+``lock://`` for the default lock, or ``lock://my_locks`` for a named lock
+resource).
 
 .. _reference-semaphore-enabled:
 
