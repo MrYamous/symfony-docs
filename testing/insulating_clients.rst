@@ -8,6 +8,8 @@ chat for instance), create several clients::
     use Symfony\Component\HttpFoundation\Response;
 
     $harry = static::createClient();
+    // shut down the kernel to avoid a LogicException when creating another client
+    self::ensureKernelShutdown();
     $sally = static::createClient();
 
     $harry->request('POST', '/say/sally/Hello');
@@ -15,6 +17,12 @@ chat for instance), create several clients::
 
     $this->assertEquals(Response::HTTP_CREATED, $harry->getResponse()->getStatusCode());
     $this->assertRegExp('/Hello/', $sally->getResponse()->getContent());
+
+.. note::
+
+    Each call to ``createClient()`` boots the kernel. If you need multiple
+    clients, call ``self::ensureKernelShutdown()`` before creating the next one
+    to avoid a ``LogicException``.
 
 This works except when your code maintains a global state or if it depends on
 a third-party library that has some kind of global state. In such a case, you
@@ -24,6 +32,7 @@ can insulate your clients::
     use Symfony\Component\HttpFoundation\Response;
 
     $harry = static::createClient();
+    self::ensureKernelShutdown();
     $sally = static::createClient();
 
     $harry->insulate();
