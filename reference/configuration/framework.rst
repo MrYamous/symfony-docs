@@ -3769,6 +3769,101 @@ providers
 This option enables and configures :ref:`translation providers <translation-providers>`
 to push and pull your translations to/from third party translation services.
 
+pseudo_localization
+...................
+
+**type**: ``array``
+
+This option enables and configures the
+:ref:`pseudolocalization <translation-pseudo-localization>` of translations,
+which is a testing method that replaces the text elements of the application
+with altered versions of the original language (e.g. replacing ``a`` with ``à``,
+wrapping strings with brackets, etc.):
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/translation.yaml
+        framework:
+            translator:
+                pseudo_localization:
+                    enabled: true
+                    accents: true
+                    brackets: true
+                    expansion_factor: 1.0
+                    parse_html: false
+                    localizable_html_attributes: []
+
+    .. code-block:: php
+
+        // config/packages/translation.php
+        use Symfony\Config\FrameworkConfig;
+
+        return static function (FrameworkConfig $framework): void {
+            $framework->translator()
+                ->pseudoLocalization()
+                    ->enabled(true)
+                    ->accents(true)
+                    ->brackets(true)
+                    ->expansionFactor(1.0)
+                    ->parseHtml(false)
+                    ->localizableHtmlAttributes([])
+            ;
+        };
+
+enabled
+"""""""
+
+**type**: ``boolean`` **default**: ``false``
+
+Whether or not to enable pseudolocalization.
+
+accents
+"""""""
+
+**type**: ``boolean`` **default**: ``true``
+
+When ``true``, replaces characters with accented versions of themselves (e.g.
+``a`` is replaced by ``à``, ``c`` by ``ç``, etc.). This helps test the
+application with special and accented characters.
+
+brackets
+""""""""
+
+**type**: ``boolean`` **default**: ``true``
+
+When ``true``, wraps each translated string with brackets (e.g. ``[!!! ... !!!]``).
+This helps detect strings that are not being processed by the translator.
+
+expansion_factor
+""""""""""""""""
+
+**type**: ``float`` **default**: ``1.0``
+
+Controls the number of extra characters added to translated strings to simulate
+the expansion of text when translating to more verbose languages. The minimum
+value is ``1.0`` (no expansion). For example, a value of ``1.4`` means that
+strings will be approximately 40% longer than the original text.
+
+parse_html
+""""""""""
+
+**type**: ``boolean`` **default**: ``false``
+
+When ``true``, HTML tags within translated content are preserved and only the
+text content is pseudo-localized. This prevents HTML from being broken by the
+pseudolocalization process.
+
+localizable_html_attributes
+"""""""""""""""""""""""""""
+
+**type**: ``array`` **default**: ``[]``
+
+Defines which HTML attributes should also be pseudo-localized (e.g.
+``['title', 'alt']``). This option is only relevant when ``parse_html`` is
+set to ``true``.
+
 trust_x_sendfile_type_header
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

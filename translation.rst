@@ -1685,6 +1685,8 @@ to check that the translation contents are also correct:
 
     The ``lint:translations`` command was introduced in Symfony 7.2.
 
+.. _translation-pseudo-localization:
+
 Pseudo-localization translator
 ------------------------------
 
