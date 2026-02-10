@@ -289,10 +289,6 @@ If you want to know what type-hints to use for each service, see the
 Controller Allowlist
 --------------------
 
-.. versionadded:: 6.4
-
-    The controller allowlist feature was introduced in Symfony 6.4.
-
 For security reasons, Symfony maintains an allowlist of controllers that are
 permitted to handle requests. Controllers that are not in this list will be
 rejected when Symfony needs to verify their legitimacy (e.g. when rendering
