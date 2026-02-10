@@ -258,6 +258,59 @@ look at the `AbstractController`_ class that holds its logic.
 If you want to know what type-hints to use for each service, see the
 ``getSubscribedServices()`` method in `AbstractController`_.
 
+.. _controller-allowed-controllers:
+
+Controller Allowlist
+--------------------
+
+.. versionadded:: 6.4
+
+    The controller allowlist feature was introduced in Symfony 6.4.
+
+For security reasons, Symfony maintains an allowlist of controllers that are
+permitted to handle requests. Controllers that are not in this list will be
+rejected when Symfony needs to verify their legitimacy (e.g. when rendering
+:doc:`ESI fragments </http_cache/esi>` or using the
+:ref:`fragment renderer <templates-embed-controllers>`).
+
+The following controllers are automatically allowed:
+
+* Classes using the ``#[AsController]`` attribute;
+* Classes extending ``AbstractController``;
+* The built-in ``TemplateController``;
+* All services tagged with ``controller.service_arguments``.
+
+If you use the ``#[Route]`` attribute on a class, Symfony already registers it
+as a service with the ``controller.service_arguments`` tag, so it is
+automatically allowed.
+
+For bundle authors or advanced use cases where a controller does not match any
+of these criteria, call the
+:method:`Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver::allowControllers`
+method on the ``controller_resolver`` service to register additional controller
+types or attributes::
+
+    // src/DependencyInjection/MyBundleExtension.php
+    namespace App\DependencyInjection;
+
+    use App\Controller\CustomFragmentController;
+    use Symfony\Component\DependencyInjection\ContainerBuilder;
+    use Symfony\Component\DependencyInjection\Extension\Extension;
+
+    class MyBundleExtension extends Extension
+    {
+        public function load(array $configs, ContainerBuilder $container): void
+        {
+            $container->getDefinition('controller_resolver')
+                ->addMethodCall('allowControllers', [[CustomFragmentController::class]]);
+        }
+    }
+
+The ``allowControllers()`` method accepts two arguments: an array of class names
+(``$types``) and an array of attribute class names (``$attributes``). A controller
+is allowed if it is an instance of one of the given types or if its class has
+one of the given attributes.
+
 .. _`Controller class source code`: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Controller/AbstractController.php
 .. _`AbstractController`: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Controller/AbstractController.php
 .. _`ADR pattern`: https://en.wikipedia.org/wiki/Action%E2%80%93domain%E2%80%93responder
