@@ -2113,31 +2113,65 @@ Then, pass the route name to the ``path`` option:
 Fetching the User Object
 ------------------------
 
-After authentication, the ``User`` object of the current user can be
-accessed via the ``getUser()`` shortcut in the
-:ref:`base controller <the-base-controller-class-services>`::
+Fetching the User from a Controller
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-    use Symfony\Component\HttpFoundation\Response;
+To get the authenticated user in a :doc:`controller </controller>`, add a
+``#[CurrentUser]`` attribute to a controller argument typed with a class
+representing your users (commonly ``User``). Make the argument nullable to allow
+anonymous access, or non-nullable to automatically deny access when no user is
+authenticated (Symfony will throw a ``403`` error).
 
-    class ProfileController extends AbstractController
-    {
-        public function index(): Response
+The ``getUser()`` shortcut from the base controller also works, but ``#[CurrentUser]``
+is preferred because it provides proper type-hinting without a ``@var`` annotation,
+works in any controller (not only those extending ``AbstractController``), and
+makes the dependency on the authenticated user explicit in the method signature:
+
+.. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Controller/ProfileController.php
+        namespace App\Controller;
+
+        use App\Entity\User;
+        use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+        use Symfony\Component\Security\Http\Attribute\CurrentUser;
+
+        class ProfileController
         {
             // usually you'll want to make sure the user is authenticated first,
             // see "Authorization" below
-            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-            // returns your User object, or null if the user is not authenticated
-            // use inline documentation to tell your editor your exact User class
-            /** @var \App\Entity\User $user */
-            $user = $this->getUser();
-
-            // Call whatever methods you've added to your User class
-            // For example, if you added a getFirstName() method, you can use that.
-            return new Response('Well hi there '.$user->getFirstName());
+            #[IsGranted('IS_AUTHENTICATED_FULLY')]
+            public function index(#[CurrentUser] User $user): Response
+            {
+                // ... call here any methods you've added to your User class
+                return new Response('Well hi there '.$user->getFirstName());
+            }
         }
-    }
+
+    .. code-block:: php
+
+        // src/Controller/ProfileController.php
+        namespace App\Controller;
+
+        use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+        class ProfileController extends AbstractController
+        {
+            public function index(): Response
+            {
+                // usually you'll want to make sure the user is authenticated first,
+                // see "Authorization" below
+                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+                /** @var \App\Entity\User $user */
+                $user = $this->getUser();
+
+                // ... call here any methods you've added to your User class
+                return new Response('Well hi there '.$user->getFirstName());
+            }
+        }
 
 Fetching the User from a Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2152,8 +2186,8 @@ If you need to get the logged in user from a service, use the
 
     class ExampleService
     {
-        // Avoid calling getUser() in the constructor: auth may not
-        // be complete yet. Instead, store the entire Security object.
+        // avoid calling getUser() in the constructor: auth may not
+        // be complete yet. Instead, inject the entire Security object.
         public function __construct(
             private Security $security,
         ){
