@@ -157,9 +157,16 @@ In addition, some components, bridges and official bundles provide other value r
     can be set to ``null`` in case  the controller can be accessed by anonymous
     users. It requires installing the :doc:`SecurityBundle </security>`.
 
+    Union types are also supported, which is useful when your application has
+    multiple user classes (e.g. ``#[CurrentUser] Admin|Member $user``).
+
     If the argument is not nullable and there is no logged in user or the logged in
     user has a user class not matching the type-hinted class, an ``AccessDeniedException``
     is thrown by the resolver to prevent access to the controller.
+
+    .. versionadded:: 7.4
+
+        Support for union types in ``#[CurrentUser]`` was introduced in Symfony 7.4.
 
 :class:`Symfony\\Component\\Security\\Http\\Controller\\SecurityTokenValueResolver`
     Injects the object that represents the current logged in token if type-hinted

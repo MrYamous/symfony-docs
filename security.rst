@@ -1869,6 +1869,16 @@ makes the dependency on the authenticated user explicit in the method signature:
             }
         }
 
+.. tip::
+
+    You can apply the ``#[CurrentUser]`` attribute to a union of different user classes::
+
+        #[CurrentUser] Admin|Customer|User $user
+
+    .. versionadded:: 7.4
+
+        Support for unions in ``#[CurrentUser]`` was introduced in Symfony 7.4.
+
 Fetching the User from a Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
