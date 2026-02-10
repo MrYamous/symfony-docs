@@ -239,6 +239,16 @@ This parameter stores the value of
 This parameter stores the value of
 :ref:`the framework.http_method_override parameter <configuration-framework-http_method_override>`.
 
+``kernel.allowed_http_method_override``
+---------------------------------------
+
+This parameter stores the value of
+:ref:`the framework.allowed_http_method_override parameter <configuration-framework-allowed_http_method_override>`.
+
+.. versionadded:: 7.4
+
+    The ``kernel.allowed_http_method_override`` parameter was introduced in Symfony 7.4.
+
 ``kernel.logs_dir``
 -------------------
 
@@ -368,6 +378,12 @@ method of the kernel class, which you can override to return a different value.
 
 This parameter stores the value of
 :ref:`the framework.trust_x_sendfile_type_header parameter <configuration-framework-http_method_override>`.
+
+``kernel.trusted_headers``
+--------------------------
+
+This parameter stores the value of
+:ref:`the framework.trusted_headers parameter <reference-framework-trusted-headers>`.
 
 ``kernel.trusted_hosts``
 ------------------------
