@@ -154,6 +154,7 @@ having to add any configuration in external files::
 
     namespace App\EventListener;
 
+    use App\Event\CustomEvent;
     use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
     #[AsEventListener]
@@ -172,6 +173,7 @@ doesn't explicitly define its method, so the ``onFoo()`` method will be called::
 
     namespace App\EventListener;
 
+    use App\Event\CustomEvent;
     use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
     #[AsEventListener(event: CustomEvent::class, method: 'onCustomEvent')]
@@ -200,6 +202,7 @@ can also be applied to methods directly::
 
     namespace App\EventListener;
 
+    use App\Event\CustomEvent;
     use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
     final class MyMultiListener
