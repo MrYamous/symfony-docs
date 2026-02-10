@@ -164,10 +164,6 @@ In addition, some components, bridges and official bundles provide other value r
     user has a user class not matching the type-hinted class, an ``AccessDeniedException``
     is thrown by the resolver to prevent access to the controller.
 
-    .. versionadded:: 7.4
-
-        Support for union types in ``#[CurrentUser]`` was introduced in Symfony 7.4.
-
 :class:`Symfony\\Component\\Security\\Http\\Controller\\SecurityTokenValueResolver`
     Injects the object that represents the current logged in token if type-hinted
     with ``TokenInterface`` or a class extending it.
