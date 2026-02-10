@@ -166,7 +166,7 @@ In addition, some components, bridges and official bundles provide other value r
 
     .. versionadded:: 7.4
 
-        The support for union types in ``#[CurrentUser]`` was introduced in Symfony 7.4.
+        Support for union types in ``#[CurrentUser]`` was introduced in Symfony 7.4.
 
 :class:`Symfony\\Component\\Security\\Http\\Controller\\SecurityTokenValueResolver`
     Injects the object that represents the current logged in token if type-hinted
