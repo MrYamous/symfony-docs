@@ -2114,9 +2114,19 @@ Then, pass the route name to the ``path`` option:
 Fetching the User Object
 ------------------------
 
-After authentication, the ``User`` object of the current user can be
-accessed via the :ref:`#[CurrentUser] <controller-value-resolver-current-user>` attribute or ``getUser()`` shortcut in the
-:ref:`base controller <the-base-controller-class-services>`:
+Fetching the User from a Controller
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get the authenticated user in a :doc:`controller </controller>`, add a
+``#[CurrentUser]`` attribute to a controller argument typed with a class
+representing your users (commonly ``User``). Make the argument nullable to allow
+anonymous access, or non-nullable to automatically deny access when no user is
+authenticated (Symfony will throw a ``403`` error).
+
+The ``getUser()`` shortcut from the base controller also works, but ``#[CurrentUser]``
+is preferred because it provides proper type-hinting without a ``@var`` annotation,
+works in any controller (not only those extending ``AbstractController``), and
+makes the dependency on the authenticated user explicit in the method signature:
 
 .. configuration-block::
 
@@ -2129,17 +2139,14 @@ accessed via the :ref:`#[CurrentUser] <controller-value-resolver-current-user>` 
         use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
         use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-        class ProfileController extends AbstractController
+        class ProfileController
         {
             // usually you'll want to make sure the user is authenticated first,
             // see "Authorization" below
             #[IsGranted('IS_AUTHENTICATED_FULLY')]
-            public function index(
-                // returns your User object, or null if the user is not authenticated
-                #[CurrentUser] ?User $user
-            ): Response {
-                // Call whatever methods you've added to your User class
-                // For example, if you added a getFirstName() method, you can use that.
+            public function index(#[CurrentUser] User $user): Response
+            {
+                // ... call here any methods you've added to your User class
                 return new Response('Well hi there '.$user->getFirstName());
             }
         }
@@ -2159,21 +2166,13 @@ accessed via the :ref:`#[CurrentUser] <controller-value-resolver-current-user>` 
                 // see "Authorization" below
                 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-                // returns your User object, or null if the user is not authenticated
-                // use inline documentation to tell your editor your exact User class
                 /** @var \App\Entity\User $user */
                 $user = $this->getUser();
 
-                // Call whatever methods you've added to your User class
-                // For example, if you added a getFirstName() method, you can use that.
+                // ... call here any methods you've added to your User class
                 return new Response('Well hi there '.$user->getFirstName());
             }
         }
-
-.. note::
-
-    The ``#[CurrentUser]`` attribute can only be used in controller arguments to
-    retrieve the authenticated user.
 
 Fetching the User from a Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2188,8 +2187,8 @@ If you need to get the logged in user from a service, use the
 
     class ExampleService
     {
-        // Avoid calling getUser() in the constructor: auth may not
-        // be complete yet. Instead, store the entire Security object.
+        // avoid calling getUser() in the constructor: auth may not
+        // be complete yet. Instead, inject the entire Security object.
         public function __construct(
             private Security $security,
         ){
