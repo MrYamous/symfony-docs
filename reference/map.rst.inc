@@ -6,13 +6,14 @@ Ever wondered what configuration options you have available to you in
 configuration is broken down by the key (e.g. ``framework``) that defines
 each possible section of your Symfony configuration.
 
-* :doc:`framework </reference/configuration/framework>`
-* :doc:`doctrine </reference/configuration/doctrine>`
-* :doc:`security </reference/configuration/security>`
-* :doc:`twig </reference/configuration/twig>`
-* :doc:`monolog </reference/configuration/monolog>`
-* :doc:`web_profiler </reference/configuration/web_profiler>`
-* :doc:`debug </reference/configuration/debug>`
+* :doc:`Framework </reference/configuration/framework>`
+* :doc:`Doctrine </reference/configuration/doctrine>`
+* `Doctrine Migrations`_
+* :doc:`Security </reference/configuration/security>`
+* :doc:`Twig </reference/configuration/twig>`
+* :doc:`Monolog </reference/configuration/monolog>`
+* :doc:`Web Profiler </reference/configuration/web_profiler>`
+* :doc:`Debug </reference/configuration/debug>`
 
 Forms and Validation
 --------------------
@@ -37,3 +38,5 @@ Others
 * :doc:`/reference/dic_tags`
 * :doc:`Symfony Attributes Overview </reference/attributes>`
 * :doc:`/reference/events`
+
+.. _`Doctrine Migrations`: https://symfony.com/bundles/DoctrineMigrationsBundle/current/index.html#configuration
