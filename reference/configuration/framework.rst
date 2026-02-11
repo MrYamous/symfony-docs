@@ -2811,6 +2811,21 @@ The name of the rate limiting algorithm to use. Example names are ``fixed_window
 ``sliding_window`` and ``no_limit``. See :ref:`Rate Limiter Policies <rate-limiter-policies>`)
 for more information.
 
+remote-event
+~~~~~~~~~~~~
+
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
+Whether to enable or not the RemoteEvent support.
+
+.. seealso::
+
+    For more details, see the :doc:`Webhook </webhook>`
+    documentation.
+
 request
 ~~~~~~~
 
