@@ -2318,6 +2318,21 @@ Another alternative is to set the ``xdebug.file_link_format`` option in your
         // by removing the `/path/to/root/` (note trailing `/`), it becomes relative
         'jetbrains://php-storm/navigate/reference?project=my-project&path=%%f:%%l&/path/to/root/>'
 
+json_streamer
+~~~~~~~~~~~~~
+
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
+Whether to enable or not the JSON Streamer support.
+
+.. seealso::
+
+    For more details, see the :doc:`Streaming JSON </serializer/streaming_json>`
+    documentation.
+
 .. _reference-lock:
 
 lock
