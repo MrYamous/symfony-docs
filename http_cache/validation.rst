@@ -232,7 +232,7 @@ have access to the following variables:
 
 ``request``
     The current :class:`Symfony\\Component\\HttpFoundation\\Request` object,
-    giving you access to headers, query parameters, and other request data.
+    which gives you access to headers, query parameters, and other request data.
 
 ``args``
     An array containing all controller action arguments (including those
@@ -241,8 +241,8 @@ have access to the following variables:
 In addition to these variables, all request attributes (such as route parameters)
 are also available directly by name.
 
-Here's an example using expressions to compute the ``ETag`` and ``Last-Modified``
-values dynamically::
+The following example uses expressions to compute the ``ETag`` and
+``Last-Modified`` values dynamically::
 
     // src/Controller/ArticleController.php
     namespace App\Controller;
