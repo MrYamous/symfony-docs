@@ -344,8 +344,8 @@ controller.service_arguments
 
 This tag allows controller action methods to receive services as arguments
 without explicitly defining them as service arguments. It is automatically
-applied when using the ``#[AsController]`` attribute or when your controllers
-extend ``AbstractController``.
+applied when using the ``#[AsController]`` attribute or when your controller
+extends ``AbstractController``.
 
 For details, read the :doc:`/controller/service` article.
 
