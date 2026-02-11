@@ -862,6 +862,8 @@ typed properties:
             }
         }
 
+.. _autowiring-anonymous-services-inline:
+
 Autowiring Anonymous Services Inline
 ------------------------------------
 

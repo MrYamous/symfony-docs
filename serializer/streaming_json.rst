@@ -369,6 +369,8 @@ Pass the ``include_null_properties`` option to include them explicitly::
 
     The ``include_null_properties`` option was introduced in Symfony 7.4.
 
+.. _json-streamer-configure-encoded-name:
+
 Configuring the Encoded Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -404,6 +406,8 @@ This maps the ``Duck::$id`` property to the ``@id`` JSON key::
     // {
     //   "@id": "/ducks/daffy"
     // }
+
+.. _json-streamer-configure-encoded-value:
 
 Configuring the Encoded Value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
