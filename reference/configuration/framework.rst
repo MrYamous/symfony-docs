@@ -601,15 +601,6 @@ settings is configured.
 
     For more details, see :doc:`/forms`.
 
-.. _reference-form-field-name:
-
-field_name
-..........
-
-**type**: ``string`` **default**: ``_token``
-
-This is the field name that you should give to the CSRF token field of your forms.
-
 .. _reference-framework-csrf-protection:
 
 csrf_protection
@@ -667,6 +658,15 @@ can also :ref:`disable CSRF protection on individual forms <form-csrf-customizat
 If you're using forms, but want to avoid starting your session (e.g. using
 forms in an API-only website), ``csrf_protection`` will need to be set to
 ``false``.
+
+.. _reference-form-field-name:
+
+field_name
+..........
+
+**type**: ``string`` **default**: ``_token``
+
+This is the field name that you should give to the CSRF token field of your forms.
 
 .. _config-framework-error_controller:
 
