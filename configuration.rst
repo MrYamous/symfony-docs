@@ -30,6 +30,10 @@ directory, which has this default structure:
 * The ``config/routes/`` directory stores the routing configuration loaded by
   installed packages (e.g. ``framework.yaml``).
 
+.. versionadded:: 7.4
+
+    The ``config/reference.php`` file was introduced in Symfony 7.4.
+
 Packages (also called "bundles" in Symfony and "plugins/modules" in other
 projects) add ready-to-use features to your projects.
 
