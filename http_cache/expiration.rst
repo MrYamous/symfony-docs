@@ -113,12 +113,13 @@ Applying Cache Conditionally
 
 .. versionadded:: 8.1
 
-    The ability to apply the ``#[Cache]`` attribute conditionally was introduced
-    in Symfony 8.1.
+    The ``if`` option of the ``#[Cache]`` attribute was introduced in Symfony 8.1.
 
-You can use the ``if`` option to conditionally apply the ``#[Cache]`` attribute.
-This option accepts either a closure or an :doc:`ExpressionLanguage </components/expression_language>`
-expression that must return a boolean value:
+Use the ``if`` option to apply the ``#[Cache]`` attribute only when a given
+condition is met. This option accepts a closure or an
+:doc:`ExpressionLanguage </components/expression_language>` expression that
+receives the ``Request`` object and the controller arguments and must return
+a boolean value:
 
 .. configuration-block::
 
@@ -132,7 +133,7 @@ expression that must return a boolean value:
         #[Cache(
             public: true,
             maxage: 3600,
-            if: fn (Request $request) => $request->query->has('cache')
+            if: static fn (Request $request): bool => $request->query->has('cache')
         )]
         public function index(Request $request): Response
         {
@@ -150,48 +151,20 @@ expression that must return a boolean value:
             // ...
         }
 
-The closure or expression has access to the ``Request`` object and controller
-arguments. When the condition evaluates to ``true``, the cache headers are
-applied; when it evaluates to ``false``, they are not.
+When the condition evaluates to ``true``, the cache headers are applied; when
+it evaluates to ``false``, they are not.
 
-This is particularly useful when:
+This is useful when you need to enable caching based on runtime conditions such
+as user authentication state, feature flags, or request parameters. It is also
+helpful when the controller does not return a ``Response`` object directly (e.g.
+when using `FOSRestBundle`_ or other libraries that handle view rendering).
 
-* You need to enable caching programmatically based on runtime conditions
-* Your controller does not return a ``Response`` object directly (e.g. when using
-  `FOSRestBundle`_ or other libraries that handle view rendering)
-* You want to cache based on user authentication, feature flags, or request parameters
+.. note::
 
-Multiple Cache Attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``#[Cache]`` attribute is repeatable, allowing you to define multiple
-attributes with different conditions on the same controller:
-
-.. code-block:: php-attributes
-
-    use Symfony\Component\HttpFoundation\Request;
-    use Symfony\Component\HttpKernel\Attribute\Cache;
-    // ...
-
-    #[Cache(
-        public: true,
-        maxage: 3600,
-        if: fn (Request $request) => !$request->query->has('preview')
-    )]
-    #[Cache(
-        public: false,
-        maxage: 0,
-        if: fn (Request $request) => $request->query->has('preview')
-    )]
-    public function article(Request $request): Response
-    {
-        // This will cache for 1 hour when preview=1 is NOT in the query string,
-        // and disable caching when preview=1 IS present
-    }
-
-Only the first ``#[Cache]`` attribute whose condition evaluates to ``true``
-will be applied. If no condition matches, no cache headers will be set by
-the attribute.
+    The ``#[Cache]`` attribute is repeatable. When multiple attributes are
+    defined on the same controller, they are evaluated in order and the first
+    one whose condition returns ``true`` is applied. If no condition matches,
+    no cache headers are set by the attribute.
 
 .. _`expiration model`: https://tools.ietf.org/html/rfc2616#section-13.2
 .. _`Calculating Freshness Lifetime`: https://tools.ietf.org/html/rfc7234#section-4.2.1
