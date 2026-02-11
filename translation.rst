@@ -288,27 +288,40 @@ using PHP's :phpclass:`MessageFormatter` class. Read more about this in
 Translatable Objects
 --------------------
 
-Sometimes translating contents in templates is cumbersome because you need the
-original message, the translation parameters and the translation domain for
-each content. Making the translation in the controller or services simplifies
-your templates, but requires injecting the translator service in different
-parts of your application and mocking it in your tests.
+In many applications, translatable text does not only live in Twig templates
+and controllers. Enums, services, value objects and form types often need to
+produce messages that will be translated later. Translating those messages at
+creation time forces you to inject the ``translator`` service everywhere and to
+mock it in every test.
 
-Instead of translating a string at the time of creation, you can use a
-"translatable object", which is an instance of the
-:class:`Symfony\\Component\\Translation\\TranslatableMessage` class. This object stores
-all the information needed to fully translate its contents when needed::
+A **translatable object** solves this by storing all the information needed for
+a future translation (the message ID, parameters and domain) without actually
+translating anything. When the object eventually reaches a Twig template or any
+other translation-aware layer, it is translated automatically.
+
+Symfony ships with :class:`Symfony\\Component\\Translation\\TranslatableMessage`,
+which implements :class:`Symfony\\Contracts\\Translation\\TranslatableInterface`.
+You can use it directly or create your own implementations of the interface.
+
+Basic Usage
+~~~~~~~~~~~
+
+Create a ``TranslatableMessage`` anywhere in your code. The translation
+happens later, when the object is rendered::
 
     use Symfony\Component\Translation\TranslatableMessage;
 
-    // the first argument is required and it's the original message
-    $message = new TranslatableMessage('Symfony is great!');
-    // the optional second argument defines the translation parameters and
-    // the optional third argument is the translation domain
-    $status = new TranslatableMessage('order.status', ['%status%' => $order->getStatus()], 'store');
+    // a translatable message using the default domain ("messages")
+    $message = new TranslatableMessage('notification.welcome');
 
-Templates are now much simpler because you can pass translatable objects to the
-``trans`` filter:
+    // with parameters and a custom domain
+    $status = new TranslatableMessage(
+        'order.status',
+        ['%status%' => $order->getStatus()],
+        'store'
+    );
+
+In Twig, pass translatable objects to the ``trans`` filter just like regular strings:
 
 .. code-block:: html+twig
 
@@ -317,12 +330,92 @@ Templates are now much simpler because you can pass translatable objects to the
 
 .. tip::
 
-    The translation parameters can also be a :class:`Symfony\\Component\\Translation\\TranslatableMessage`.
+    Use the :ref:`t() shortcut function <reference-twig-function-t>` to create
+    translatable objects with less boilerplate, both in Twig and PHP::
+
+        use function Symfony\Component\Translation\t;
+
+        $message = t('notification.welcome');
+        $status  = t('order.status', ['%status%' => $order->getStatus()], 'store');
 
 .. tip::
 
-    There's also a :ref:`function called t() <reference-twig-function-t>`,
-    available both in Twig and PHP, as a shortcut to create translatable objects.
+    The translation parameters of a ``TranslatableMessage`` can themselves be
+    :class:`Symfony\\Component\\Translation\\TranslatableMessage` instances.
+
+Translatable Objects In Practice
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Enums are a common source of user-facing text. Consider a ``UserRole`` enum
+that needs to display a translated label in the UI::
+
+    enum UserRole: string
+    {
+        case User  = 'ROLE_USER';
+        case Admin = 'ROLE_ADMIN';
+    }
+
+A first approach is to return plain strings or translation keys from a method.
+However, this has two significant drawbacks:
+
+#. You cannot attach translation parameters (e.g. for pluralization) or specify
+   a translation domain.
+#. The :ref:`translation:extract command <extracting-translation-contents>`
+   cannot detect the keys, so it will not update your translation files automatically
+   and the ``--clean`` option will wrongly flag those keys as unused.
+
+Using ``TranslatableMessage`` fixes both problems::
+
+    use Symfony\Component\Translation\TranslatableMessage;
+
+    enum UserRole: string
+    {
+        case User  = 'ROLE_USER';
+        case Admin = 'ROLE_ADMIN';
+
+        public function label(): TranslatableMessage
+        {
+            return match ($this) {
+                self::User  => new TranslatableMessage('user_role.user'),
+                self::Admin => new TranslatableMessage('user_role.admin'),
+            };
+        }
+    }
+
+In Twig, render the label with the ``trans`` filter:
+
+.. code-block:: html+twig
+
+    <span>{{ role.label|trans }}</span>
+
+The ``translation:extract`` command will detect these ``TranslatableMessage``
+constructors and keep your translation catalogs up to date.
+
+Custom TranslatableInterface Implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need more control, implement
+:class:`Symfony\\Contracts\\Translation\\TranslatableInterface` directly on
+any class. The interface requires a single ``trans()`` method::
+
+    use Symfony\Contracts\Translation\TranslatableInterface;
+    use Symfony\Contracts\Translation\TranslatorInterface;
+
+    enum UserRole: string implements TranslatableInterface
+    {
+        case User  = 'ROLE_USER';
+        case Admin = 'ROLE_ADMIN';
+
+        public function trans(TranslatorInterface $translator, ?string $locale = null): string
+        {
+            return $translator->trans('user_role.'.$this->name, locale: $locale);
+        }
+    }
+
+Any object that implements ``TranslatableInterface`` can be passed to the
+``trans`` Twig filter and will be translated automatically. This approach is
+useful when translation logic is more complex than a static message ID, for
+example when the message depends on runtime conditions.
 
 Non-Translatable Messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -480,6 +573,8 @@ When translating a message, the translator uses the specified locale or the
 use for translation::
 
     $translator->trans('Symfony is great', locale: 'fr_FR');
+
+.. _extracting-translation-contents:
 
 Extracting Translation Contents and Updating Catalogs Automatically
 -------------------------------------------------------------------
