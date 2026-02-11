@@ -3825,6 +3825,9 @@ reverse proxy. See :doc:`/deployment/proxies`.
 uid
 ~~~
 
+Read the :doc:`UID component documentation </components/uid>` for complete
+details about each option.
+
 default_uuid_version
 ....................
 
@@ -3861,11 +3864,6 @@ time_based_uuid_node
 **type**: ``string`` | ``integer`` **default**: ``null``
 
 The node to use for generating time-based UUIDs (e.g. ``'121212121212'``).
-
-.. seealso::
-
-    For more details, see the :doc:`UID component </components/uid>`
-    documentation.
 
 .. _reference-validation:
 
