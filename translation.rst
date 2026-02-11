@@ -290,8 +290,8 @@ However, creating a translation for this string is impossible since the
 translator will try to look up the message including the variable portions
 (e.g. *"Hello Ryan"* or *"Hello Fabien"*).
 
-Instead, you can use **placeholders** in your translation messages and pass the
-variable values when translating:
+Instead, you can replace the variable parts with **placeholders** wrapped in
+``%`` characters::
 
 .. configuration-block::
 
@@ -325,39 +325,32 @@ variable values when translating:
             'say_hello' => 'Hello %name%!',
         ];
 
-Then, pass the placeholder values as the second argument of the ``trans()``
-method::
+Then, pass the placeholder values as the second argument of the ``trans()`` method::
 
     // ...
     $translated = $translator->trans('say_hello', ['%name%' => 'Fabien']);
-
     // $translated = 'Hello Fabien!'
 
-The translator replaces the placeholders with the given values using PHP's
-``strtr()`` function. The ``%name%`` convention (wrapping placeholder names in
-``%`` characters) helps avoid accidental replacements and makes placeholders
-easy to spot in translation files.
+Symfony replaces the placeholders with the given values using PHP's
+:phpfunction:`strtr` function. The ``%`` wrapping is a convention to make
+placeholders easy to spot, but it's not required. You can use any wrapper
+(e.g. ``#name#`` or ``{name}``), as long as the key in the parameters array
+matches the placeholder in the message exactly. This basic mechanism works in
+all translation formats and covers most use cases.
 
-Another complication is when you have translations that may or may not be
-plural, based on some variable:
+When your translations need to handle more complex scenarios, basic
+placeholders are not enough. For example, you might need to adjust a message:
 
-.. code-block:: text
+* based on a count: *"There is one apple"* vs *"There are 5 apples"*
+* based on gender: *"He accepted the invitation"* vs *"She accepted the invitation"*
+  vs *"They accepted the invitation"*
+* based on the user's locale: *"Published at Jan 25, 2026"* vs *"Published at 25 January 2019"*
 
-    There is one apple.
-    There are 5 apples.
-
-To manage these situations, Symfony follows the `ICU MessageFormat`_ syntax by
-using PHP's :phpclass:`MessageFormatter` class. Read more about this in
+Symfony handles all these cases through the :doc:`ICU MessageFormat </reference/formats/message_format>`
+syntax, using PHP's :phpclass:`MessageFormatter` class. ICU placeholders use ``{name}``
+instead of ``%name%`` and require the ``+intl-icu`` suffix in the translation
+filename (e.g. ``messages+intl-icu.en.yaml``). Read more about this in
 :doc:`/reference/formats/message_format`.
-
-.. tip::
-
-    **Basic placeholders** (``%name%``) work in any standard translation file
-    and use simple string replacement. **ICU MessageFormat** (``{name}``)
-    requires the ``+intl-icu`` suffix in the translation filename (e.g.
-    ``messages+intl-icu.en.yaml``) and supports advanced features like
-    pluralization, gender selection and number/date formatting. You don't need
-    ICU MessageFormat for simple placeholder substitutions.
 
 .. _translatable-objects:
 
@@ -1750,7 +1743,6 @@ Learn more
     reference/formats/xliff
 
 .. _`i18n`: https://en.wikipedia.org/wiki/Internationalization_and_localization
-.. _`ICU MessageFormat`: https://unicode-org.github.io/icu/userguide/format_parse/messages/
 .. _`ISO 3166-1 alpha-2`: https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
 .. _`ISO 639-1`: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 .. _`PHP intl extension`: https://php.net/book.intl
