@@ -290,6 +290,54 @@ However, creating a translation for this string is impossible since the
 translator will try to look up the message including the variable portions
 (e.g. *"Hello Ryan"* or *"Hello Fabien"*).
 
+Instead, you can use **placeholders** in your translation messages and pass the
+variable values when translating:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # translations/messages.en.yaml
+        say_hello: 'Hello %name%!'
+
+    .. code-block:: xml
+
+        <!-- translations/messages.en.xlf -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2
+            https://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+            <file source-language="en" datatype="plaintext" original="file.ext">
+                <body>
+                    <trans-unit id="say_hello">
+                        <source>say_hello</source>
+                        <target>Hello %name%!</target>
+                    </trans-unit>
+                </body>
+            </file>
+        </xliff>
+
+    .. code-block:: php
+
+        // translations/messages.en.php
+        return [
+            'say_hello' => 'Hello %name%!',
+        ];
+
+Then, pass the placeholder values as the second argument of the ``trans()``
+method::
+
+    // ...
+    $translated = $translator->trans('say_hello', ['%name%' => 'Fabien']);
+
+    // $translated = 'Hello Fabien!'
+
+The translator replaces the placeholders with the given values using PHP's
+``strtr()`` function. The ``%name%`` convention (wrapping placeholder names in
+``%`` characters) helps avoid accidental replacements and makes placeholders
+easy to spot in translation files.
+
 Another complication is when you have translations that may or may not be
 plural, based on some variable:
 
@@ -301,6 +349,15 @@ plural, based on some variable:
 To manage these situations, Symfony follows the `ICU MessageFormat`_ syntax by
 using PHP's :phpclass:`MessageFormatter` class. Read more about this in
 :doc:`/reference/formats/message_format`.
+
+.. tip::
+
+    **Basic placeholders** (``%name%``) work in any standard translation file
+    and use simple string replacement. **ICU MessageFormat** (``{name}``)
+    requires the ``+intl-icu`` suffix in the translation filename (e.g.
+    ``messages+intl-icu.en.yaml``) and supports advanced features like
+    pluralization, gender selection and number/date formatting. You don't need
+    ICU MessageFormat for simple placeholder substitutions.
 
 .. _translatable-objects:
 
