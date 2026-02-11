@@ -694,8 +694,8 @@ enabled
 
 **type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
 
-This option can be used to disable CSRF protection on *all* forms. But you
-can also :ref:`disable CSRF protection on individual forms <form-csrf-customization>`.
+This option can be used to disable CSRF protection on *all* Symfony features,
+but you can also disable CSRF protection only on forms. See :ref:`form.csrf_protection <reference-framework-form-csrf-protection>`.
 
 .. configuration-block::
 
@@ -1011,8 +1011,20 @@ settings is configured.
 
     For more details, see :doc:`/forms`.
 
+.. _reference-framework-form-csrf-protection:
+
 csrf_protection
 ...............
+
+enabled
+'''''''
+
+**type**: ``boolean`` **default**: ``true``
+
+Whether to enable CSRF protection for all forms. You can also
+:ref:`disable CSRF protection for individual forms <form-csrf-customization>`
+or disable it for your entire application (see
+:ref:`framework.csrf_protection <reference-framework-csrf-protection>`).
 
 field_name
 ''''''''''
