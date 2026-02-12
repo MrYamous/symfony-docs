@@ -12,6 +12,8 @@ Arguments are the strings - separated by spaces - that
 come after the command name itself. They are ordered, and can be optional
 or required.
 
+.. _console-input-arguments:
+
 Using Arguments in Invokable Commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -184,6 +186,8 @@ Unlike arguments, options are not ordered (meaning you can specify them in any
 order) and are specified with two dashes (e.g. ``--yell``). Options are
 *always* optional, and can be setup to accept a value (e.g. ``--dir=src``) or
 as a boolean flag without a value (e.g.  ``--yell``).
+
+.. _console-input-options:
 
 Using Options in Invokable Commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -395,6 +399,8 @@ You need to combine ``VALUE_IS_ARRAY`` with ``VALUE_REQUIRED`` or
             ['blue', 'red']
         )
     ;
+
+.. _console-input-map-input:
 
 Mapping Input to Objects
 ------------------------
