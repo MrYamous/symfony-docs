@@ -853,6 +853,8 @@ You can add the ``#[Groups]`` attribute to your class:
             #[Groups(["public-view"])]
             private bool $sportsperson;
 
+            private string $email;
+
             // ...
         }
 
@@ -867,6 +869,7 @@ You can add the ``#[Groups]`` attribute to your class:
                     groups: ['public-view']
                 sportsperson:
                     groups: ['public-view']
+                # email has no groups defined
 
     .. code-block:: xml
 
@@ -887,6 +890,7 @@ You can add the ``#[Groups]`` attribute to your class:
                 <attribute name="sportsperson">
                     <group>public-view</group>
                 </attribute>
+                <!-- email has no groups defined -->
             </class>
         </serializer>
 
@@ -907,13 +911,14 @@ You can now choose which groups to use when serializing::
     );
     // $json contains {"name":"Jane Doe","age":32,"sportsperson":false}
 
-    // or use the special "*" value to select all groups
+    // or use the special "*" value to serialize all properties
+    // (including those without any groups)
     $json = $serializer->serialize(
         $person,
         'json',
         ['groups' => '*']
     );
-    // $json contains {"name":"Jane Doe","age":32,"sportsperson":false}
+    // $json contains {"name":"Jane Doe","age":32,"sportsperson":false,"email":"jane.doe@exemple.com"}
 
 Using the Serialization Context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
