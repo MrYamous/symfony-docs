@@ -32,6 +32,7 @@ key in your application configuration.
 Some of these options define tens of sub-options and they are explained in
 separate articles:
 
+* `access_decision_manager`_
 * `access_control`_
 * :ref:`hashers <passwordhasher-supported-algorithms>`
 * `firewalls`_
@@ -131,6 +132,98 @@ The possible values of this option are:
 * ``INVALIDATE`` constant from :class:`Symfony\\Component\\Security\\Http\\Session\\SessionAuthenticationStrategy`
   The entire session is regenerated, so the session ID is updated but all the
   other session attributes are lost.
+
+access_decision_manager
+-----------------------
+
+Configures the access decision manager used by the security system to make
+authorization decisions (e.g. when ``is_granted()`` is called):
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/security.yaml
+        security:
+            access_decision_manager:
+                strategy: affirmative
+                allow_if_all_abstain: false
+                allow_if_equal_granted_denied: true
+
+    .. code-block:: php
+
+        // config/packages/security.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'security' => [
+                'access_decision_manager' => [
+                    'strategy' => 'affirmative',
+                    'allow_if_all_abstain' => false,
+                    'allow_if_equal_granted_denied' => true,
+                ],
+            ],
+        ]);
+
+.. seealso::
+
+    For a detailed explanation of access decision strategies and custom
+    voters, see :doc:`/security/voters`.
+
+strategy
+........
+
+**type**: ``string`` **default**: ``affirmative``
+
+Defines the strategy used by the access decision manager to decide whether
+access should be granted. The available strategies are:
+
+* ``affirmative``: grants access as soon as there is one voter granting access;
+* ``consensus``: grants access if there are more voters granting access than
+  denying;
+* ``unanimous``: only grants access if there is no voter denying access;
+* ``priority``: grants or denies access by the first voter that does not abstain,
+  based on their service priority.
+
+allow_if_all_abstain
+....................
+
+**type**: ``boolean`` **default**: ``false``
+
+If ``true``, access is granted when all voters abstain (no voter explicitly
+grants or denies access). If ``false`` (the default), access is denied when
+all voters abstain.
+
+allow_if_equal_granted_denied
+.............................
+
+**type**: ``boolean`` **default**: ``true``
+
+This option is only used by the ``consensus`` strategy. If the number of
+voters granting access is equal to the number of voters denying access,
+this option determines the final decision. If ``true`` (the default), access
+is granted in case of a tie.
+
+service
+.......
+
+**type**: ``string`` **default**: ``null``
+
+Defines a custom access decision manager service to replace the default one
+entirely. The service must implement the
+:class:`Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface`.
+
+When this option is set, the ``strategy``, ``allow_if_all_abstain`` and
+``allow_if_equal_granted_denied`` options are ignored.
+
+strategy_service
+................
+
+**type**: ``string`` **default**: ``null``
+
+Defines a custom strategy service to use instead of one of the built-in
+strategies. The service must implement the
+:class:`Symfony\\Component\\Security\\Core\\Authorization\\Strategy\\AccessDecisionStrategyInterface`.
 
 access_control
 --------------
