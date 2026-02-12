@@ -450,6 +450,7 @@
 /routing/external_resources /routing
 /routing/hostname_pattern /routing
 /routing/extra_information /routing
+/console/coloring /console/style
 /console/request_context /routing
 /form/action_method /forms
 /reference/requirements /setup
