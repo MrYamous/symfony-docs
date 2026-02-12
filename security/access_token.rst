@@ -122,8 +122,7 @@ The application is now ready to handle incoming tokens. A *token extractor*
 retrieves the token from the request (e.g. a header or request body).
 
 By default, the access token is read from the request header parameter
-``Authorization`` with the scheme ``Bearer`` (e.g. ``Authorization: Bearer
-the-token-value``).
+``Authorization`` with the scheme ``Bearer`` (e.g. ``Authorization: Bearer the-token-value``).
 
 Symfony provides other extractors as per the `RFC6750`_:
 
