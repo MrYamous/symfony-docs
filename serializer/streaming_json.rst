@@ -148,10 +148,10 @@ method to perform the actual JSON parsing:
 
             public function __construct(
                 private StreamReaderInterface $jsonStreamReader,
-                #[Autowire(param: 'kernel.root_dir')]
-                string $rootDir,
+                #[Autowire(param: 'kernel.project_dir')]
+                string $projectDir,
             ) {
-                $this->catsJsonFile = sprintf('%s/var/cats.json', $rootDir);
+                $this->catsJsonFile = sprintf('%s/var/cats.json', $projectDir);
             }
 
             public function pickTheTenthCat(): ?Cat
