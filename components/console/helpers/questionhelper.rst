@@ -537,6 +537,36 @@ invalid answer and will only be able to proceed if their input is valid.
         ));
         $question->setValidator($validation);
 
+Using Validator Constraints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of writing custom validation logic, you can pass
+:doc:`Validator constraints </reference/constraints>` directly to the question
+using the :method:`Symfony\\Component\\Console\\Question\\Question::setConstraints`
+method::
+
+    // ...
+    $question = new Question('Please enter your email');
+    $question->setConstraints([
+        new Assert\NotBlank(),
+        new Assert\Email(),
+    ]);
+
+    $email = $helper->ask($input, $output, $question);
+
+When the input fails validation, the error messages are displayed in the console
+and the user is prompted again (the same behavior as ``setValidator()``). You can
+also call ``setMaxAttempts()`` to limit the number of retries.
+
+If both constraints and a custom validator are set on the same question, the
+constraints are validated first and the custom validator is only called if all
+constraints pass.
+
+.. versionadded:: 8.1
+
+    The :method:`Symfony\\Component\\Console\\Question\\Question::setConstraints`
+    method was introduced in Symfony 8.1.
+
 Validating a Hidden Response
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
