@@ -16,6 +16,8 @@ Symfony provides several user providers:
     Loads users from a configuration file;
 :ref:`Chain User Provider <security-chain-user-provider>`
     Merges two or more user providers into a new user provider.
+    Since each firewall has exactly *one* user provider, you can use this
+    to chain multiple providers together.
 
 .. _security-entity-user-provider:
 
