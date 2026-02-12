@@ -32,4 +32,17 @@ The target controller method might look something like this::
     }
 
 Like when creating a controller for a route, the order of the arguments of the
-``fancy()`` method doesn't matter: the matching is done by name.
+target method (``fancy()`` in the above example) doesn't matter: the matching is done by name.
+
+.. note::
+
+    Twig's ``app.current_route``, ``app.current_route_parameters``, and
+    ``_route_params`` will be empty after such a ``->forward()`` call. However,
+    you can set them manually by adding a ``_route`` and ``_route_params`` keys
+    to the array passed as the second argument of ``forward()``::
+
+        $response = $this->forward('App\Controller\OtherController::fancy', [
+            // ...
+            '_route' => '...',
+            '_route_params' => ['...' => '...'];
+        ]);
