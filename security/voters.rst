@@ -493,6 +493,8 @@ security configuration:
             ],
         ]);
 
+.. _security-custom-access-decision-strategy:
+
 Custom Access Decision Strategy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -574,6 +576,8 @@ Then, access that value when counting votes to make a decision::
             // ...
         }
     }
+
+.. _security-custom-access-decision-manager:
 
 Custom Access Decision Manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
