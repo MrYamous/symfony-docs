@@ -105,6 +105,34 @@ To enable the attribute loader, call the
 To disable the attribute loader after it was enabled, call
 :method:`Symfony\\Component\\Validator\\ValidatorBuilder::disableAttributeMapping`.
 
+Compile-Time Attribute Metadata
+...............................
+
+.. versionadded:: 7.4
+
+    Compile-time discovery of classes using constraint attributes was introduced
+    in Symfony 7.4.
+
+When using the Symfony framework with :ref:`autoconfiguration <services-autoconfigure>`,
+classes that use constraint attributes (such as ``#[Assert\NotBlank]``,
+``#[Assert\Length]``, etc.) are automatically discovered at compile time. This
+allows the attribute loader to only process the classes that are known to have
+constraint attributes, improving performance in production.
+
+If you need to explicitly register a class that uses constraint attributes
+(e.g. from a third-party library that is not part of your service
+definitions), tag it with ``validator.attribute_metadata`` and
+``container.excluded``:
+
+.. code-block:: yaml
+
+    # config/services.yaml
+    services:
+        Vendor\Library\SomeModel:
+            tags:
+                - { name: container.excluded }
+                - { name: validator.attribute_metadata }
+
 Using Multiple Loaders
 ----------------------
 
