@@ -176,23 +176,16 @@ strategy
 **type**: ``string`` **default**: ``affirmative``
 
 Defines the strategy used by the access decision manager to decide whether
-access should be granted. The available strategies are:
-
-* ``affirmative``: grants access as soon as there is one voter granting access;
-* ``consensus``: grants access if there are more voters granting access than
-  denying;
-* ``unanimous``: only grants access if there is no voter denying access;
-* ``priority``: grants or denies access by the first voter that does not abstain,
-  based on their service priority.
+access should be granted. Read about :ref:`all the available strategies <security-voters-change-strategy>`.
 
 allow_if_all_abstain
 ....................
 
 **type**: ``boolean`` **default**: ``false``
 
-If ``true``, access is granted when all voters abstain (no voter explicitly
-grants or denies access). If ``false`` (the default), access is denied when
-all voters abstain.
+If ``true``, access is granted when all :doc:`voters </security/voters>`
+abstain (no voter explicitly grants or denies access). If ``false``
+(the default), access is denied when all voters abstain.
 
 allow_if_equal_granted_denied
 .............................
@@ -200,17 +193,17 @@ allow_if_equal_granted_denied
 **type**: ``boolean`` **default**: ``true``
 
 This option is only used by the ``consensus`` strategy. If the number of
-voters granting access is equal to the number of voters denying access,
-this option determines the final decision. If ``true`` (the default), access
-is granted in case of a tie.
+:doc:`voters </security/voters>` granting access is equal to the number of
+ voters denying access, this option determines the final decision. If ``true``
+ (the default), access is granted in case of a tie.
 
 service
 .......
 
 **type**: ``string`` **default**: ``null``
 
-Defines a custom access decision manager service to replace the default one
-entirely. The service must implement the
+Defines a :ref:`custom access decision manager <security-custom-access-decision-manager>`
+service to replace the default one entirely. The service must implement the
 :class:`Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface`.
 
 When this option is set, the ``strategy``, ``allow_if_all_abstain`` and
@@ -221,8 +214,8 @@ strategy_service
 
 **type**: ``string`` **default**: ``null``
 
-Defines a custom strategy service to use instead of one of the built-in
-strategies. The service must implement the
+Defines a :ref:`custom strategy service <security-custom-access-decision-strategy>`
+to use instead of one of the built-in strategies. The service must implement the
 :class:`Symfony\\Component\\Security\\Core\\Authorization\\Strategy\\AccessDecisionStrategyInterface`.
 
 access_control

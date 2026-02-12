@@ -488,6 +488,8 @@ security configuration:
             ;
         };
 
+.. _security-custom-access-decision-strategy:
+
 Custom Access Decision Strategy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -588,6 +590,8 @@ Then, access that value when counting votes to make a decision::
 .. versionadded:: 7.4
 
     The feature to store arbitrary data inside votes was introduced in Symfony 7.4.
+
+.. _security-custom-access-decision-manager:
 
 Custom Access Decision Manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
