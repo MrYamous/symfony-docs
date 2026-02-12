@@ -2757,7 +2757,8 @@ Possible options to configure with tags are:
 
 ``priority``
     Defines the order in which the handler is executed when multiple handlers
-    can process the same message; those with higher priority run first.
+    can process the same message. Handlers with a higher priority run first,
+    and each handler starts only after the previous one has fully completed.
 
 ``sign``
     Whether messages handled by this handler should be cryptographically signed
