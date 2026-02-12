@@ -21,10 +21,14 @@ Configuring lazy services is one answer to this. With a lazy service, a
 like the ``mailer``, except that the ``mailer`` isn't actually instantiated
 until you interact with the proxy in some way.
 
-.. warning::
+.. note::
 
-    Lazy services do not support `final`_ or ``readonly`` classes, but you can use
-    `Interface Proxifying`_ to work around this limitation.
+    When using PHP 8.4 or later, lazy services rely on native lazy objects,
+    so ``final`` and ``readonly`` classes are fully supported.
+
+    On older PHP versions, lazy services do not support ``final`` or ``readonly``
+    classes, but you can use :ref:`interface proxifying <lazy-services-interface-proxifying>`
+    to work around this limitation.
 
 .. _lazy-services_configuration:
 
@@ -126,8 +130,17 @@ It defines an optional parameter used to define interfaces for proxy and interse
     ) {
     }
 
+.. _lazy-services-interface-proxifying:
+
 Interface Proxifying
 --------------------
+
+.. note::
+
+    If you are using PHP 8.4 or later, ``final`` and ``readonly`` classes
+    are supported natively and the technique explained in this section is not
+    required. It remains useful as a safe guard to restrict callable methods to
+    those defined by the interface.
 
 Internally, proxies generated to lazily load services inherit from the class
 used by the service. However, sometimes this is not possible at all (e.g. because
