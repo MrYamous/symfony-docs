@@ -67,6 +67,48 @@ The argument mode (required, optional, array) is inferred from the parameter typ
 * **Optional**: Parameters with a default value (e.g. ``string $name = ''`` or ``?string $name = null``);
 * **Array**: Parameters with the ``array`` type (e.g. ``array $names = []``);
 
+You can also use ``BackedEnum`` types for arguments. The string input is
+automatically converted to the enum case using ``BackedEnum::from()``, and
+autocompletion is provided based on the enum cases.
+
+Given a backed enum like this::
+
+    // src/Enum/Format.php
+    namespace App\Enum;
+
+    enum Format: string
+    {
+        case Json = 'json';
+        case Xml = 'xml';
+    }
+
+You can type-hint it directly in your command::
+
+    // ...
+    use App\Enum\Format;
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\AsCommand;
+
+    #[AsCommand(name: 'app:export')]
+    class ExportCommand
+    {
+        public function __invoke(
+            #[Argument]
+            Format $format,
+        ): int {
+            // $format is an instance of the Format enum
+            // ...
+        }
+    }
+
+If the user provides a value that doesn't match any enum case, a clear error
+message is displayed along with the list of valid values.
+
+.. versionadded:: 7.4
+
+    Support for ``BackedEnum`` in ``#[Argument]`` and ``#[Option]`` was
+    introduced in Symfony 7.4.
+
 Using the Classic configure() Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -271,6 +313,10 @@ The option mode is inferred from the parameter type and default value:
   or ``--output=file.txt`` (returns ``'file.txt'``)::
 
       #[Option] string|bool $output = false
+
+* **BackedEnum** (``VALUE_REQUIRED``): ``BackedEnum`` types. The input value is
+  automatically converted to the enum case, and autocompletion is provided
+  (e.g. ``Format $format = Format::Json`` or ``?Format $format = null``).
 
 .. seealso::
 
