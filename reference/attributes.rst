@@ -14,7 +14,10 @@ Doctrine Bridge
 Command
 ~~~~~~~
 
+* :ref:`Argument <console-input-arguments>`
 * :ref:`AsCommand <console_creating-command>`
+* :ref:`MapInput <console-input-map-input>`
+* :ref:`Option <console-input-options>`
 
 Contracts
 ~~~~~~~~~
@@ -33,6 +36,7 @@ Dependency Injection
 * :ref:`Autowire <autowire-attribute>`
 * :ref:`AutowireCallable <autowiring_closures>`
 * :doc:`AutowireDecorated </service_container/service_decoration>`
+* :ref:`AutowireInline <autowiring-anonymous-services-inline>`
 * :ref:`AutowireIterator <service-locator_autowire-iterator>`
 * :ref:`AutowireLocator <service-locator_autowire-locator>`
 * :ref:`AutowireMethodOf <autowiring_closures>`
@@ -70,11 +74,23 @@ HttpKernel
 * :ref:`WithHttpStatus <framework_exceptions>`
 * :ref:`WithLogLevel <framework_exceptions>`
 
+JsonStreamer
+~~~~~~~~~~~~
+
+* :ref:`JsonStreamable <json-streamer-streamable-attribute>`
+* :ref:`StreamedName <json-streamer-configure-encoded-name>`
+* :ref:`ValueTransformer <json-streamer-configure-encoded-value>`
+
 Messenger
 ~~~~~~~~~
 
 * :ref:`AsMessage <messenger-message-attribute>`
 * :ref:`AsMessageHandler <messenger-handler>`
+
+ObjectMapper
+~~~~~~~~~~~~
+
+* :ref:`Map <object_mapper-with-attributes>`
 
 RemoteEvent
 ~~~~~~~~~~~
@@ -84,6 +100,7 @@ RemoteEvent
 Routing
 ~~~~~~~
 
+* :ref:`DeprecatedAlias <routing-alias-deprecation>``
 * :doc:`Route </routing>`
 
 Scheduler
@@ -107,6 +124,7 @@ Serializer
 
 * :ref:`Context <serializer-context>`
 * :ref:`DiscriminatorMap <serializer_interfaces-and-abstract-classes>`
+* :ref:`ExtendsSerializationFor <serializer-extends-serialization-for>`
 * :ref:`Groups <serializer-groups-attribute>`
 * :ref:`Ignore <serializer_ignoring-attributes>`
 * :ref:`MaxDepth <serializer_handling-serialization-depth>`

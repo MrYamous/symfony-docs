@@ -361,6 +361,8 @@ Pass the ``include_null_properties`` option to include them explicitly::
     // Without the option: {"name": "Garfield"}
     // With the option:    {"name": "Garfield", "color": null}
 
+.. _json-streamer-configure-encoded-name:
+
 Configuring the Encoded Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -396,6 +398,8 @@ This maps the ``Duck::$id`` property to the ``@id`` JSON key::
     // {
     //   "@id": "/ducks/daffy"
     // }
+
+.. _json-streamer-configure-encoded-value:
 
 Configuring the Encoded Value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

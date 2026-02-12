@@ -109,6 +109,8 @@ useful when working with decoded JSON data or loosely typed input::
 
     // $product is an instance of Product with properties mapped from $productData
 
+.. _object_mapper-with-attributes:
+
 Configuring Mapping with Attributes
 -----------------------------------
 
