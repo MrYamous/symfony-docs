@@ -28,19 +28,23 @@ Creating Routes as Attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PHP attributes allow you to define routes next to the code of the
-:doc:`controllers </controller>` associated to those routes.
+:doc:`controllers </controller>` associated with those routes. Attributes are
+enabled by default in Symfony applications that use :ref:`Symfony Flex <symfony-flex>`,
+so you can start using them right away.
 
-You don't need to add any configuration to your project before using them. If your
-project uses :ref:`Symfony Flex <symfony-flex>`, this file is already created for you.
+.. note::
 
-.. code-block:: yaml
+    If your project does not use Symfony Flex, you must enable attribute
+    routing manually by creating the following configuration file:
 
-    # config/routes.yaml
-    controllers:
-        resource: routing.controllers
+    .. code-block:: yaml
 
-This configuration tells Symfony to enables auto-registration of ``#[Route]`` attribute of controllers, 
-independently of where they are located in the app.
+        # config/routes.yaml
+        controllers:
+            resource: routing.controllers
+
+    This tells Symfony to look for ``#[Route]`` attributes across your
+    application and register both the routes and their associated controllers.
 
 Suppose you want to define a route for the ``/blog`` URL in your application. To
 do so, create a :doc:`controller class </controller>` like the following:
@@ -1764,10 +1768,9 @@ when importing the routes.
 
     .. code-block:: yaml
 
-        # config/routes/attributes.yaml
+        # config/routes.yaml
         controllers:
-            resource: '../../src/Controller/'
-            type: attribute
+            resource: routing.controllerss
             # this is added to the beginning of all imported route URLs
             prefix: '/blog'
             # this is added to the beginning of all imported route names
@@ -1782,7 +1785,7 @@ when importing the routes.
 
             # you can optionally exclude some files/subdirectories when loading attributes
             # (the value must be a string or an array of PHP glob patterns)
-            # exclude: '../../src/Controller/{Debug*Controller.php}'
+            # exclude: '../src/Controller/{Debug*Controller.php}'
 
     .. code-block:: xml
 
@@ -1871,10 +1874,9 @@ defined in the class attribute.
 
         .. code-block:: yaml
 
-            # config/routes/attributes.yaml
+            # config/routes.yaml
             controllers:
-                resource: '../../src/Controller/'
-                type:     attribute
+                resource: routing.controllers
                 prefix:   '/blog'
                 trailing_slash_on_root: false
                 # ...
@@ -2403,13 +2405,12 @@ with a locale. This can be done by defining a different prefix for each locale
 
     .. code-block:: yaml
 
-        # config/routes/attributes.yaml
+        # config/routes.yaml
         controllers:
-            resource: '../../src/Controller/'
-            type: attribute
             prefix:
                 en: '' # don't prefix URLs for English, the default locale
                 nl: '/nl'
+            resource: routing.controllers
 
     .. code-block:: xml
 
@@ -2460,10 +2461,9 @@ locale.
 
     .. code-block:: yaml
 
-        # config/routes/attributes.yaml
+        # config/routes.yaml
         controllers:
-            resource: '../../src/Controller/'
-            type: attribute
+            resource: routing.controllers
             host:
                 en: 'www.example.com'
                 nl: 'www.example.nl'
@@ -3008,11 +3008,10 @@ defined as attributes:
 
     .. code-block:: yaml
 
-        # config/routes/attributes.yaml
+        # config/routes.yaml
         controllers:
-            resource: '../../src/Controller/'
-            type: attribute
             schemes: [https]
+            resource: routing.controllers
 
     .. code-block:: xml
 
