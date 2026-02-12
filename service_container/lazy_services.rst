@@ -21,19 +21,14 @@ Configuring lazy services is one answer to this. With a lazy service, a
 like the ``mailer``, except that the ``mailer`` isn't actually instantiated
 until you interact with the proxy in some way.
 
-.. warning::
+.. note::
 
-    On PHP versions older than 8.4 or Symfony versions older than 7.3,
-    lazy services do not support `final`_ or ``readonly`` classes.
-    In that case, you can use ``Interface Proxifying``.
+    When using PHP 8.4 or later, lazy services rely on native lazy objects,
+    so ``final`` and ``readonly`` classes are fully supported.
 
-.. versionadded:: 7.3
-
-    When using PHP 8.4 or newer together with Symfony 7.3 or later,
-    lazy services rely on native lazy ghost objects.
-
-    As a result, services can be declared as ``final`` and/or
-    ``readonly`` without requiring any workaround.
+    On older PHP versions, lazy services do not support ``final`` or ``readonly``
+    classes, but you can use :ref:`interface proxifying <lazy-services-interface-proxifying>`
+    to work around this limitation.
 
 .. _lazy-services_configuration:
 
@@ -151,11 +146,17 @@ It defines an optional parameter used to define interfaces for proxy and interse
 
     The ``#[Lazy]`` attribute was introduced in Symfony 7.1.
 
+.. _lazy-services-interface-proxifying:
+
 Interface Proxifying
 --------------------
 
-This section only applies when using PHP versions older than 8.4 or
-Symfony versions older than 7.3.
+.. note::
+
+    If you are using PHP 8.4 or later, ``final`` and ``readonly`` classes
+    are supported natively and the technique explained in this section is not
+    required. It remains useful as a safe guard to restrict callable methods to
+    those defined by the interface.
 
 Internally, proxies generated to lazily load services inherit from the class
 used by the service. However, sometimes this is not possible at all (e.g. because
