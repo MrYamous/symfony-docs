@@ -647,6 +647,20 @@ tags
 Whether your service should be able to handle tags or not.
 Can also be the service id of another cache pool where tags will be stored.
 
+marshaller
+""""""""""
+
+**type**: ``string``
+
+.. versionadded:: 8.1
+
+    The ``marshaller`` option was introduced in Symfony 8.1.
+
+The service id of a custom marshaller to use for this pool. If not set,
+the pool uses the global ``cache.default_marshaller`` service. This is useful
+when you need different serialization strategies per pool (e.g. encrypting or
+compressing data only in specific pools).
+
 .. _reference-cache-prefix-seed:
 
 prefix_seed
