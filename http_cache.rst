@@ -246,57 +246,6 @@ pattern and other request properties.
 
 Finally, for more information about expiration caching, see :doc:`/http_cache/expiration`.
 
-Computing Last-Modified and ETag with Closures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In addition to expressions, the ``#[Cache]`` attribute allows using PHP
-closures to compute the ``Last-Modified`` and ``ETag`` headers.
-
-Closures receive two arguments:
-
-* an array containing the resolved controller arguments
-* the current ``Request`` object
-
-Example using controller arguments:
-
-.. code-block:: php-attributes
-
-    use Symfony\Component\HttpFoundation\Request;
-    use Symfony\Component\HttpKernel\Attribute\Cache;
-
-    #[Cache(
-        lastModified: static function (array $args, Request $request): \DateTimeInterface {
-            return $args['post']->getUpdatedAt();
-        },
-        etag: static function (array $args, Request $request): string {
-            return (string) $args['post']->getId();
-        }
-    )]
-    public function show(Post $post): Response
-    {
-        // ...
-    }
-
-Example using request attributes:
-
-.. code-block:: php-attributes
-
-    #[Cache(
-        lastModified: static function (array $args, Request $request): \DateTimeInterface {
-            return $request->attributes->get('date');
-        },
-        etag: static function (array $args, Request $request): string {
-            return (string) $request->attributes->get('id');
-        }
-    )]
-    public function show(): Response
-    {
-        // ...
-    }
-
-Closures follow the same rules as expressions: cache headers already set
-on the response are not overridden.
-
 .. _http-cache-validation-intro:
 
 Validation Caching

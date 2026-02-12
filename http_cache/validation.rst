@@ -283,6 +283,70 @@ in the cache key::
     The ``request`` and ``args`` variables in ``#[Cache]`` attribute expressions
     were introduced in Symfony 8.1.
 
+Using Closures in the Cache Attribute
+-------------------------------------
+
+In addition to expressions, the ``#[Cache]`` attribute also supports PHP
+closures to compute the ``etag`` and ``lastModified`` values. This is useful
+when the logic is too complex for an expression string or when you prefer
+type-safe PHP code over the ExpressionLanguage syntax.
+
+Closures receive two arguments: an array containing all resolved controller
+arguments (the same as the ``args`` variable in expressions) and the current
+:class:`Symfony\\Component\\HttpFoundation\\Request` object::
+
+    // src/Controller/ArticleController.php
+    namespace App\Controller;
+
+    use App\Entity\Article;
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\Cache;
+    use Symfony\Component\Routing\Attribute\Route;
+
+    class ArticleController extends AbstractController
+    {
+        #[Route('/article/{id}')]
+        #[Cache(
+            lastModified: static function (array $args, Request $request): \DateTimeInterface {
+                return $args['article']->getUpdatedAt();
+            },
+            etag: static function (array $args, Request $request): string {
+                return $args['article']->computeETag();
+            },
+            public: true,
+        )]
+        public function show(Article $article): Response
+        {
+            return $this->render('article/show.html.twig', [
+                'article' => $article,
+            ]);
+        }
+    }
+
+
+You can also use the ``$request`` argument to include request-specific data
+in the cache key::
+
+    #[Cache(
+        etag: static function (array $args, Request $request): string {
+            return $request->headers->get('Accept-Language').$args['article']->getId();
+        },
+    )]
+    public function show(Article $article): Response
+    {
+        // ...
+    }
+
+Like expressions, closures follow the same rules: cache headers already set
+on the response are not overridden by the ``#[Cache]`` attribute.
+
+.. versionadded:: 8.1
+
+    Support for closures in the ``#[Cache]`` attribute was introduced in
+    Symfony 8.1.
+
 .. _`expiration model`: https://tools.ietf.org/html/rfc2616#section-13.2
 .. _`validation model`: https://tools.ietf.org/html/rfc2616#section-13.3
 .. _`HTTP ETag`: https://en.wikipedia.org/wiki/HTTP_ETag
