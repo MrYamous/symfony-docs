@@ -20,7 +20,7 @@ loaded/dumped inside a Symfony application:
 .. code-block:: xml
 
     <?xml version="1.0" encoding="UTF-8" ?>
-    <xliff xmlns="urn:oasis:names:tc:xliff:document:2.1" version="2.1"
+    <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0"
         srcLang="fr-FR" trgLang="en-US">
         <file id="messages.en_US">
             <unit id="LCa0a2j" name="original-content">
@@ -41,4 +41,4 @@ loaded/dumped inside a Symfony application:
 
     The support of attributes in the ``<segment>`` element was introduced in Symfony 7.2.
 
-.. _XLIFF: https://docs.oasis-open.org/xliff/xliff-core/v2.1/xliff-core-v2.1.html
+.. _XLIFF: https://docs.oasis-open.org/xliff/xliff-core/v2.0/xliff-core-v2.0.html
