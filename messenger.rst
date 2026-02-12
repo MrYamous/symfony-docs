@@ -1884,6 +1884,15 @@ The Redis transport DSN may looks like this:
     MESSENGER_TRANSPORT_DSN=rediss://localhost:6379/messages
     # Multiple Redis Sentinel Hosts Example
     MESSENGER_TRANSPORT_DSN=redis:?host[redis1:26379]&host[redis2:26379]&host[redis3:26379]&sentinel_master=db
+    # Redis Sentinel with separate master and sentinel credentials
+    MESSENGER_TRANSPORT_DSN=redis://master-pass@?host[redis1:26379]&host[redis2:26379]&sentinel_master=db&auth=sentinel-pass
+    # Redis Sentinel with ACL credentials for both master and sentinel
+    MESSENGER_TRANSPORT_DSN=redis://master-user:master-pass@?host[redis1:26379]&host[redis2:26379]&sentinel_master=db&auth[]=sentinel-user&auth[]=sentinel-pass
+
+.. versionadded:: 7.4
+
+    Support for separate sentinel and master authentication was introduced in
+    Symfony 7.4.
 
 A number of options can be configured via the DSN or via the ``options`` key
 under the transport in ``messenger.yaml``:
@@ -1914,7 +1923,11 @@ under the transport in ``messenger.yaml``:
     Whether to create the Redis group automatically
 
 ``auth``
-    The Redis password
+    The Redis password. Use a string for password-only authentication or an
+    array with two elements ``[username, password]`` for ACL-based authentication.
+    When using Redis Sentinel, this option is used for the **sentinel**
+    credentials. The **master** credentials should be provided via the DSN
+    userinfo (e.g. ``redis://master-pass@host``)
 
 ``delete_after_ack`` (default: ``true``)
     If ``true``, messages are deleted automatically after processing them
