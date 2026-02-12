@@ -11,9 +11,9 @@ and calls the defined controller. The ``forward()`` method returns the
 :class:`Symfony\\Component\\HttpFoundation\\Response` object that is returned
 from *that* controller::
 
-    public function __invoke(string $name): Response
+    public function index(string $name): Response
     {
-        $response = $this->forward(OtherController::class, [
+        $response = $this->forward('App\Controller\OtherController::fancy', [
             'name'  => $name,
             'color' => 'green',
         ]);
@@ -26,16 +26,23 @@ from *that* controller::
 The array passed to the method becomes the arguments for the resulting controller.
 The target controller method might look something like this::
 
-    public function __invoke(string $name, string $color): Response
+    public function fancy(string $name, string $color): Response
     {
         // ... create and return a Response object
     }
 
 Like when creating a controller for a route, the order of the arguments of the
-target method doesn't matter: the matching is done by name.
+target method (``fancy()`` in the above example) doesn't matter: the matching is done by name.
 
 .. note::
 
-    Twig's ``app.current_route``, ``app.current_route_parameters``, and ``_route_params``
-    will be empty after such a ``->forward()``. But you can set its value manually
-    by adding an array key ``_route`` to `forward()``'s second argument.
+    Twig's ``app.current_route``, ``app.current_route_parameters``, and
+    ``_route_params`` will be empty after such a ``->forward()`` call. However,
+    you can set them manually by adding a ``_route`` and ``_route_params`` keys
+    to the array passed as the second argument of ``forward()``::
+
+        $response = $this->forward('App\Controller\OtherController::fancy', [
+            // ...
+            '_route' => '...',
+            '_route_params' => ['...' => '...'];
+        ]);
