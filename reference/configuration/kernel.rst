@@ -263,10 +263,6 @@ This parameter stores the value of
 This parameter stores the value of
 :ref:`the framework.allowed_http_method_override parameter <configuration-framework-allowed_http_method_override>`.
 
-.. versionadded:: 7.4
-
-    The ``kernel.allowed_http_method_override`` parameter was introduced in Symfony 7.4.
-
 ``kernel.logs_dir``
 -------------------
 
