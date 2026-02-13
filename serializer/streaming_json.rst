@@ -657,18 +657,6 @@ configurations, providing more flexibility than attributes::
         }
     }
 
-.. versionadded:: 7.4
-
-    The ``valueTransformers`` parameter and the ``withAdditionalValueTransformer()``
-    method were introduced in Symfony 7.4.
-
-.. deprecated:: 7.4
-
-    The ``nativeToStreamValueTransformers`` and ``streamToNativeValueTransformers``
-    constructor parameters, as well as the ``withAdditionalNativeToStreamValueTransformer()``
-    and ``withAdditionalStreamToNativeValueTransformer()`` methods, were deprecated
-    in Symfony 7.4.
-
 Although powerful, this approach introduces complexity. Decorating property
 metadata loaders requires a deep understanding of the internals.
 
