@@ -684,9 +684,8 @@ configurations, providing more flexibility than attributes::
                 unset($propertyMetadataMap[$jsonKey]);
             }
 
-            // you can add virtual properties
-            $propertyMetadataMap['is_sensitive'] = new PropertyMetadata(
-                name: 'theNameWontBeUsed',
+            // you can add synthetic properties (not backed by a class property)
+            $propertyMetadataMap['is_sensitive'] = PropertyMetadata::createSynthetic(
                 type: Type::bool(),
                 valueTransformers: [fn() => true],
             );
