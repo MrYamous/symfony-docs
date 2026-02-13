@@ -197,12 +197,10 @@ The ``#[AsAlias]`` attribute can also be limited to one or more specific
             // ...
         }
 
-You can also use the ``target`` parameter to create aliases for specific
-:ref:`named autowiring <autowiring-multiple-implementations-same-type>` targets.
+You can also use the ``target`` parameter to wire a specific implementation
+via :ref:`named autowiring <autowiring-multiple-implementations-same-type>`.
 This is useful when you have multiple implementations of the same interface
-and need to inject a specific one based on context.
-
-For example, you might have different mailer implementations for different types of emails::
+and need to inject a specific one based on context::
 
     // src/Mail/SmtpMailer.php
     namespace App\Mail;
@@ -215,14 +213,19 @@ For example, you might have different mailer implementations for different types
         // ...
     }
 
+    // src/Mail/TransactionalMailer.php
+    namespace App\Mail;
+
+    use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+
     #[AsAlias(MailerInterface::class, target: 'transactionalMailer')]
     class TransactionalMailer implements MailerInterface
     {
         // ...
     }
 
-You can then inject the specific implementation by matching the argument name
-to the target::
+The container will now match the ``target`` value against the argument name,
+so naming the constructor parameter accordingly is enough::
 
     class UserNotificationService
     {
@@ -232,8 +235,6 @@ to the target::
         }
     }
 
-::
-
     class OrderConfirmationService
     {
         public function __construct(
@@ -242,8 +243,8 @@ to the target::
         }
     }
 
-Alternatively, you can use the :ref:`#[Target] attribute <autowiring-multiple-implementations-same-type>`
-to be more explicit::
+If you prefer to decouple the argument name from the target, use the
+:ref:`#[Target] attribute <autowiring-multiple-implementations-same-type>` instead::
 
     use Symfony\Component\DependencyInjection\Attribute\Target;
 
@@ -255,8 +256,6 @@ to be more explicit::
         ) {
         }
     }
-
-::
 
     class OrderConfirmationService
     {
