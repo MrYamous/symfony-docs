@@ -107,6 +107,8 @@ determine the current time::
         }
     }
 
+.. _clock-mockclock:
+
 MockClock
 ~~~~~~~~~
 

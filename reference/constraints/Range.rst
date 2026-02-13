@@ -311,7 +311,7 @@ Clock-aware Date Ranges
 When the :doc:`Clock component </components/clock>` is installed and registered
 as a service, the Range validator automatically uses it to resolve relative date
 strings (e.g. ``now``, ``+5 hours``). This makes date range comparisons
-deterministic and testable by using :class:`Symfony\\Component\\Clock\\MockClock`.
+deterministic and testable by using :ref:`MockClock <clock-mockclock>`.
 
 Options
 -------

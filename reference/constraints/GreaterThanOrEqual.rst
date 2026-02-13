@@ -296,7 +296,7 @@ Clock-aware Date Comparisons
 When the :doc:`Clock component </components/clock>` is installed and registered
 as a service, comparison validators automatically use it to resolve relative date
 strings (e.g. ``today``, ``+5 hours``). This makes date comparisons deterministic
-and testable by using :class:`Symfony\\Component\\Clock\\MockClock`.
+and testable by using :ref:`MockClock <clock-mockclock>`.
 
 Options
 -------
