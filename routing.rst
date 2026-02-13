@@ -82,10 +82,9 @@ the ``list()`` method of the ``BlogController`` class.
 .. warning::
 
     If you define multiple PHP classes in the same file, Symfony only loads the
-    routes of the first class, ignoring all the other routes.The route attribute 
-    is always wins over route with yaml, xml or PHP file and Symfony will always 
+    routes of the first class, ignoring all the other routes.The route attribute
+    is always wins over route with yaml, xml or PHP file and Symfony will always
     load the route attribute.
-    
 
 The route name (``blog_list``) is not important for now, but it will be
 essential later when :ref:`generating URLs <routing-generating-urls>`. You only
