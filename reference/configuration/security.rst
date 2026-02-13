@@ -138,8 +138,8 @@ allow_if_equal_granted_denied
 
 This option is only used by the ``consensus`` strategy. If the number of
 :doc:`voters </security/voters>` granting access is equal to the number of
- voters denying access, this option determines the final decision. If ``true``
- (the default), access is granted in case of a tie.
+voters denying access, this option determines the final decision. If ``true``
+(the default), access is granted in case of a tie.
 
 service
 .......
