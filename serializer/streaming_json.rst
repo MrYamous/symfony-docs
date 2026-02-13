@@ -667,7 +667,7 @@ configurations, providing more flexibility than attributes::
                 if (in_array($metadata->getName(), $className::getPropertiesToEncrypt(), true)) {
                     $propertyMetadataMap[$jsonKey] = $metadata
                         ->withType(Type::string())
-                        ->withAdditionalNativeToStreamValueTransformer(EncryptorValueTransformer::class);
+                        ->withAdditionalValueTransformer(EncryptorValueTransformer::class);
                 }
             }
 
@@ -688,12 +688,24 @@ configurations, providing more flexibility than attributes::
             $propertyMetadataMap['is_sensitive'] = new PropertyMetadata(
                 name: 'theNameWontBeUsed',
                 type: Type::bool(),
-                nativeToStreamValueTransformers: [fn() => true],
+                valueTransformers: [fn() => true],
             );
 
             return $propertyMetadataMap;
         }
     }
+
+.. versionadded:: 7.4
+
+    The ``valueTransformers`` parameter and the ``withAdditionalValueTransformer()``
+    method were introduced in Symfony 7.4.
+
+.. deprecated:: 7.4
+
+    The ``nativeToStreamValueTransformers`` and ``streamToNativeValueTransformers``
+    constructor parameters, as well as the ``withAdditionalNativeToStreamValueTransformer()``
+    and ``withAdditionalStreamToNativeValueTransformer()`` methods, were deprecated
+    in Symfony 7.4.
 
 Although powerful, this approach introduces complexity. Decorating property
 metadata loaders requires a deep understanding of the internals.
