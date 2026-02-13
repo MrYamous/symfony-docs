@@ -3,7 +3,7 @@ Formatter Helper
 
 The :class:`Symfony\\Component\\Console\\Helper\\FormatterHelper` helper provides
 functions to format the output with colors. You can do more advanced things with
-this helper than you can with the :doc:`basic colors and styles </console/coloring>`::
+this helper than you can with the :doc:`basic colors and styles </console/style>`::
 
     $formatter = new FormatterHelper();
 
@@ -62,7 +62,7 @@ messages and 2 spaces on the left and right).
 The exact "style" you use in the block is up to you. In this case, you're using
 the pre-defined ``error`` style, but there are other styles (``info``,
 ``comment``, ``question``), or you can create your own.
-See :doc:`/console/coloring`.
+See :doc:`/console/style`.
 
 Print Truncated Messages
 ------------------------

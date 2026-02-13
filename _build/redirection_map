@@ -584,3 +584,4 @@
 /form/disabling_validation /form#form-disabling-validation
 /form/form_dependencies /form#form-injecting-services
 /form/without_class /form#forms-without-class
+/console/coloring /console/style#output-coloring
