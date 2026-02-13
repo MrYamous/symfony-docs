@@ -361,23 +361,19 @@ User Input Methods
 
         $io->choice('Select the queue to analyze', ['queue1', 'queue2', 'queue3'], multiSelect: true);
 
-.. versionadded:: 8.1
-
-    The ``askFile()`` method was introduced in Symfony 8.1.
-
 :method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::askFile`
     It asks the user to provide a file (via paste or file path) and returns
-    an ``InputFile`` instance.
+    an ``InputFile`` instance::
 
-.. code-block:: php-standalone
+        $file = $io->askFile('Provide an image:');
 
-    $file = $io->askFile('Provide an image:');
+    You can restrict the allowed MIME types by passing them as the second argument::
 
-You can restrict the allowed MIME types by passing them as the second argument:
+        $file = $io->askFile('Provide an image:', ['image/png', 'image/jpeg']);
 
-.. code-block:: php-standalone
+    .. versionadded:: 8.1
 
-    $file = $io->askFile('Provide an image:', ['image/png', 'image/jpeg']);
+        The ``askFile()`` method was introduced in Symfony 8.1.
 
 .. _symfony-style-blocks:
 

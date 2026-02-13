@@ -578,10 +578,10 @@ Asking for a File
 
     The ``FileQuestion`` class and ``InputFile`` class were introduced in Symfony 8.1.
 
-The ``FileQuestion`` class lets you ask the
-user for a file. In terminals that support image protocols (such as Kitty, Ghostty,
-iTerm2, WezTerm, etc.), users can paste images directly from their clipboard.
-In other terminals, the question falls back to asking for a file path::
+The ``FileQuestion`` class lets you ask the user for a file. In terminals that
+support image protocols (such as Kitty, Ghostty, iTerm2, WezTerm, etc.), users
+can paste images directly from their clipboard. In other terminals, the question
+falls back to asking for a file path::
 
     // ...
     public function __invoke(InputInterface $input, OutputInterface $output): int
@@ -608,15 +608,15 @@ In other terminals, the question falls back to asking for a file path::
         return Command::SUCCESS;
     }
 
-The ``InputFile`` class extends
-``\SplFileInfo`` and provides additional methods for working with the received
-file:
+The ``InputFile`` class extends ``\SplFileInfo`` and provides these additional
+methods:
 
-* ``getMimeType()`` - Returns the MIME type of the file
-* ``getContents()`` - Returns the file contents as a string
-* ``getHumanReadableSize()`` - Returns a human-readable file size (e.g. ``1.5 MB``)
-* ``move()`` - Moves the file to a new location
-* ``isTempFile()`` - Returns ``true`` if the file was created from pasted data (temporary files are cleaned up automatically at shutdown)
+* ``getMimeType()``: returns the MIME type of the file
+* ``getContents()``: returns the file contents as a string
+* ``getHumanReadableSize()``: returns a human-readable file size (e.g. ``1.5 MB``)
+* ``move()``: moves the file to a new location
+* ``isTempFile()``: returns ``true`` if the file was created from pasted data
+  (temporary files are cleaned up automatically at shutdown)
 
 Testing a Command that Expects Input
 ------------------------------------

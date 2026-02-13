@@ -552,11 +552,10 @@ File Input
 
     File input support in invokable commands was introduced in Symfony 8.1.
 
-You can ask the user for a file by typing a parameter as
-:class:`Symfony\\Component\\Console\\Input\\File\\InputFile` and combining the ``#[Argument]`` and ``#[Ask]`` attributes. The console
-will automatically prompt for file input (paste or path):
-
-::
+You can ask the user for a file by type-hinting a parameter as
+:class:`Symfony\\Component\\Console\\Input\\File\\InputFile` and combining the
+``#[Argument]`` and ``#[Ask]`` attributes. The console will automatically prompt
+for file input (paste or path)::
 
     use Symfony\Component\Console\Attribute\Argument;
     use Symfony\Component\Console\Attribute\AsCommand;
