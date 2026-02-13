@@ -197,6 +197,80 @@ The ``#[AsAlias]`` attribute can also be limited to one or more specific
             // ...
         }
 
+You can also use the ``target`` parameter to create aliases for specific
+:ref:`named autowiring <autowiring-multiple-implementations-same-type>` targets.
+This is useful when you have multiple implementations of the same interface
+and need to inject a specific one based on context.
+
+For example, you might have different mailer implementations for different types of emails::
+
+    // src/Mail/SmtpMailer.php
+    namespace App\Mail;
+
+    use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+
+    #[AsAlias(MailerInterface::class, target: 'notificationMailer')]
+    class SmtpMailer implements MailerInterface
+    {
+        // ...
+    }
+
+    #[AsAlias(MailerInterface::class, target: 'transactionalMailer')]
+    class TransactionalMailer implements MailerInterface
+    {
+        // ...
+    }
+
+You can then inject the specific implementation by matching the argument name
+to the target::
+
+    class UserNotificationService
+    {
+        public function __construct(
+            private MailerInterface $notificationMailer,
+        ) {
+        }
+    }
+
+::
+
+    class OrderConfirmationService
+    {
+        public function __construct(
+            private MailerInterface $transactionalMailer,
+        ) {
+        }
+    }
+
+Alternatively, you can use the :ref:`#[Target] attribute <autowiring-multiple-implementations-same-type>`
+to be more explicit::
+
+    use Symfony\Component\DependencyInjection\Attribute\Target;
+
+    class UserNotificationService
+    {
+        public function __construct(
+            #[Target('notificationMailer')]
+            private MailerInterface $mailer,
+        ) {
+        }
+    }
+
+::
+
+    class OrderConfirmationService
+    {
+        public function __construct(
+            #[Target('transactionalMailer')]
+            private MailerInterface $mailer,
+        ) {
+        }
+    }
+
+.. versionadded:: 8.1
+
+    The ``target`` parameter for the ``#[AsAlias]`` attribute was introduced in Symfony 8.1.
+
 Deprecating Service Aliases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
