@@ -130,6 +130,89 @@ that, change the recipe JSON file as follows:
 For more examples of what you can include in a recipe file, browse the
 `Symfony recipe files`_.
 
+Generating Private Recipes Automatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Writing recipe files in the format described above can be tedious. The
+`recipes checker`_ tool can generate these files for you from a simplified
+directory structure.
+
+First, clone and install the tool:
+
+.. code-block:: terminal
+
+   $ git clone https://github.com/symfony-tools/recipes-checker.git
+   $ cd recipes-checker/
+   $ composer install
+
+Simplified Recipe Structure
+···························
+
+Instead of creating the final recipe JSON files manually, organize your recipes
+using this directory structure:
+
+.. code-block:: text
+
+   your-recipes-repository/
+    └─ acme/
+       └─ private-bundle/
+          └─ 1.0/
+             ├─ config/
+             ├─ manifest.json
+             └─ post-install.txt
+
+Replace ``acme``, ``private-bundle`` and ``1.0`` with your own bundle details.
+
+.. warning::
+
+    The bundle version number **must** use the **{major}.{minor}** format
+    (e.g. use ``1.0`` instead of ``1.0.0``).
+
+.. note::
+
+    The only required file in the version directory is a valid ``manifest.json``.
+    All other files are optional. See `how to create recipes`_ for more examples.
+
+The simplified ``manifest.json`` looks like this:
+
+.. code-block:: json
+
+    {
+        "bundles": {
+            "Acme\\PrivateBundle\\AcmePrivateBundle": ["all"]
+        },
+        "copy-from-recipe": {
+            "config/": "%CONFIG_DIR%/"
+        },
+        "aliases": ["private-bundle"]
+    }
+
+.. note::
+
+    All configurators in the ``manifest.json`` file are optional. See the
+    `full list of available configurators`_.
+
+Generating the Recipe Files
+···························
+
+Run the following command from your recipes root directory to generate the
+final recipe files:
+
+.. code-block:: terminal
+
+    $ git ls-tree HEAD */*/* | /path/to/recipes-checker-directory/run generate:flex-endpoint acme/private-bundle source-branch target-branch ./output/
+
+Replace the arguments with your own values:
+
+* ``acme/private-bundle``: your account and recipe repository name
+* ``source-branch``: the branch where you create your recipes
+* ``target-branch``: the branch that Composer pulls recipes from
+* ``./output/``: the directory where the compiled files will be written
+
+The output directory will contain the following files: ``index.json``,
+``acme.private-bundle.1.0.json`` (the compiled recipe), and an ``archived``
+directory.
+
 Create an Index to the Recipes
 ------------------------------
 
@@ -262,6 +345,11 @@ Replace ``your-github-account-name`` and ``your-recipes-repository`` with your o
     The ``endpoint`` URL **must** point to ``https://api.github.com/repos`` and
     **not** to ``https://www.github.com``.
 
+    When using the recipes checker, the endpoint in your ``composer.json`` must
+    point to the branch containing the compiled recipes. You can do this either
+    by adding a ``ref`` query parameter to the endpoint URL or by setting that
+    branch as the default branch of your repository.
+
 Gitlab
 ~~~~~~
 
@@ -288,6 +376,13 @@ Replace ``your-gitlab-project-id`` with your own details.
     ``composer.json``. In that case, add the ``"endpoint"`` key to the existing
     ``extra.symfony`` entry.
 
+.. note::
+
+    When using the recipes checker, the endpoint in your ``composer.json`` must
+    point to the branch containing the compiled recipes. You can do this either
+    by adding a ``ref`` query parameter to the endpoint URL or by setting that
+    branch as the default branch of your repository.
+
 Install the Recipes in Your Project
 -----------------------------------
 
@@ -307,3 +402,6 @@ install the new private recipes, run the following command:
 
 .. _`release of version 1.16`: https://github.com/symfony/cli
 .. _`Symfony recipe files`: https://github.com/symfony/recipes/tree/flex/main
+.. _`how to create recipes`: https://github.com/symfony/recipes?tab=readme-ov-file#creating-recipes
+.. _`recipes checker`: https://github.com/symfony-tools/recipes-checker
+.. _`full list of available configurators`: https://github.com/symfony/recipes?tab=readme-ov-file#configurators
