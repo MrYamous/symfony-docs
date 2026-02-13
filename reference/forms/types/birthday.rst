@@ -11,25 +11,6 @@ This type is essentially the same as the :doc:`DateType </reference/forms/types/
 type, but with a more appropriate default for the `years`_ option. The `years`_
 option defaults to 120 years ago to the current year.
 
-When the ``widget`` option is set to ``single_text``, the field automatically
-adds ``min`` and ``max`` HTML attributes based on the `years`_ option. These
-attributes are set to January 1st of the first year and December 31st of the
-last year respectively. To change the year range, use the `years`_ option.
-You can also override them with custom dates using the ``attr`` option::
-
-    $builder->add('birthday', BirthdayType::class, [
-        'widget' => 'single_text',
-        'attr' => [
-            'min' => '2000-01-01',
-            'max' => '2010-12-31',
-        ],
-    ]);
-
-.. versionadded:: 8.1
-
-    The ``min``/``max`` attributes usage with default values for ``single_text`` widget were
-    introduced in Symfony 8.1.
-
 +---------------------------+-------------------------------------------------------------------------------+
 | Underlying Data Type      | can be ``DateTime``, ``string``, ``timestamp``, or ``array``                  |
 |                           | (see the :ref:`input option <form-reference-date-input>`)                     |
@@ -102,6 +83,25 @@ values for the year, month and day fields::
 .. include:: /reference/forms/types/options/view_timezone.rst.inc
 
 .. include:: /reference/forms/types/options/date_widget.rst.inc
+
+When the ``widget`` option is set to ``single_text``, the field automatically
+adds the ``min`` and ``max`` HTML attributes based on the `years`_ option. These
+attributes default to January 1st of the first year and December 31st of the
+last year. To change the year range, use the ``years`` option. You can also
+override these attributes with custom dates using the ``attr`` option::
+
+    $builder->add('birthday', BirthdayType::class, [
+        'widget' => 'single_text',
+        'attr' => [
+            'min' => '2000-01-01',
+            'max' => '2010-12-31',
+        ],
+    ]);
+
+.. versionadded:: 8.1
+
+    The ``min``/``max`` attributes usage with default values for ``single_text``
+    widget were introduced in Symfony 8.1.
 
 These options inherit from the :doc:`FormType </reference/forms/types/form>`:
 
