@@ -65,12 +65,10 @@ You can use ``#[HasNamedArguments]`` to make some constraint options required::
 Constraint with Private Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Constraints are cached for performance reasons. To achieve this, the base
-``Constraint`` class uses PHP's :phpfunction:`get_object_vars` function, which
-excludes private properties of child classes.
-
-If your constraint defines private properties, you must explicitly include them
-in the ``__sleep()`` method to ensure they are serialized correctly::
+Constraints are cached for performance reasons. The base ``Constraint`` class
+implements `__serialize()`_ which automatically handles all properties,
+including private ones defined in child classes. You can use private properties
+in your constraints without any extra configuration::
 
     // src/Validator/ContainsAlphanumeric.php
     namespace App\Validator;
@@ -90,16 +88,6 @@ in the ``__sleep()`` method to ensure they are serialized correctly::
             mixed $payload = null,
         ) {
             parent::__construct(null, $groups, $payload);
-        }
-
-        public function __sleep(): array
-        {
-            return array_merge(
-                parent::__sleep(),
-                [
-                    'mode'
-                ]
-            );
         }
     }
 
@@ -665,3 +653,4 @@ class to check precisely which of the constraints failed to pass::
         }
     }
 
+.. _`__serialize()`: https://www.php.net/manual/en/language.oop5.magic.php#object.serialize
