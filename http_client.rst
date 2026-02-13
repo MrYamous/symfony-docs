@@ -2184,10 +2184,10 @@ Then configure Symfony to use your callback:
         ]);
 
 You can also set ``mock_response_factory`` to ``true`` to replace all HTTP
-clients with a ``MockHttpClient`` that returns empty 200 responses. When a
+clients with a ``MockHttpClient`` that returns empty ``200`` responses. When
 ``mock_response_factory`` is set at the ``http_client`` level, all scoped
-clients inherit it. You can override this per scoped client: set it to
-``false`` to disable mocking for a specific client, to ``true`` for an empty
+clients inherit it. You can override this per scoped client: set it to ``false``
+to disable mocking for a specific client, to ``true`` to use an empty
 ``MockHttpClient``, or to a different service ID:
 
 .. configuration-block::
@@ -2233,7 +2233,7 @@ clients inherit it. You can override this per scoped client: set it to
 
 .. versionadded:: 8.1
 
-    The support for setting ``mock_response_factory`` per scoped HTTP client
+    Support for setting ``mock_response_factory`` per scoped HTTP client
     and the ``true``/``false`` values were introduced in Symfony 8.1.
 
 To return json, you would normally do::
