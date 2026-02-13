@@ -119,7 +119,7 @@ option to explicitly define which options to display::
         ],
     ]);
 
-You can add keys to the `choices` array, which will then be used as labels::
+You can add keys to the ``choices`` array, which will then be used as labels::
 
     'choices' => [
         'Align to the right' => TextAlign::Left,
