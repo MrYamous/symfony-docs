@@ -113,6 +113,13 @@ option to explicitly define which options to display::
         ],
     ]);
 
+You can add keys to the ``choices`` array, which will then be used as labels::
+
+    'choices' => [
+        'Align to the right' => TextAlign::Left,
+        'Align to the left' => TextAlign::Right,
+    ],
+
 .. include:: /reference/forms/types/options/choice_attr.rst.inc
 
 .. include:: /reference/forms/types/options/choice_filter.rst.inc
