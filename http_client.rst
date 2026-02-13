@@ -2183,6 +2183,59 @@ Then configure Symfony to use your callback:
             ],
         ]);
 
+You can also set ``mock_response_factory`` to ``true`` to replace all HTTP
+clients with a ``MockHttpClient`` that returns empty 200 responses. When a
+``mock_response_factory`` is set at the ``http_client`` level, all scoped
+clients inherit it. You can override this per scoped client: set it to
+``false`` to disable mocking for a specific client, to ``true`` for an empty
+``MockHttpClient``, or to a different service ID:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/test/framework.yaml
+        framework:
+            http_client:
+                mock_response_factory: true
+                scoped_clients:
+                    my_api.client:
+                        base_uri: 'https://my-api.com'
+                        mock_response_factory: App\Tests\MyApiMockClientCallback
+                    not_mocked.client:
+                        base_uri: 'https://example.com'
+                        mock_response_factory: false
+
+    .. code-block:: php
+
+        // config/packages/test/framework.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use App\Tests\MyApiMockClientCallback;
+
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'mock_response_factory' => true,
+                    'scoped_clients' => [
+                        'my_api.client' => [
+                            'base_uri' => 'https://my-api.com',
+                            'mock_response_factory' => MyApiMockClientCallback::class,
+                        ],
+                        'not_mocked.client' => [
+                            'base_uri' => 'https://example.com',
+                            'mock_response_factory' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+.. versionadded:: 8.1
+
+    The support for setting ``mock_response_factory`` per scoped HTTP client
+    and the ``true``/``false`` values were introduced in Symfony 8.1.
+
 To return json, you would normally do::
 
     use Symfony\Component\HttpClient\Response\MockResponse;
