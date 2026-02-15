@@ -898,6 +898,67 @@ If the :doc:`serializer service </serializer>` is enabled in your
 application, it will be used to serialize the data to JSON. Otherwise,
 the :phpfunction:`json_encode` function is used.
 
+.. _controller_serialize:
+
+Serializing Controller Return Values Automatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of manually calling the serializer and building a response, you can use
+the :class:`Symfony\\Component\\HttpKernel\\Attribute\\Serialize` attribute on
+your controller method. The controller can then return any object or array, and
+Symfony will serialize it automatically based on the request format (defaulting
+to JSON)::
+
+    use Symfony\Component\HttpKernel\Attribute\Serialize;
+
+    class ProductController
+    {
+        #[Serialize]
+        public function show(): Product
+        {
+            return new Product(1, 'Asus UX550');
+        }
+    }
+
+You can customize the HTTP status code, headers and serialization context::
+
+    use Symfony\Component\HttpKernel\Attribute\Serialize;
+
+    class ProductController
+    {
+        #[Serialize(code: 201, headers: ['X-Custom' => 'value'], context: ['groups' => ['read']])]
+        public function create(): ProductCreated
+        {
+            // ... create the product
+
+            return new ProductCreated(1);
+        }
+    }
+
+The ``#[Serialize]`` attribute accepts the following arguments:
+
+``code``
+    The HTTP status code of the response (default: ``200``).
+``headers``
+    An associative array of extra HTTP headers to add to the response.
+``context``
+    The serialization context passed to the :doc:`Serializer </serializer>`
+    (e.g. ``['groups' => ['read']]``).
+
+The response format is determined by the request format (``$request->getRequestFormat()``),
+defaulting to ``json``. The ``Content-Type`` header is set automatically based
+on the format. If the format is not supported by the serializer, a
+``415 Unsupported Media Type`` response is returned.
+
+.. note::
+
+    The ``#[Serialize]`` attribute requires the
+    :doc:`Serializer component </serializer>` to be installed and enabled.
+
+.. versionadded:: 8.1
+
+    The ``#[Serialize]`` attribute was introduced in Symfony 8.1.
+
 Streaming File Responses
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
