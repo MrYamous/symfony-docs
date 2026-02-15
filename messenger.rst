@@ -1797,6 +1797,52 @@ under the transport in ``messenger.yaml``:
 The Redis transport supports the ``--keepalive`` option by using Redis's ``XCLAIM``
 command to periodically reset the message's idle time to zero.
 
+Listing and Finding Messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Redis transport implements the
+:class:`Symfony\\Component\\Messenger\\Transport\\Receiver\\ListableReceiverInterface`,
+which allows you to list and find messages in the Redis stream. This is useful
+for inspecting queued messages or building custom management tools.
+
+You can access these features programmatically through the receiver::
+
+    use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+
+    // Get the receiver for your Redis transport
+    $receiver = $container->get('messenger.receiver.your_transport_name');
+
+    if ($receiver instanceof ListableReceiverInterface) {
+        // List all messages in the stream
+        foreach ($receiver->all() as $envelope) {
+            // $envelope is an instance of Symfony\Component\Messenger\Envelope
+            // Process each envelope
+        }
+
+        // List messages with a limit
+        foreach ($receiver->all(10) as $envelope) {
+            // Process up to 10 messages
+        }
+
+        // Find a specific message by its ID
+        $envelope = $receiver->find('1234567890-0');
+        if ($envelope) {
+            // $envelope is an instance of Symfony\Component\Messenger\Envelope
+        }
+    }
+
+.. note::
+
+    The ``all()`` method returns all messages currently in the Redis stream,
+    including messages that are being processed. The ``find()`` method accepts
+    a Redis stream message ID (e.g., ``1234567890-0``) and returns the
+    :class:`Symfony\Component\Messenger\Envelope` if found, or ``null`` otherwise.
+
+    Each envelope returned by these methods contains:
+    - a :class:`Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp`
+      representing the Redis message ID
+    - a :class:`Symfony\Component\Messenger\Stamp\TransportMessageIdStamp` for internal tracking
+
 In Memory Transport
 ~~~~~~~~~~~~~~~~~~~
 
