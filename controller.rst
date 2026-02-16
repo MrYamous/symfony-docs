@@ -633,6 +633,21 @@ using the ``type`` option of the attribute::
         // ...
     }
 
+You can also use a variadic argument to achieve the same result without the
+``type`` option::
+
+    public function dashboard(
+        #[MapRequestPayload] UserDto ...$users
+    ): Response
+    {
+        // ...
+    }
+
+.. versionadded:: 8.1
+
+    Support for variadic arguments with ``#[MapRequestPayload]`` was introduced
+    in Symfony 8.1.
+
 .. _controller_map-uploaded-file:
 
 Mapping Uploaded Files
