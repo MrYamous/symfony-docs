@@ -2760,13 +2760,11 @@ That's it! You can now consume each transport:
 Process Messages by Batches
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can declare "special" handlers which will process messages by batch.
-By doing so, the handler will wait for a certain amount of messages to be
-pending before processing them. The declaration of a batch handler is done
-by implementing
-:class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerInterface`. The
-:class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerTrait` is also
-provided in order to ease the declaration of these special handlers::
+Instead of processing messages one by one, you can group them into batches.
+The handler collects messages until the batch is full, then processes them
+all at once. To create a batch handler, implement
+:class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerInterface` and
+use :class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerTrait`::
 
     use Symfony\Component\Messenger\Handler\Acknowledger;
     use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
@@ -2785,31 +2783,35 @@ provided in order to ease the declaration of these special handlers::
         {
             foreach ($jobs as [$message, $ack]) {
                 try {
-                    // Compute $result from $message...
+                    // compute $result from $message...
 
-                    // Acknowledge the processing of the message
+                    // acknowledge the processing of the message
                     $ack->ack($result);
                 } catch (\Throwable $e) {
                     $ack->nack($e);
                 }
             }
         }
+    }
 
-        // Optionally, you can override some of the trait methods, such as the
-        // `getBatchSize()` method, to specify your own batch size...
+When the ``$ack`` argument of ``__invoke()`` is ``null``, the message is
+expected to be handled synchronously. Otherwise, ``__invoke()`` is expected to
+return the number of pending messages. The :class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerTrait`
+handles this for you.
+
+By default, batches are processed in groups of ``10`` messages. Override the
+``getBatchSize()`` method to change this::
+
+    class MyBatchHandler implements BatchHandlerInterface
+    {
+
+        // ...
+
         private function getBatchSize(): int
         {
             return 100;
         }
     }
-
-.. note::
-
-    When the ``$ack`` argument of ``__invoke()`` is ``null``, the message is
-    expected to be handled synchronously. Otherwise, ``__invoke()`` is
-    expected to return the number of pending messages. The
-    :class:`Symfony\\Component\\Messenger\\Handler\\BatchHandlerTrait` handles
-    this for you.
 
 .. note::
 
