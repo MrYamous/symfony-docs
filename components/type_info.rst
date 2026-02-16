@@ -94,54 +94,6 @@ Each of these calls will return you a ``Type`` instance that corresponds to the
 static method used. You can also resolve types from a string (as shown in the
 ``bool`` parameter of the previous example).
 
-
-The TypeInfo component provides a new array shape type to define exact array structures with specific key-value type relationships.
-
-.. versionadded:: 7.3
-
-    The array shape type was introduced in Symfony 7.3.
-
-Array shape types support:
-
-* Required and optional keys
-* Nested array shapes
-* Sealed and unsealed shapes (allowing or rejecting extra entries)
-
-Array shapes can be sealed or unsealed:
-
-- ``array{0: int}`` is sealed: it does not accept extra entries.
-- ``array{0: int, ...}`` is unsealed: it accepts extra entries.
-- You can also define the type of extra keys and values: ``array{0: int, ...<string, bool>}``.
-
-This information is stored on the ``ArrayShapeType`` via its ``extraKeyType`` and ``extraValueType`` and validated by the ``accepts()`` method.
-
-Array shapes support associative array definitions::
-
-    use Symfony\Component\TypeInfo\Type;
-
-    // Simple array shape
-    $type = Type::arrayShape([
-        'name' => Type::string(),
-        'age' => Type::int()
-    ]);
-
-    // With optional keys (denoted by "?" suffix)
-    $type = Type::arrayShape([
-        'required_id' => Type::int(),
-        'optional_name' => ['type' => Type::string(), 'optional' => true],
-    ]);
-
-    // Unsealed: allow extra entries not defined above (sealed = false)
-    $type = Type::arrayShape([
-        'id' => Type::int(),
-    ], false);
-
-    // Unsealed with typed extra keys and values (extraKeyType=string, extraValueType=bool)
-    // Equivalent to: array{id: int, ...<string, bool>}
-    $type = Type::arrayShape([
-        'id' => Type::int(),
-    ], false, Type::string(), Type::bool());
-
 PHPDoc Parsing
 ~~~~~~~~~~~~~~
 
@@ -230,6 +182,75 @@ You can also import type aliases defined in other classes::
 .. versionadded:: 7.3
 
     The type alias support was introduced in Symfony 7.3.
+
+Array Shapes
+~~~~~~~~~~~~
+
+.. versionadded:: 7.3
+
+    Support for array shapes was introduced in Symfony 7.3.
+
+TypeInfo can resolve array shapes, which describe the structure of arrays with
+specific key-value type relationships. Use the ``array{...}`` syntax in PHPDoc
+annotations::
+
+    use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+
+    class Dummy
+    {
+        /**
+         * @var array{name: string, age: int, email?: string}
+         */
+        public array $person;
+    }
+
+    $typeResolver = TypeResolver::create();
+    $type = $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'person'));
+    // returns an ArrayShapeType with "name" (string), "age" (int), and optional "email" (string)
+
+The ``?`` suffix marks a key as optional (e.g. ``email?``).
+
+Array shapes are **sealed** by default, meaning they reject extra entries
+beyond those explicitly defined. Use ``...`` to create an **unsealed** shape
+that accepts additional entries::
+
+Array shapes can be sealed or unsealed:
+
+    // sealed: only accepts "id" key
+    // @var array{id: int}
+
+    // unsealed: accepts "id" and any extra entries
+    // @var array{id: int, ...}
+
+    // unsealed but extra entries must use strings as keys and booleans as values
+    // @var array{id: int, ...<string, bool>}
+
+You can also create array shapes manually using the ``Type::arrayShape()`` method::
+
+    use Symfony\Component\TypeInfo\Type;
+
+    // simple array shape (sealed by default)
+    $type = Type::arrayShape([
+        'name' => Type::string(),
+        'age' => Type::int()
+    ]);
+
+    // with optional keys (denoted by "?" suffix)
+    $type = Type::arrayShape([
+        'required_id' => Type::int(),
+        'optional_name' => ['type' => Type::string(), 'optional' => true],
+    ]);
+
+    // unsealed: allow extra entries (sealed = false)
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false);
+
+    // unsealed with typed extra keys and values (extraKeyType=string, extraValueType=bool)
+    // equivalent to: array{id: int, ...<string, bool>}
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false, Type::string(), Type::bool());
 
 Advanced Usages
 ~~~~~~~~~~~~~~~
