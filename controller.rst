@@ -623,18 +623,8 @@ each DTO object into an array and return something like this:
         }
     ]
 
-To do so, map the parameter as an array and configure the type of each element
-using the ``type`` option of the attribute::
-
-    public function dashboard(
-        #[MapRequestPayload(type: UserDto::class)] array $users
-    ): Response
-    {
-        // ...
-    }
-
-You can also use a variadic argument to achieve the same result without the
-``type`` option::
+To do so, use a variadic argument and let Symfony map each payload item to a DTO
+instance automatically::
 
     public function dashboard(
         #[MapRequestPayload] UserDto ...$users
@@ -647,6 +637,19 @@ You can also use a variadic argument to achieve the same result without the
 
     Support for variadic arguments with ``#[MapRequestPayload]`` was introduced
     in Symfony 8.1.
+
+.. note::
+
+    As an alternative, instead of variadic arguments you can map the parameter
+    as an array and configure the type of each element using the ``type`` option
+    of the attribute::
+
+        public function dashboard(
+            #[MapRequestPayload(type: UserDto::class)] array $users
+        ): Response
+        {
+            // ...
+        }
 
 .. _controller_map-uploaded-file:
 
