@@ -195,22 +195,19 @@ and :method:`Symfony\\Component\\Console\\Command\\Command::interact`)::
         }
     }
 
+.. _console-method-based-commands:
+
 Method-based Commands
 ~~~~~~~~~~~~~~~~~~~~~
 
-You can define multiple console commands inside the same class by annotating
-individual public methods with ``#[AsCommand]``.
-
-This is useful to group related commands while sharing common dependencies.
-
 .. versionadded:: 8.1
 
-    Support for method-based console commands was introduced.
+    Support for method-based console commands was introduced in Symfony 8.1.
 
-Basic Example
-~~~~~~~~~~~~~
-
-Each method annotated with ``#[AsCommand]`` becomes an independent command::
+Instead of creating one class per command, you can define multiple commands
+in the same class by adding the ``#[AsCommand]`` attribute to individual
+public methods. This is useful to group related commands that share the
+same dependencies::
 
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Command\Command;
@@ -221,7 +218,7 @@ Each method annotated with ``#[AsCommand]`` becomes an independent command::
         #[AsCommand('app:user:create')]
         public function create(OutputInterface $output): int
         {
-            $output->writeln('User created');
+            // ...
 
             return Command::SUCCESS;
         }
@@ -229,56 +226,26 @@ Each method annotated with ``#[AsCommand]`` becomes an independent command::
         #[AsCommand('app:user:delete')]
         public function delete(OutputInterface $output): int
         {
-            $output->writeln('User deleted');
+            // ...
 
             return Command::SUCCESS;
         }
     }
 
-The constructor of the class can be used to inject shared services.
+Each annotated method becomes an independent command that can be run, listed
+and tested separately.
 
-Using ``__invoke()``
-~~~~~~~~~~~~~~~~~~~~
+.. note::
 
-You can also define a command using the ``__invoke()`` method::
+    When using the Console component without the service container, you can
+    register method-based commands manually::
 
-    use Symfony\Component\Console\Attribute\AsCommand;
-    use Symfony\Component\Console\Command\Command;
-    use Symfony\Component\Console\Output\OutputInterface;
+        $commands = new UserCommands($userRepository);
 
-    #[AsCommand('app:user:default')]
-    class UserDefaultCommand
-    {
-        public function __invoke(OutputInterface $output): int
-        {
-            $output->writeln('Default command');
-
-            return Command::SUCCESS;
-        }
-    }
-
-Manual Registration
-~~~~~~~~~~~~~~~~~~~
-
-Method-based commands can also be registered manually when using the Console
-component without the service container::
-
-    $instance = new UserCommands();
-
-    $application = new Application();
-    $application->addCommand($instance->create(...));
-    $application->addCommand($instance->delete(...));
-
-Testing Method-based Commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Method-based commands can be tested like any other command::
-
-    $instance = new UserCommands();
-
-    $tester = new CommandTester($instance->create(...));
-    $tester->execute([]);
-
+        $application = new Application();
+        // the "..." is PHP's first-class callable syntax, which turns each method into a callable
+        $application->addCommand($commands->create(...));
+        $application->addCommand($commands->delete(...));
 
 Running the Command
 ~~~~~~~~~~~~~~~~~~~
@@ -595,6 +562,16 @@ call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``
 
     You can also test a whole console application by using
     :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`.
+
+.. tip::
+
+    Use PHP's first-class callable syntax to test
+    :ref:`method-based commands <console-method-based-commands>`::
+
+        $commands = new UserCommands($userRepository);
+
+        $tester = new CommandTester($commands->create(...));
+        $tester->execute([]);
 
 .. warning::
 
