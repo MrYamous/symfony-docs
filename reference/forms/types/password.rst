@@ -76,6 +76,12 @@ object.
 Adds "Show"/"Hide" links to the field which toggle the password field to plaintext when clicked.
 See `symfony/ux-toggle-password`_ for more details.
 
+.. deprecated:: 2.29
+
+    The ``ux-toggle-password`` component has been deprecated in Symfony UX
+    2.29 and will be removed in 3.0. See symfony/ux-toggle-password`_ for
+    migration.
+
 Overridden Options
 ------------------
 
