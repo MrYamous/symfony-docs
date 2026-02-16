@@ -194,6 +194,13 @@ In addition, some components, bridges and official bundles provide other value r
     To learn more about the use of the ``EntityValueResolver``, see the dedicated
     section :ref:`Automatically Fetching Objects <doctrine-entity-value-resolver>`.
 
+.. versionadded:: 8.0
+
+    Automatic mapping of Doctrine entities to controller arguments has been removed.
+
+    Doctrine entities must now be mapped explicitly, for example by using the
+    ``#[MapEntity]`` attribute or mapped route parameters.
+
 PSR-7 Objects Resolver:
     Injects a Symfony HttpFoundation ``Request`` object created from a PSR-7 object
     of type ``Psr\Http\Message\ServerRequestInterface``,
