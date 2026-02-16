@@ -703,41 +703,39 @@ yourself::
 Fetch Automatically
 ~~~~~~~~~~~~~~~~~~~
 
-If your route wildcards match properties on your entity, then the resolver
-will automatically fetch them::
+By default, automatic fetching only works when your route contains an ``{id}``
+wildcard. The resolver uses it to fetch the entity by its primary key via the
+``find()`` method::
 
-    /**
-     * Fetch via primary key because {id} is in the route.
-     */
+    // performs a find($id) query to find the $product object
     #[Route('/product/{id}')]
-    public function showByPk(Product $product): Response
+    public function show(Product $product): Response
     {
+        // ...
     }
 
-    /**
-     * Perform a findOneBy() where the slug property matches {slug}.
-     */
+To fetch entities by other properties, use the ``{param:argument}`` route
+syntax. This maps a route parameter to a controller argument and tells the
+resolver to query the database using that property::
+
+    // performs a findOneBy(['slug' => $slug]) query to find the $product object
     #[Route('/product/{slug:product}')]
-    public function showBySlug(Product $product): Response
+    public function show(Product $product): Response
     {
+        // ...
     }
 
-Automatic fetching works in these situations:
+.. tip::
 
-* If ``{id}`` is in your route, then this is used to fetch by
-  primary key via the ``find()`` method.
-
-* The resolver will attempt to do a ``findOneBy()`` fetch by using
-  *all* of the wildcards in your route that are actually properties
-  on your entity (non-properties are ignored).
-
-The ``{slug:product}`` syntax maps the route parameter named ``slug`` to the
-controller argument named ``$product``. It also hints the resolver to look up
-the corresponding ``Product`` object from the database using the slug.
+    If you set the ``doctrine.orm.controller_resolver.auto_mapping`` option
+    to ``true``, the resolver will attempt to do a ``findOneBy()`` using
+    *all* route wildcards that match properties on your entity (non-properties
+    are ignored). This removes the need for the ``{param:argument}`` syntax,
+    but the behavior is less explicit and no longer recommended.
 
 You can also configure the mapping explicitly for any controller argument
 using the ``MapEntity`` attribute. You can even control the behavior of the
-``EntityValueResolver`` by using the `MapEntity options`_ ::
+``EntityValueResolver`` by using the `MapEntity options`_::
 
     // src/Controller/ProductController.php
     namespace App\Controller;
