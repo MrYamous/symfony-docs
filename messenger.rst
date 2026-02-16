@@ -2811,12 +2811,30 @@ By default, batches are processed in groups of ``10`` messages. Override the
         {
             return 100;
         }
+
+        // ... or `getIdleTimeout()` to flush the batch after a period
+        // of inactivity (in seconds). Set to `null` to disable.
+        private function getIdleTimeout(): ?int
+        {
+            return 5;
+        }
     }
 
 .. note::
 
     By default, pending batches are flushed when the worker is idle as well
-    as when it is stopped.
+    as when it is stopped. The ``BatchHandlerTrait`` defines an idle timeout
+    of ``1`` second. This means that if no new messages are received within
+    that time, the pending batch will be flushed even if the batch size has
+    not been reached. This is useful for low-throughput workloads where you
+    don't want messages to wait indefinitely for the batch to fill up.
+
+    You can customize this by overriding the ``getIdleTimeout()`` method.
+    Return ``null`` to disable the idle timeout entirely.
+
+.. versionadded:: 8.1
+
+    The ``getIdleTimeout()`` method was introduced in Symfony 8.1.
 
 Extending Messenger
 -------------------
