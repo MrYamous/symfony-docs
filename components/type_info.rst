@@ -27,7 +27,7 @@ This component gives you a :class:`Symfony\\Component\\TypeInfo\\Type` object th
 represents the PHP type of anything you built or asked to resolve.
 
 There are two ways to use this component. First one is to create a type manually thanks
-to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as following::
+to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as follows::
 
     use Symfony\Component\TypeInfo\Type;
 
@@ -37,7 +37,7 @@ to the :class:`Symfony\\Component\\TypeInfo\\Type` static methods as following::
     Type::list(Type::bool());
     Type::intersection(Type::object(\Stringable::class), Type::object(\Iterator::class));
 
-Many others methods are available and can be found
+Many other methods are available and can be found
 in :class:`Symfony\\Component\\TypeInfo\\TypeFactoryTrait`.
 
 You can also use a generic method that detects the type automatically::
@@ -70,6 +70,8 @@ that need a simple way to describe a class or anything with a type::
     // Then resolve types for any subject
     $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'id')); // returns an "int" Type instance
     $typeResolver->resolve('bool'); // returns a "bool" Type instance
+    $typeResolver->resolve('array{id: int, name?: string}'); // returns an array shape type instance where 'id' is required and 'name' is optional
+
 
     // Types can be instantiated thanks to static factories
     $type = Type::list(Type::nullable(Type::bool()));
@@ -86,7 +88,7 @@ that need a simple way to describe a class or anything with a type::
 
 Each of these calls will return you a ``Type`` instance that corresponds to the
 static method used. You can also resolve types from a string (as shown in the
-``bool`` parameter of the previous example)
+``bool`` parameter of the previous example).
 
 PHPDoc Parsing
 ~~~~~~~~~~~~~~
@@ -173,8 +175,81 @@ You can also import type aliases defined in other classes::
     Both syntax variations are supported: with an equals sign
     (``@phpstan-type TypeAlias = Type``) or without (``@phpstan-type TypeAlias Type``).
 
+Array Shapes
+~~~~~~~~~~~~
+
+.. versionadded:: 7.3
+
+    Support for array shapes was introduced in Symfony 7.3.
+
+TypeInfo can resolve array shapes, which describe the structure of arrays with
+specific key-value type relationships. Use the ``array{...}`` syntax in PHPDoc
+annotations::
+
+    use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+
+    class Dummy
+    {
+        /**
+         * @var array{name: string, age: int, email?: string}
+         */
+        public array $person;
+    }
+
+    $typeResolver = TypeResolver::create();
+    $type = $typeResolver->resolve(new \ReflectionProperty(Dummy::class, 'person'));
+    // returns an ArrayShapeType with "name" (string), "age" (int), and optional "email" (string)
+
+The ``?`` suffix marks a key as optional (e.g. ``email?``).
+
+Array shapes are **sealed** by default, meaning they reject extra entries
+beyond those explicitly defined. Use ``...`` to create an **unsealed** shape
+that accepts additional entries::
+
+Array shapes can be sealed or unsealed:
+
+    // sealed: only accepts "id" key
+    // @var array{id: int}
+
+    // unsealed: accepts "id" and any extra entries
+    // @var array{id: int, ...}
+
+    // unsealed but extra entries must use strings as keys and booleans as values
+    // @var array{id: int, ...<string, bool>}
+
+You can also create array shapes manually using the ``Type::arrayShape()`` method::
+
+    use Symfony\Component\TypeInfo\Type;
+
+    // simple array shape (sealed by default)
+    $type = Type::arrayShape([
+        'name' => Type::string(),
+        'age' => Type::int()
+    ]);
+
+    // with optional keys (denoted by "?" suffix)
+    $type = Type::arrayShape([
+        'required_id' => Type::int(),
+        'optional_name' => ['type' => Type::string(), 'optional' => true],
+    ]);
+
+    // unsealed: allow extra entries (sealed = false)
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false);
+
+    // unsealed with typed extra keys and values (extraKeyType=string, extraValueType=bool)
+    // equivalent to: array{id: int, ...<string, bool>}
+    $type = Type::arrayShape([
+        'id' => Type::int(),
+    ], false, Type::string(), Type::bool());
+
 Object Shapes
 .............
+
+.. versionadded:: 8.1
+
+    Support for object shapes was introduced in Symfony 8.1.
 
 TypeInfo can resolve object shapes, which describe the structure of anonymous
 objects with specific properties and their types. Use the ``object{...}`` syntax
@@ -205,10 +280,6 @@ You can also create object shapes manually using the ``Type::objectShape()`` met
         'age' => Type::int(),
         'email' => Type::nullable(Type::string()),
     ]);
-
-.. versionadded:: 8.1
-
-    The support for object shapes was introduced in Symfony 8.1.
 
 Advanced Usages
 ~~~~~~~~~~~~~~~
