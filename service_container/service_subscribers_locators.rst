@@ -823,6 +823,51 @@ services based on type-hinted helper methods::
         }
     }
 
+Hooked Properties
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.7
+
+    Support for hooked properties in ``ServiceMethodsSubscriberTrait`` was
+    introduced in ``symfony/service-contracts`` 3.7.
+
+Instead of using methods, you can also use PHP 8.4
+`virtual/hooked properties`_ with the ``SubscribedService`` attribute. The
+property must define a ``get`` hook that retrieves the service from the
+container:
+
+.. code-block:: php-attributes
+
+    // src/Service/MyService.php
+    namespace App\Service;
+
+    use Psr\Log\LoggerInterface;
+    use Symfony\Component\Routing\RouterInterface;
+    use Symfony\Contracts\Service\Attribute\SubscribedService;
+    use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
+    use Symfony\Contracts\Service\ServiceSubscriberInterface;
+
+    class MyService implements ServiceSubscriberInterface
+    {
+        use ServiceMethodsSubscriberTrait;
+
+        public function doSomething(): void
+        {
+            // $this->router ...
+            // $this->logger ...
+        }
+
+        #[SubscribedService]
+        public RouterInterface $router {
+            get => $this->container->get(__METHOD__);
+        }
+
+        #[SubscribedService]
+        public LoggerInterface $logger {
+            get => $this->container->get(__METHOD__);
+        }
+    }
+
 This  allows you to create helper traits like RouterAware, LoggerAware, etc...
 and compose your services with them::
 
@@ -990,3 +1035,4 @@ Another alternative is to mock it using ``PHPUnit``::
 
 .. _`Command pattern`: https://en.wikipedia.org/wiki/Command_pattern
 .. _`PSR-11 container`: https://www.php-fig.org/psr/psr-11/
+.. _`virtual/hooked properties`: https://php.net/language.oop5.property-hooks
