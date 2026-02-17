@@ -922,14 +922,13 @@ Customizing the Violation Mapper
 
 .. versionadded:: 8.1
 
-    The ``ViolationMapperInterface`` and its injection into the form
-    validation system was introduced in Symfony 8.1.
+    The ``ViolationMapperInterface`` and its integration into the form
+    validation system were introduced in Symfony 8.1.
 
 When a form is validated, the
 :class:`Symfony\\Component\\Form\\Extension\\Validator\\ViolationMapper\\ViolationMapper`
-is responsible for mapping constraint violations to the corresponding form
-fields. If you need to customize this mapping logic, you can create a class
-implementing
+class is responsible for mapping constraint violations to the corresponding
+form fields. To customize this mapping logic, create a class that implements
 :class:`Symfony\\Component\\Form\\Extension\\Validator\\ViolationMapper\\ViolationMapperInterface`
 and register it as a service::
 
@@ -948,10 +947,9 @@ and register it as a service::
         }
     }
 
-The custom violation mapper will be used automatically because the
-``ViolationMapperInterface`` is registered as a service alias. If you need to
-:doc:`decorate </service_container/service_decoration>` the default violation
-mapper instead, decorate the ``form.violation_mapper`` service.
+The custom violation mapper is used automatically because ``ViolationMapperInterface``
+is registered as a service alias. To :doc:`decorate </service_container/service_decoration>`
+the default violation mapper instead, decorate the ``form.violation_mapper`` service.
 
 Other Common Form Features
 --------------------------
