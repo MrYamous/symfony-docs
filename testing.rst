@@ -769,6 +769,35 @@ To set a specific firewall (``main`` is set by default)::
     By design, the ``loginUser()`` method doesn't work when using stateless firewalls.
     Instead, add the appropriate token/header in each ``request()`` call.
 
+.. _testing_setup_the_session:
+
+Setup the session
+.................
+
+The client provides a ``getSession()`` method, which allows you to set up the
+session before performing the request::
+
+    // tests/Controller/FormControllerTest.php
+    use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+    class FormControllerTest extends WebTestCase
+    {
+        public function testSetupCsrfTokenBeforeFormSubmit(): void
+        {
+            $client = self::createClient();
+
+            $session = $client->getSession();
+            $session->set('_csrf/form', 'fhr8d5sha3a69tpv24s5');
+            $session->save();
+
+            $client->request('POST', '/form', ['form' => ['_token' => 'fhr8d5sha3a69tpv24s5']]);
+        }
+    }
+
+.. versionadded:: 7.4
+
+    The ``getSession()`` method was introduced in Symfony 7.4.
+
 Making AJAX Requests
 ....................
 
