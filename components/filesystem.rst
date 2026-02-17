@@ -257,6 +257,18 @@ files)::
 
     $filesystem->mirror('/path/to/source', '/path/to/target');
 
+    // you can pass an array of options as the fourth argument
+    $filesystem->mirror('/path/to/source', '/path/to/target', null, $options);
+
+The available options are:
+
+ * ``override`` (default: ``false``): If true, target files newer than origin
+   files are overwritten (see :method:`Symfony\\Component\\Filesystem\\Filesystem::copy`)
+ * ``copy_on_windows`` (default: ``false``): Whether to copy files instead of
+   links on Windows (see :method:`Symfony\\Component\\Filesystem\\Filesystem::symlink`)
+ * ``delete`` (default: ``false``): Whether to delete files that are not in the
+   source directory
+
 ``isAbsolutePath``
 ~~~~~~~~~~~~~~~~~~
 
