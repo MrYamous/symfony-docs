@@ -301,6 +301,51 @@ You can update your third-party packages to their current versions by running:
     $ php bin/console importmap:update bootstrap lodash
     $ php bin/console importmap:outdated bootstrap lodash
 
+Using Local npm Packages
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, ``importmap:require`` downloads packages from a CDN. If you prefer
+to install packages locally via npm (e.g. to use a specific build or a package
+not available on the CDN), you can point AssetMapper to your ``node_modules/``
+directory.
+
+First, install the package with npm and register the directory containing its
+browser-compatible files in your AssetMapper paths:
+
+.. code-block:: yaml
+
+    # config/packages/asset_mapper.yaml
+    framework:
+        asset_mapper:
+            paths:
+                assets/: ''
+                node_modules/@hpcc-js/wasm/dist/: 'hpcc'
+
+Using a namespace (like ``hpcc``) for registered directories is highly
+recommended to avoid collisions in logical paths. For example, if both
+``assets/`` and ``node_modules/@hpcc-js/wasm/dist/`` contained an ``index.js``
+file, only one of them would be mapped without namespaces.
+
+Then, require the package in the importmap using the ``--path`` option to point
+to the local file using its logical path:
+
+.. code-block:: terminal
+
+    $ php bin/console importmap:require @hpcc-js/wasm --path=hpcc/index.js
+
+Now you can import the package as usual:
+
+.. code-block:: javascript
+
+    import { Graphviz } from '@hpcc-js/wasm';
+
+.. note::
+
+    Only the registered directories are served by AssetMapper. All relative
+    imports inside those directories are resolved automatically. Make sure
+    the registered directory includes every file the package needs for its
+    browser imports.
+
 Removing JavaScript Packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
