@@ -757,7 +757,8 @@ To set a specific firewall (``main`` is set by default)::
 Setup the session
 .................
 
-The client provides a ``getSession()`` method, which allows you to setup the session before performing the request::
+The client provides a ``getSession()`` method, which allows you to set up the
+session before performing the request::
 
     // tests/Controller/FormControllerTest.php
     use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -776,10 +777,9 @@ The client provides a ``getSession()`` method, which allows you to setup the ses
         }
     }
 
-
 .. versionadded:: 7.4
 
-    The ``getSession()`` method is available since Symfony 7.4.
+    The ``getSession()`` method was introduced in Symfony 7.4.
 
 Making AJAX Requests
 ....................
