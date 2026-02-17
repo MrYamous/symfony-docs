@@ -1,5 +1,5 @@
-How to Create Service Aliases and Mark Services as Private
-==========================================================
+How to Create Service Aliases and Mark Services as Public
+=========================================================
 
 .. _container-private-services:
 
