@@ -684,7 +684,7 @@ you must register a service for it in order to use it as a named hasher:
         security:
             # ...
             password_hashers:
-                app_hasher:
+                App\Entity\User:
                     id: 'App\Security\Hasher\MyCustomPasswordHasher'
 
     .. code-block:: xml
@@ -702,7 +702,7 @@ you must register a service for it in order to use it as a named hasher:
 
             <config>
                 <!-- ... -->
-                <security:password_hasher class="app_hasher"
+                <security:password_hasher class="App\Entity\User"
                     id="App\Security\Hasher\MyCustomPasswordHasher"/>
             </config>
         </srv:container>
@@ -715,12 +715,12 @@ you must register a service for it in order to use it as a named hasher:
 
         return static function (SecurityConfig $security): void {
             // ...
-            $security->passwordHasher('app_hasher')
+            $security->passwordHasher('App\Entity\User')
                 ->id(MyCustomPasswordHasher::class)
             ;
         };
 
-This creates a hasher named ``app_hasher`` from a service with the ID
+This creates a hasher named ``App\Entity\User`` from a service with the ID
 ``App\Security\Hasher\MyCustomPasswordHasher``.
 
 Hashing a Stand-Alone String
@@ -900,7 +900,7 @@ Now, define a password hasher using the ``id`` setting:
         security:
             # ...
             password_hashers:
-                app_hasher:
+                App\Entity\User:
                     # the service ID of your custom hasher (the FQCN using the default services.yaml)
                     id: 'App\Security\Hasher\MyCustomPasswordHasher'
 
@@ -920,7 +920,7 @@ Now, define a password hasher using the ``id`` setting:
             <config>
                 <!-- ... -->
                 <!-- id: the service ID of your custom hasher (the FQCN using the default services.yaml) -->
-                <security:password_hasher class="app_hasher"
+                <security:password_hasher class="App\Entity\User"
                     id="App\Security\Hasher\CustomVerySecureHasher"/>
             </config>
         </srv:container>
@@ -933,7 +933,7 @@ Now, define a password hasher using the ``id`` setting:
 
         return static function (SecurityConfig $security): void {
             // ...
-            $security->passwordHasher('app_hasher')
+            $security->passwordHasher('App\Entity\User')
                 // the service ID of your custom hasher (the FQCN using the default services.yaml)
                 ->id(CustomVerySecureHasher::class)
             ;
