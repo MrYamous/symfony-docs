@@ -768,10 +768,6 @@ session before performing the request::
         }
     }
 
-.. versionadded:: 7.4
-
-    The ``getSession()`` method was introduced in Symfony 7.4.
-
 Making AJAX Requests
 ....................
 
