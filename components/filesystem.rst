@@ -255,17 +255,19 @@ contents of the source directory into the target one (use the
 :method:`Symfony\\Component\\Filesystem\\Filesystem::copy` method to copy single
 files)::
 
-    // mirror a directory
     $filesystem->mirror('/path/to/source', '/path/to/target');
-    // mirror with any options
+
+    // you can pass an array of options as the fourth argument
     $filesystem->mirror('/path/to/source', '/path/to/target', null, $options);
 
-The following options can be passed:
+The available options are:
 
- * ``override`` (default: ``false``): If true, target files newer than origin files are overwritten (see :method:`Symfony\\Component\\Filesystem\\Filesystem::copy`)
- * ``copy_on_windows`` (default: ``false``): Whether to copy files instead of links on Windows. Since symfony/filesystem 6.4 this option is deprecated, use follow_symlinks instead.
- * ``follow_symlinks`` (default: ``false``): Whether to copy files instead of links, where using symlinks in not working: windows, different drive, docker context not supporting symlinks.
- * ``delete`` (default: ``false``): Whether to delete files that are not in the source directory.
+ * ``override`` (default: ``false``): If true, target files newer than origin
+   files are overwritten (see :method:`Symfony\\Component\\Filesystem\\Filesystem::copy`)
+ * ``copy_on_windows`` (default: ``false``): Whether to copy files instead of
+   links on Windows (see :method:`Symfony\\Component\\Filesystem\\Filesystem::symlink`)
+ * ``delete`` (default: ``false``): Whether to delete files that are not in the
+   source directory
 
 ``isAbsolutePath``
 ~~~~~~~~~~~~~~~~~~
