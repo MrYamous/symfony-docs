@@ -497,7 +497,7 @@ will be able to authenticate (e.g. login form, API token, etc).
                 # the order in which firewalls are defined is very important, as the
                 # request will be handled by the first firewall whose pattern matches
                 dev:
-                    pattern: ^/(_(profiler|wdt)|css|images|js)/
+                    pattern: ^/_profiler|_wdt|assets|build/ # `assets` is for AssetMapper; `build` is for Webpack Encore
                     security: false
                 # a firewall with no pattern should be defined last because it will match all requests
                 main:
@@ -529,8 +529,8 @@ will be able to authenticate (e.g. login form, API token, etc).
                 <!-- the order in which firewalls are defined is very important, as the
                      request will be handled by the first firewall whose pattern matches -->
                 <firewall name="dev"
-                    pattern="^/(_(profiler|wdt)|css|images|js)/"
-                    security="false"/>
+                    pattern="^/_profiler|_wdt|assets|build/"
+                    security="false"/> <!-- `assets` is for AssetMapper; `build` is for Webpack Encore -->
 
                 <!-- a firewall with no pattern should be defined last because it will match all requests -->
                 <firewall name="main"
@@ -555,7 +555,7 @@ will be able to authenticate (e.g. login form, API token, etc).
             // the order in which firewalls are defined is very important, as the
             // request will be handled by the first firewall whose pattern matches
             $security->firewall('dev')
-                ->pattern('^/(_(profiler|wdt)|css|images|js)/')
+                ->pattern('^/(_profiler|_wdt|assets|build)/') // `assets` is for AssetMapper; `build` is for Webpack Encore
                 ->security(false)
             ;
 
@@ -598,9 +598,7 @@ don't accidentally block Symfony's dev tools - which live under URLs like
                         pattern:
                             - ^/_profiler/
                             - ^/_wdt/
-                            - ^/css/
-                            - ^/images/
-                            - ^/js/
+                            - ^/assets/
             # ...
 
         .. code-block:: php
@@ -614,9 +612,7 @@ don't accidentally block Symfony's dev tools - which live under URLs like
                     ->pattern([
                         '^/_profiler/',
                         '^/_wdt/',
-                        '^/css/',
-                        '^/images/',
-                        '^/js/',
+                        '^/assets/',
                     ])
                     ->security(false)
                 ;
