@@ -611,7 +611,7 @@ you must register a service for it in order to use it as a named hasher:
         security:
             # ...
             password_hashers:
-                app_hasher:
+                App\Entity\User:
                     id: 'App\Security\Hasher\MyCustomPasswordHasher'
 
     .. code-block:: php
@@ -625,14 +625,14 @@ you must register a service for it in order to use it as a named hasher:
             'security' => [
                 // ...
                 'password_hashers' => [
-                    'app_hasher' => [
+                    'App\Entity\User' => [
                         'id' => MyCustomPasswordHasher::class,
                     ],
                 ],
             ],
         ]);
 
-This creates a hasher named ``app_hasher`` from a service with the ID
+This creates a hasher named ``App\Entity\User`` from a service with the ID
 ``App\Security\Hasher\MyCustomPasswordHasher``.
 
 Hashing a Stand-Alone String
@@ -812,7 +812,7 @@ Now, define a password hasher using the ``id`` setting:
         security:
             # ...
             password_hashers:
-                app_hasher:
+                App\Entity\User:
                     # the service ID of your custom hasher (the FQCN using the default services.yaml)
                     id: 'App\Security\Hasher\MyCustomPasswordHasher'
 
@@ -827,7 +827,7 @@ Now, define a password hasher using the ``id`` setting:
             'security' => [
                 // ...
                 'password_hashers' => [
-                    'app_hasher' => [
+                    'App\Entity\User' => [
                         // the service ID of your custom hasher (the FQCN using the default services.yaml)
                         'id' => MyCustomPasswordHasher::class,
                     ],
