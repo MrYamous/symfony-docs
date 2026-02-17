@@ -264,10 +264,15 @@ The available options are:
 
  * ``override`` (default: ``false``): If true, target files newer than origin
    files are overwritten (see :method:`Symfony\\Component\\Filesystem\\Filesystem::copy`)
- * ``copy_on_windows`` (default: ``false``): Whether to copy files instead of
-   links on Windows (see :method:`Symfony\\Component\\Filesystem\\Filesystem::symlink`)
+ * ``follow_symlinks`` (default: ``false``): Whether to copy files instead of
+   links, especially useful on Windows (see :method:`Symfony\\Component\\Filesystem\\Filesystem::symlink`)
  * ``delete`` (default: ``false``): Whether to delete files that are not in the
    source directory
+
+.. deprecated:: 8.1
+
+    The ``copy_on_windows`` option was deprecated in Symfony 8.1 in favor of
+    the ``follow_symlinks`` option.
 
 ``isAbsolutePath``
 ~~~~~~~~~~~~~~~~~~
