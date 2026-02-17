@@ -915,6 +915,44 @@ want a "Previous" button to save data without running validation::
 The form will still validate basic integrity constraints even when clicking
 "previousStep".
 
+.. _form-custom-violation-mapper:
+
+Customizing the Violation Mapper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``ViolationMapperInterface`` and its injection into the form
+    validation system was introduced in Symfony 8.1.
+
+When a form is validated, the
+:class:`Symfony\\Component\\Form\\Extension\\Validator\\ViolationMapper\\ViolationMapper`
+is responsible for mapping constraint violations to the corresponding form
+fields. If you need to customize this mapping logic, you can create a class
+implementing
+:class:`Symfony\\Component\\Form\\Extension\\Validator\\ViolationMapper\\ViolationMapperInterface`
+and register it as a service::
+
+    // src/Form/CustomViolationMapper.php
+    namespace App\Form;
+
+    use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+    use Symfony\Component\Form\FormInterface;
+    use Symfony\Component\Validator\ConstraintViolation;
+
+    class CustomViolationMapper implements ViolationMapperInterface
+    {
+        public function mapViolation(ConstraintViolation $violation, FormInterface $form, bool $allowNonSynchronized = false): void
+        {
+            // custom mapping logic...
+        }
+    }
+
+The custom violation mapper will be used automatically because the
+``ViolationMapperInterface`` is registered as a service alias. If you need to
+:doc:`decorate </service_container/service_decoration>` the default violation
+mapper instead, decorate the ``form.violation_mapper`` service.
+
 Other Common Form Features
 --------------------------
 
