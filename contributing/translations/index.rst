@@ -30,8 +30,10 @@ Then, you need to either download or browse that Symfony version contents:
   `https://github.com/symfony/symfony <https://github.com/symfony/symfony>`_
   and switch to the oldest maintained branch.
 
-**Step 2.** Check out if there's some missing translation in your language by
-checking these directories:
+**Step 2.** Check if there are any missing translations in your language by
+visiting `https://symfony-translations.nyholm.tech/`__.
+
+If you prefer, you can also check these directories:
 
 * ``src/Symfony/Component/Form/Resources/translations/``
 * ``src/Symfony/Component/Security/Core/Resources/translations/``
