@@ -580,6 +580,17 @@ at the moment the exception was thrown.
 
 .. _http-kernel-creating-listener:
 
+10) Resetting the state of request/response flow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PHP is designed to be stateless, there are no shared resources across different
+requests. However, with some specific Runtime (ie FrankenPHP in worker mode), the
+kernel can handle multiple request/response, and so you need to take care of cleaning
+some services state to not leak memory if needed.
+
+To do so, your service must implement the :class:`Symfony\\Contracts\\Service\\ResetInterface`
+where you can reset the properties in the ``reset()`` method.
+
 Creating an Event Listener
 --------------------------
 
