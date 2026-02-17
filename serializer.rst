@@ -1392,10 +1392,9 @@ normalizers (in order of priority):
     ``DateTimeNormalizer::TIMEZONE_KEY`` to change the format.
 
     To always create :phpclass:`DateTime` and :phpclass:`DateTimeImmutable`
-    with the timezone specified in the context, set the
-    ``DateTimeNormalizer::FORCE_TIMEZONE_KEY`` context option to
-    ``true``. This will force the timezone of the context and ignores any
-    timezone from the input.
+    objects using the time zone specified in the context, set the
+    ``DateTimeNormalizer::FORCE_TIMEZONE_KEY`` context option to ``true``. This
+    forces the context time zone and ignores any time zone provided in the input.
 
     To convert the objects to integers or floats, set the serializer
     context option ``DateTimeNormalizer::CAST_KEY`` to ``int`` or
