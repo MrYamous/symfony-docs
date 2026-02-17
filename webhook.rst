@@ -5,12 +5,14 @@ Webhook
 
     The Webhook component was introduced in Symfony 6.3.
 
-Webhooks are event notification mechanisms typically delivered via HTTP POST requests, enabling real-time updates between systems.
+In web-development a Webhook is a remote-notification mechanism, typically
+delivered via HTTP POST requests.
+Webhooks enable real-time updates between systems.
 
 The Webhook component provides two primary capabilities:
 
-1. **Consuming**: Receive and process webhook calls from remote systems
-2. **Sending**: Dispatch webhooks to registered endpoints when events occur
+1. **Consuming**: Receive and process webhook calls from remote systems;
+2. **Sending**: Dispatch webhook callbacks to registered endpoints when events occur.
 
 This document covers both capabilities in the context of a full-stack Symfony application.
 
@@ -420,8 +422,8 @@ attribute:
 The routing name in the attribute must match the configuration entry of the
 webhook routing.
 
-Asynchronous Processing
-^^^^^^^^^^^^^^^^^^^^^^^
+Asynchronous Consuming
+^^^^^^^^^^^^^^^^^^^^^^
 
 By default, webhook consumers are invoked synchronously when the
 RemoteEvent is dispatched. To process webhooks asynchronously using
@@ -618,9 +620,9 @@ Configure similarly to mailers, then consume
 Sending Webhooks
 ----------------
 
-The Webhook component also enables your application to dispatch webhooks to
-external endpoints when your application events occur. This is useful when
-building APIs that notify subscribers of important events.
+The Webhook component also enables your application to invoke webhooks on
+remote endpoints. This is useful, as an example, when building APIs that notify
+subscribers of important events.
 
 .. note::
 
@@ -662,7 +664,7 @@ the Messenger component:
         new SendWebhookMessage($subscriber, $event)
     );
 
-The message will be queued and processed by
+The message will be queued and processed by the
 :class:`Symfony\\Component\\Webhook\\Messenger\\SendWebhookHandler`,
 which:
 
@@ -676,7 +678,7 @@ which:
    - ``Content-Type``: application/json
 
 3. Signs the request using the subscriber's secret
-4. Sends via Symfony's HttpClient component
+4. Sends the HTTP request by using the Symfony HttpClient component
 
 Resulting HTTP Request
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -705,7 +707,7 @@ to ensure webhook authenticity.
 Custom Sending Logic
 ~~~~~~~~~~~~~~~~~~~~
 
-For advanced use cases, you can build custom sending logic using
+For advanced use cases, you can build a custom sending logic by implementing the
 :class:`Symfony\\Component\\Webhook\\Server\\TransportInterface`.
 
 
