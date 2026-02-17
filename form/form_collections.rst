@@ -124,6 +124,46 @@ inside the task form itself::
         }
     }
 
+.. tip::
+
+    If you need to customize the child form fields based on the underlying data
+    (e.g. making a field read-only for persisted entities), use the ``PRE_SET_DATA``
+    event inside the child form type::
+
+        // src/Form/TagType.php
+        namespace App\Form;
+
+        use App\Entity\Tag;
+        use Symfony\Component\Form\AbstractType;
+        use Symfony\Component\Form\FormBuilderInterface;
+        use Symfony\Component\Form\FormEvent;
+        use Symfony\Component\Form\FormEvents;
+
+        class TagType extends AbstractType
+        {
+            public function buildForm(FormBuilderInterface $builder, array $options): void
+            {
+                // ...
+
+                $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+                    $tag = $event->getData();
+                    $form = $event->getForm();
+
+                    // $tag is the Tag entity bound to this specific entry
+                    // in the collection; use it to conditionally add/modify fields
+                    if ($tag && $tag->getId()) {
+                        $form->add('name', TextType::class, [
+                            'disabled' => true,
+                        ]);
+                    } else {
+                        $form->add('name');
+                    }
+                });
+            }
+        }
+
+    For more details, see :doc:`/form/dynamic_form_modification`.
+
 In your controller, you'll create a new form from the ``TaskType``::
 
     // src/Controller/TaskController.php
