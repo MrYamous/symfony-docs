@@ -625,6 +625,8 @@ writing, and the additional key(s) will only be used for reading. Once all
 cache items encrypted with the old key have expired, you can completely remove
 ``OLD_CACHE_DECRYPTION_KEY``.
 
+.. _cache-custom-marshaller-per-pool:
+
 Configuring a Custom Marshaller per Cache Pool
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -632,9 +634,9 @@ Configuring a Custom Marshaller per Cache Pool
 
     The ``marshaller`` option for cache pools was introduced in Symfony 8.1.
 
-The above example decorates the ``cache.default_marshaller`` service, which
-applies to **all** cache pools. If you need a custom marshaller only for specific
-pools, use the ``marshaller`` option instead:
+The above configuration decorates the ``cache.default_marshaller`` service, so
+the custom marshaller applies to **all** cache pools. If you need a custom
+marshaller only for specific pools, use the ``marshaller`` option instead:
 
 .. configuration-block::
 
@@ -684,9 +686,9 @@ pools, use the ``marshaller`` option instead:
             ],
         ]);
 
-This approach lets you mix different marshalling strategies. For example,
-you can encrypt tokens in one pool, compress large data in another, and keep
-a regular pool with no extra processing:
+This approach lets you mix different marshalling strategies across pools
+(e.g. encrypting data in one pool and compressing it in another) while
+leaving other pools with the default marshaller:
 
 .. configuration-block::
 

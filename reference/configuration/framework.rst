@@ -656,10 +656,13 @@ marshaller
 
     The ``marshaller`` option was introduced in Symfony 8.1.
 
-The service id of a custom marshaller to use for this pool. If not set,
-the pool uses the global ``cache.default_marshaller`` service. This is useful
-when you need different serialization strategies per pool (e.g. encrypting or
-compressing data only in specific pools).
+The service ID of a custom marshaller to use for this pool. When not set,
+the pool uses the global ``cache.default_marshaller`` service. Use it when you
+need different serialization strategies per pool (e.g. encrypting or compressing
+data only in specific pools).
+
+See :ref:`configuring a custom marshaller per cache pool <cache-custom-marshaller-per-pool>`
+for a detailed explanation and examples.
 
 .. _reference-cache-prefix-seed:
 
