@@ -26,7 +26,7 @@ separate articles:
 
 * `access_decision_manager`_
 * `access_control`_
-* :ref:`hashers <passwordhasher-supported-algorithms>`
+* `password_hashers`_
 * `firewalls`_
 * `providers`_
 * `role_hierarchy`_
@@ -1002,6 +1002,175 @@ Firewalls can configure a list of required badges that must be present on the au
             ],
         ]);
 
+password_hashers
+----------------
+
+**type**: ``array``
+
+Defines the :doc:`password hasher </security/passwords>` for each user class.
+The key of each item is the fully qualified class name of the user class, and
+the value defines the hasher configuration. Use ``auto`` as the algorithm to let
+Symfony choose the best available algorithm.:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/security.yaml
+        security:
+            # ...
+            password_hashers:
+                App\Entity\User: 'auto'
+
+    .. code-block:: php
+
+        // config/packages/security.php
+        use Symfony\Config\SecurityConfig;
+
+        return static function (SecurityConfig $security): void {
+            $security->firewall('main');
+            // ...
+
+            $security->passwordHasher('App\Entity\User')
+                ->algorithm('auto');
+        };
+
+Or use the expanded syntax to configure additional options:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/security.yaml
+        security:
+            # ...
+            password_hashers:
+                App\Entity\User:
+                    algorithm: 'auto'
+                    cost: 15
+
+    .. code-block:: php
+
+        // config/packages/security.php
+        use Symfony\Config\SecurityConfig;
+
+        return static function (SecurityConfig $security): void {
+            $security->firewall('main');
+            // ...
+
+            $security->passwordHasher('App\Entity\User')
+                ->algorithm('auto')
+                ->cost(15);
+        };
+
+algorithm
+~~~~~~~~~
+
+**type**: ``string``
+
+The hashing algorithm to use. The available algorithms depend on your PHP
+installation. The most common values are:
+
+* ``auto``: automatically selects the best available hasher (currently Bcrypt);
+* ``bcrypt``: uses the `bcrypt`_ algorithm;
+* ``sodium``: uses the Argon2 algorithm via the `libsodium`_ extension;
+* ``pbkdf2``: uses the `PBKDF2`_ algorithm (no longer recommended).
+
+You can also set this to the ``id`` of a service to use a custom password hasher
+(see the ``id`` option below).
+
+.. seealso::
+
+    Read more about the :ref:`supported hashing algorithms <passwordhasher-supported-algorithms>`.
+
+cost
+~~~~
+
+**type**: ``integer`` **default**: ``null``
+
+This option is only available for the ``bcrypt`` algorithm. It defines the
+value of the ``cost`` used to hash the password. The allowed range is ``4``
+to ``31``. Each single increment of the cost **doubles** the time it takes
+to hash a password.
+
+memory_cost
+~~~~~~~~~~~
+
+**type**: ``integer`` **default**: ``null``
+
+This option is only available for the ``sodium`` (Argon2) algorithm. It defines
+the amount of memory (in KiB) the algorithm may consume.
+
+time_cost
+~~~~~~~~~
+
+**type**: ``integer`` **default**: ``null``
+
+This option is only available for the ``sodium`` (Argon2) algorithm. It defines
+the number of iterations used to hash the password.
+
+hash_algorithm
+~~~~~~~~~~~~~~
+
+**type**: ``string`` **default**: ``sha512``
+
+The hash algorithm used by the ``pbkdf2`` hasher. You can use any algorithm
+returned by the ``hash_algos()`` PHP function (e.g. ``sha256``, ``sha512``, etc.).
+
+key_length
+~~~~~~~~~~
+
+**type**: ``integer`` **default**: ``40``
+
+The length of the generated hash for the ``pbkdf2`` hasher.
+
+iterations
+~~~~~~~~~~
+
+**type**: ``integer`` **default**: ``5000``
+
+The number of iterations used by the ``pbkdf2`` hasher to generate the hash.
+
+encode_as_base64
+~~~~~~~~~~~~~~~~
+
+**type**: ``boolean`` **default**: ``true``
+
+Whether to encode the generated hash in base64 for the ``pbkdf2`` hasher.
+
+ignore_case
+~~~~~~~~~~~
+
+**type**: ``boolean`` **default**: ``false``
+
+Whether to ignore case when comparing the password for the ``pbkdf2`` hasher.
+
+id
+~~
+
+**type**: ``string``
+
+The service id of a custom password hasher. This option can be used to
+configure a custom hasher service instead of using a built-in algorithm.
+
+.. seealso::
+
+    Read more about :ref:`creating a custom password hasher <custom-password-hasher>`.
+
+migrate_from
+~~~~~~~~~~~~
+
+**type**: ``array``
+
+A list of previous hasher configurations to migrate from. When a password
+is verified, Symfony checks if it was hashed with one of these previous
+algorithms. If so, the password is automatically rehashed using the
+current algorithm the next time the user logs in.
+
+.. seealso::
+
+    Read more about :ref:`password migration <security-password-migration>`.
+
 providers
 ---------
 
@@ -1017,4 +1186,7 @@ Instead of associating many roles to users, this option allows you to define
 role inheritance rules by creating a role hierarchy, as explained in
 :ref:`security-role-hierarchy`.
 
+.. _`bcrypt`: https://en.wikipedia.org/wiki/Bcrypt
+.. _`libsodium`: https://pecl.php.net/package/libsodium
+.. _`PBKDF2`: https://en.wikipedia.org/wiki/PBKDF2
 .. _`Session Fixation`: https://owasp.org/www-community/attacks/Session_fixation
