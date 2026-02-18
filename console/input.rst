@@ -543,6 +543,32 @@ they are assigned to the DTO::
 With this setup, when the command input is resolved, the email is lowercased
 and trimmed, and roles are uppercased.
 
+Validating Input with Constraints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can validate interactive input by passing
+:doc:`Validator constraints </reference/constraints>` to the ``constraints``
+option of the ``#[Ask]`` attribute::
+
+    #[Argument]
+    #[Ask(constraints: [new Assert\NotBlank, new Assert\Email])]
+    string $email,
+
+When the user provides an invalid value, the validation error messages are
+displayed in the console and the user is prompted again until valid input is
+given.
+
+.. versionadded:: 8.1
+
+    The ``constraints`` option of the ``#[Ask]`` attribute was introduced
+    in Symfony 8.1.
+
+.. seealso::
+
+    For more details on validating console questions, see
+    :ref:`Validating the Answer <console-validate-question-answer>` in
+    the QuestionHelper documentation.
+
 .. _console-input-file:
 
 File Input
