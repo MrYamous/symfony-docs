@@ -625,6 +625,141 @@ writing, and the additional key(s) will only be used for reading. Once all
 cache items encrypted with the old key have expired, you can completely remove
 ``OLD_CACHE_DECRYPTION_KEY``.
 
+Configuring a Custom Marshaller per Cache Pool
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``marshaller`` option for cache pools was introduced in Symfony 8.1.
+
+The above example decorates the ``cache.default_marshaller`` service, which
+applies to **all** cache pools. If you need a custom marshaller only for specific
+pools, use the ``marshaller`` option instead:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/cache.yaml
+        framework:
+            cache:
+                pools:
+                    cache.encrypted:
+                        adapter: cache.adapter.filesystem
+                        marshaller: 'app.sodium_marshaller'
+
+        services:
+            app.sodium_marshaller:
+                class: Symfony\Component\Cache\Marshaller\SodiumMarshaller
+                arguments:
+                    - ['%env(base64:CACHE_DECRYPTION_KEY)%']
+                    - '@cache.default_marshaller'
+
+    .. code-block:: php
+
+        // config/packages/cache.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use Symfony\Component\Cache\Marshaller\SodiumMarshaller;
+
+        return App::config([
+            'framework' => [
+                'cache' => [
+                    'pools' => [
+                        'cache.encrypted' => [
+                            'adapter' => 'cache.adapter.filesystem',
+                            'marshaller' => 'app.sodium_marshaller',
+                        ],
+                    ],
+                ],
+            ],
+            'services' => [
+                'app.sodium_marshaller' => [
+                    'class' => SodiumMarshaller::class,
+                    'arguments' => [
+                        [env('CACHE_DECRYPTION_KEY')->base64()],
+                        service('cache.default_marshaller'),
+                    ],
+                ],
+            ],
+        ]);
+
+This approach lets you mix different marshalling strategies. For example,
+you can encrypt tokens in one pool, compress large data in another, and keep
+a regular pool with no extra processing:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/cache.yaml
+        framework:
+            cache:
+                pools:
+                    cache.tokens:
+                        adapter: cache.adapter.redis
+                        marshaller: 'app.sodium_marshaller'
+                    cache.large_data:
+                        adapter: cache.adapter.filesystem
+                        marshaller: 'app.deflate_marshaller'
+                    cache.regular:
+                        adapter: cache.adapter.filesystem
+
+        services:
+            app.sodium_marshaller:
+                class: Symfony\Component\Cache\Marshaller\SodiumMarshaller
+                arguments:
+                    - ['%env(base64:CACHE_DECRYPTION_KEY)%']
+                    - '@cache.default_marshaller'
+
+            app.deflate_marshaller:
+                class: Symfony\Component\Cache\Marshaller\DeflateMarshaller
+                arguments:
+                    - '@cache.default_marshaller'
+
+    .. code-block:: php
+
+        // config/packages/cache.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
+        use Symfony\Component\Cache\Marshaller\SodiumMarshaller;
+
+        return App::config([
+            'framework' => [
+                'cache' => [
+                    'pools' => [
+                        'cache.tokens' => [
+                            'adapter' => 'cache.adapter.redis',
+                            'marshaller' => 'app.sodium_marshaller',
+                        ],
+                        'cache.large_data' => [
+                            'adapter' => 'cache.adapter.filesystem',
+                            'marshaller' => 'app.deflate_marshaller',
+                        ],
+                        'cache.regular' => [
+                            'adapter' => 'cache.adapter.filesystem',
+                        ],
+                    ],
+                ],
+            ],
+            'services' => [
+                'app.sodium_marshaller' => [
+                    'class' => SodiumMarshaller::class,
+                    'arguments' => [
+                        [env('CACHE_DECRYPTION_KEY')->base64()],
+                        service('cache.default_marshaller'),
+                    ],
+                ],
+                'app.deflate_marshaller' => [
+                    'class' => DeflateMarshaller::class,
+                    'arguments' => [
+                        service('cache.default_marshaller'),
+                    ],
+                ],
+            ],
+        ]);
+
 Computing Cache Values Asynchronously
 -------------------------------------
 
