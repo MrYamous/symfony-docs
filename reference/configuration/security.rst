@@ -1240,12 +1240,10 @@ password_hashers
 
 **type**: ``array``
 
-Defines the password hasher for each class. The key of each item is the
-fully qualified class name of the user class, and the value defines the
-hasher configuration. Use ``auto`` as the algorithm to let Symfony choose
-the best available algorithm.
-
-You can use a shorthand syntax where the value is the algorithm name:
+Defines the :doc:`password hasher </security/passwords>` for each user class.
+The key of each item is the fully qualified class name of the user class, and
+the value defines the hasher configuration. Use ``auto`` as the algorithm to let
+Symfony choose the best available algorithm.:
 
 .. configuration-block::
 
@@ -1306,18 +1304,17 @@ algorithm
 The hashing algorithm to use. The available algorithms depend on your PHP
 installation. The most common values are:
 
-* ``auto`` - automatically selects the best available hasher (currently Bcrypt);
-* ``bcrypt`` - uses the `bcrypt`_ algorithm;
-* ``sodium`` - uses the Argon2 algorithm via the `libsodium`_ extension;
-* ``pbkdf2`` - uses the `PBKDF2`_ algorithm (no longer recommended).
+* ``auto``: automatically selects the best available hasher (currently Bcrypt);
+* ``bcrypt``: uses the `bcrypt`_ algorithm;
+* ``sodium``: uses the Argon2 algorithm via the `libsodium`_ extension;
+* ``pbkdf2``: uses the `PBKDF2`_ algorithm (no longer recommended).
 
 You can also set this to the ``id`` of a service to use a custom password hasher
 (see the ``id`` option below).
 
 .. seealso::
 
-    For more information about supported algorithms, see
-    :ref:`passwordhasher-supported-algorithms`.
+    Read more about the :ref:`supported hashing algorithms <passwordhasher-supported-algorithms>`.
 
 cost
 ~~~~
@@ -1391,7 +1388,7 @@ configure a custom hasher service instead of using a built-in algorithm.
 
 .. seealso::
 
-    Read :ref:`custom-password-hasher` to learn how to create a custom password hasher.
+    Read more about :ref:`creating a custom password hasher <custom-password-hasher>`.
 
 migrate_from
 ~~~~~~~~~~~~
@@ -1405,8 +1402,7 @@ current algorithm the next time the user logs in.
 
 .. seealso::
 
-    Read :doc:`/security/passwords` for more details about password hashing
-    and migration.
+    Read more about :ref:`password migration <security-password-migration>`.
 
 providers
 ---------
