@@ -178,10 +178,6 @@ You can also import type aliases defined in other classes::
 Array Shapes
 ~~~~~~~~~~~~
 
-.. versionadded:: 7.3
-
-    Support for array shapes was introduced in Symfony 7.3.
-
 TypeInfo can resolve array shapes, which describe the structure of arrays with
 specific key-value type relationships. Use the ``array{...}`` syntax in PHPDoc
 annotations::
