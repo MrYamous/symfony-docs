@@ -276,6 +276,33 @@ manually store this file somewhere and deploy it. There are 2 ways to do that:
    This will write all the decrypted secrets into the ``.env.prod.local`` file.
    After doing this, the decryption key does *not* need to remain on the server(s).
 
+#. Customizing the Local Vault Path
+
+   By default, the ``secrets:decrypt-to-local`` command writes the decrypted
+   secrets to:
+
+   .. code-block:: terminal
+
+            %kernel.project_dir%/.env.<environment>.local
+
+   If your application stores environment files in a custom directory
+   (e.g. ``env/.env`` instead of the project root), you must override the
+   ``secrets.local_vault`` service to point to the correct file:
+
+   .. configuration-block::
+
+      .. code-block:: yaml
+
+                # config/services.yaml
+                services:
+                    secrets.local_vault:
+                        class: Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault
+                        arguments:
+                            - '%kernel.project_dir%/env/.env.%kernel.environment%.local'
+
+   After this configuration, the secrets:decrypt-to-local command will
+   write the decrypted secrets to your custom location.
+
 .. tip::
 
     When ``SYMFONY_DECRYPTION_SECRET`` is set and ``APP_SECRET`` is not defined,
