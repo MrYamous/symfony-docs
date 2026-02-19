@@ -417,6 +417,130 @@ logic you want::
 That's it! When switching users, your voter now has full control over whether or
 not this is allowed. If your voter isn't called, see :ref:`declaring-the-voter-as-a-service`.
 
+Impersonating Users Across Multiple Firewalls
+---------------------------------------------
+
+When your application uses multiple firewalls that share the same security
+context (via the ``context`` option), you need to pay special attention to
+the ``switch_user`` provider configuration.
+
+By default, ``switch_user`` uses the user provider configured for its firewall.
+This becomes a problem when the impersonator and the impersonated user come from
+different user providers: exiting impersonation fails because the listener tries
+to load the original user using the wrong provider.
+
+To solve this, configure ``switch_user`` with a
+:ref:`chain user provider <security-chain-user-provider>` that includes both the
+impersonator's provider and the impersonated user's provider:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/security.yaml
+        security:
+            providers:
+                admin_provider:
+                    entity:
+                        class: App\Entity\Admin
+                        property: username
+                user_provider:
+                    entity:
+                        class: App\Entity\User
+                        property: email
+                all_users:
+                    chain:
+                        providers: ['admin_provider', 'user_provider']
+
+            firewalls:
+                admin:
+                    pattern: ^/admin
+                    context: my_context
+                    provider: admin_provider
+                    switch_user:
+                        provider: all_users
+                    # ...
+                main:
+                    pattern: ^/
+                    context: my_context
+                    provider: user_provider
+                    # ...
+
+    .. code-block:: xml
+
+        <!-- config/packages/security.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <srv:container xmlns="http://symfony.com/schema/dic/security"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:srv="http://symfony.com/schema/dic/services"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/security
+                https://symfony.com/schema/dic/security/security-1.0.xsd">
+
+            <config>
+                <provider name="admin_provider">
+                    <entity class="App\Entity\Admin" property="username"/>
+                </provider>
+                <provider name="user_provider">
+                    <entity class="App\Entity\User" property="email"/>
+                </provider>
+                <provider name="all_users">
+                    <chain>
+                        <provider>admin_provider</provider>
+                        <provider>user_provider</provider>
+                    </chain>
+                </provider>
+
+                <firewall name="admin" pattern="^/admin" context="my_context" provider="admin_provider">
+                    <switch-user provider="all_users"/>
+                    <!-- ... -->
+                </firewall>
+                <firewall name="main" pattern="^/" context="my_context" provider="user_provider">
+                    <!-- ... -->
+                </firewall>
+            </config>
+        </srv:container>
+
+    .. code-block:: php
+
+        // config/packages/security.php
+        use Symfony\Config\SecurityConfig;
+
+        return static function (SecurityConfig $security): void {
+            $security->provider('admin_provider')
+                ->entity()
+                    ->class('App\Entity\Admin')
+                    ->property('username')
+            ;
+            $security->provider('user_provider')
+                ->entity()
+                    ->class('App\Entity\User')
+                    ->property('email')
+            ;
+            $security->provider('all_users')
+                ->chain()
+                    ->providers(['admin_provider', 'user_provider'])
+            ;
+
+            $security->firewall('admin')
+                ->pattern('^/admin')
+                ->context('my_context')
+                ->provider('admin_provider')
+                ->switchUser()
+                    ->provider('all_users')
+            ;
+            $security->firewall('main')
+                ->pattern('^/')
+                ->context('my_context')
+                ->provider('user_provider')
+            ;
+        };
+
+The chain provider ``all_users`` allows the ``switch_user`` listener to load
+both admin users (when exiting impersonation) and regular users (when starting
+impersonation).
+
 Events
 ------
 
