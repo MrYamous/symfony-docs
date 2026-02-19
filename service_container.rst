@@ -662,13 +662,13 @@ Working with container parameters is straightforward using the container's
 accessor methods for parameters::
 
     // checks if a parameter is defined (parameter names are case-sensitive)
-    $container->hasParameter('mailer.transport');
+    $container->hasParameter('app.admin_email');
 
     // gets value of a parameter
-    $container->getParameter('mailer.transport');
+    $container->getParameter('app.admin_email');
 
     // adds a new parameter
-    $container->setParameter('mailer.transport', 'sendmail');
+    $container->setParameter('app.admin_email', 'admin@example.com');
 
 .. warning::
 
