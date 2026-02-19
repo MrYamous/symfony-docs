@@ -1278,6 +1278,12 @@ Autoconfiguration also works with attributes. Some attributes like
 for autoconfiguration. Any class using these attributes will have tags applied
 to them.
 
+.. versionadded:: 7.4
+
+    In Symfony 7.4, autoconfiguration attributes on abstract classes are also
+    parsed when using resource-based service loading. Previously, abstract
+    classes were skipped entirely during this process.
+
 Linting Service Definitions
 ---------------------------
 

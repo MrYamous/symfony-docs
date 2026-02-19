@@ -147,6 +147,14 @@ When no tag name is specified, the fully qualified class name (FQCN) of the targ
     like their laziness, their bindings or their calls for example, you may rely
     on the :class:`Symfony\\Component\\DependencyInjection\\Attribute\\Autoconfigure` attribute.
 
+.. versionadded:: 7.4
+
+    In Symfony 7.4, autoconfiguration attributes (such as ``#[AutoconfigureTag]``)
+    placed on abstract classes are also parsed when using
+    :ref:`resource-based service loading <service-container-services-load-example>`.
+    Previously, abstract classes were skipped during this process, meaning their
+    attributes were not fully processed.
+
 For more advanced needs, you can define the automatic tags using the
 :method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerForAutoconfiguration` method.
 
