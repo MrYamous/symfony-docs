@@ -118,21 +118,29 @@ from the `MakerBundle`_:
     use Symfony\Component\Security\Core\User\UserInterface;
 
     #[ORM\Entity(repositoryClass: UserRepository::class)]
+    #[ORM\Table(name: '`user`')]
+    #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
     class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         #[ORM\Id]
         #[ORM\GeneratedValue]
-        #[ORM\Column(type: 'integer')]
-        private int $id;
+        #[ORM\Column]
+        private ?int $id = null;
 
-        #[ORM\Column(type: 'string', length: 180, unique: true)]
-        private ?string $email;
+        #[ORM\Column(length: 180)]
+        private ?string $email = null;
 
-        #[ORM\Column(type: 'json')]
+        /**
+         * @var list<string> The user roles
+         */
+        #[ORM\Column]
         private array $roles = [];
 
-        #[ORM\Column(type: 'string')]
-        private string $password;
+        /**
+         * @var string The hashed password
+         */
+        #[ORM\Column]
+        private ?string $password = null;
 
         public function getId(): ?int
         {
@@ -144,7 +152,7 @@ from the `MakerBundle`_:
             return $this->email;
         }
 
-        public function setEmail(string $email): self
+        public function setEmail(string $email): static
         {
             $this->email = $email;
 
@@ -152,7 +160,7 @@ from the `MakerBundle`_:
         }
 
         /**
-         * The public representation of the user (e.g. a username, an email address, etc.)
+         * A visual identifier that represents this user.
          *
          * @see UserInterface
          */
@@ -173,7 +181,10 @@ from the `MakerBundle`_:
             return array_unique($roles);
         }
 
-        public function setRoles(array $roles): self
+        /**
+         * @param list<string> $roles
+         */
+        public function setRoles(array $roles): static
         {
             $this->roles = $roles;
 
@@ -183,12 +194,12 @@ from the `MakerBundle`_:
         /**
          * @see PasswordAuthenticatedUserInterface
          */
-        public function getPassword(): string
+        public function getPassword(): ?string
         {
             return $this->password;
         }
 
-        public function setPassword(string $password): self
+        public function setPassword(string $password): static
         {
             $this->password = $password;
 
@@ -333,12 +344,14 @@ First, make sure your User class implements the
         // ...
 
         /**
-         * @return string the hashed password for this user
+         * @see PasswordAuthenticatedUserInterface
          */
-        public function getPassword(): string
+        public function getPassword(): ?string
         {
             return $this->password;
         }
+
+        // ...
     }
 
 Then, configure which password hasher should be used for this class. If your
@@ -1944,9 +1957,12 @@ database and every user is *always* given at least one role: ``ROLE_USER``::
     // src/Entity/User.php
 
     // ...
-    class User
+    class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
-        #[ORM\Column(type: 'json')]
+        /**
+         * @var list<string> The user roles
+         */
+        #[ORM\Column]
         private array $roles = [];
 
         // ...
