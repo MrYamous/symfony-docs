@@ -253,9 +253,11 @@ configuration file using a special syntax: wrap the parameter name in two ``%``
 
 .. include:: /components/dependency_injection/_imports-parameters-note.rst.inc
 
-Configuration parameters are very common in Symfony applications. Some packages
-even define their own parameters (e.g. when installing the translation package,
-a new ``locale`` parameter is added to the ``config/services.yaml`` file).
+Configuration parameters are very common in Symfony applications. Symfony itself
+defines several parameters, including those related to the
+:doc:`kernel configuration </reference/configuration/kernel>`
+(e.g. ``kernel.project_dir``, ``kernel.debug``), and some packages add their
+own parameters to your ``config/services.yaml`` when installed.
 
 .. tip::
 
