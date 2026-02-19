@@ -1676,6 +1676,12 @@ the closure::
         // services depending on which environment you're on
     };
 
+.. deprecated:: 7.4
+
+    Using ``$this`` or the loader's internal scope in PHP configuration
+    files was deprecated in Symfony 7.4. Use the variables passed to the closure
+    (e.g. ``$containerConfigurator``) or the ``$loader`` variable instead.
+
 Generating Adapters for Functional Interfaces
 ---------------------------------------------
 
