@@ -31,7 +31,7 @@ Then, you need to either download or browse that Symfony version contents:
   and switch to the oldest maintained branch.
 
 **Step 2.** Check if there are any missing translations in your language by
-visiting `https://symfony-translations.nyholm.tech/`__.
+visiting `https://symfony-translations.nyholm.tech/`_.
 
 If you prefer, you can also check these directories:
 
@@ -103,3 +103,4 @@ If you need help, check the other Symfony guides about
 the same.
 
 .. _`Symfony Releases`: https://symfony.com/releases
+.. _`https://symfony-translations.nyholm.tech/`: https://symfony-translations.nyholm.tech/
