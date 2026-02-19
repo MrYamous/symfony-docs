@@ -275,7 +275,9 @@ Constraint Validators with Custom Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to add some configuration options to your custom constraint, first
-define those options as public properties on the constraint class::
+define those options as public properties on the constraint class. Use the
+``#[HasNamedArguments]`` attribute and define mandatory options as required
+constructor arguments::
 
     // src/Validator/Foo.php
     namespace App\Validator;
@@ -286,41 +288,29 @@ define those options as public properties on the constraint class::
     #[\Attribute]
     class Foo extends Constraint
     {
-        public $mandatoryFooOption;
-        public $message = 'This value is invalid';
-        public $optionalBarOption = false;
+        public string $message = 'This value is invalid';
+        public bool $optionalBarOption = false;
 
         #[HasNamedArguments]
         public function __construct(
-            $mandatoryFooOption,
+            public string $mandatoryFooOption,
             ?string $message = null,
             ?bool $optionalBarOption = null,
             ?array $groups = null,
-            $payload = null,
-            array $options = []
+            mixed $payload = null,
         ) {
-            if (\is_array($mandatoryFooOption)) {
-                $options = array_merge($mandatoryFooOption, $options);
-            } elseif (null !== $mandatoryFooOption) {
-                $options['value'] = $mandatoryFooOption;
-            }
-
-            parent::__construct($options, $groups, $payload);
+            parent::__construct(null, $groups, $payload);
 
             $this->message = $message ?? $this->message;
             $this->optionalBarOption = $optionalBarOption ?? $this->optionalBarOption;
         }
-
-        public function getDefaultOption(): string
-        {
-            return 'mandatoryFooOption';
-        }
-
-        public function getRequiredOptions(): array
-        {
-            return ['mandatoryFooOption'];
-        }
     }
+
+.. deprecated:: 7.4
+
+    Overriding the ``getDefaultOption()`` and ``getRequiredOptions()`` methods
+    is deprecated since Symfony 7.4. Use mandatory constructor arguments instead
+    of ``getRequiredOptions()``.
 
 Then, inside the validator class you can access these options directly via the
 constraint class passed to the ``validate()`` method::
