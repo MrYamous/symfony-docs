@@ -365,7 +365,7 @@ encapsulate transformation logic::
 
 Then inject it into your parser::
 
-// src/Webhook/AcmeWebhookRequestParser.php
+    // src/Webhook/AcmeWebhookRequestParser.php
     namespace App\Webhook;
 
     use App\RemoteEvent\AcmeWebhookPayloadConverter;
