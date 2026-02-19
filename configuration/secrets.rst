@@ -258,11 +258,6 @@ manually store this file somewhere and deploy it. There are 2 ways to do that:
     secret. This means you don't need to define a separate ``APP_SECRET``
     environment variable if you are already using the secrets vault.
 
-    .. versionadded:: 7.2
-
-        The automatic derivation of ``kernel.secret`` from
-        ``SYMFONY_DECRYPTION_SECRET`` was introduced in Symfony 7.2.
-
 Rotating Secrets
 ----------------
 
