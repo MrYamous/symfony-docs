@@ -344,10 +344,10 @@ of arguments that should be passed when executing that callable.
 
     Once the controller and its arguments are resolved, the kernel exposes a
     :class:`Symfony\\Component\\HttpKernel\\ControllerMetadata\\ControllerMetadata`
-    object on all subsequent kernel events (``kernel.view``, ``kernel.response``,
-    ``kernel.finish_request``, ``kernel.exception``). This gives any listener
-    access to the controller's PHP attributes and resolved arguments via the
-    ``$event->getControllerMetadata()`` method.
+    object on all subsequent kernel events (``kernel.controller_arguments``,
+    ``kernel.view``, ``kernel.response``, ``kernel.finish_request`` and
+    ``kernel.exception``). This gives any listener access to the controller's PHP
+    attributes and resolved arguments via the ``controllerMetadata`` public property.
 
 .. versionadded:: 8.1
 

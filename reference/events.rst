@@ -121,7 +121,7 @@ All kernel events dispatched after controller resolution (``kernel.controller_ar
 ``kernel.view``, ``kernel.response``, ``kernel.finish_request`` and
 ``kernel.exception``) provide access to the controller metadata through the
 ``controllerMetadata`` public property. This allows listeners to inspect the
-controller's attributes and arguments without re-reflecting the controller::
+controller's attributes and arguments without using reflection on the controller::
 
     use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -141,18 +141,9 @@ controller's attributes and arguments without re-reflecting the controller::
         $namedArguments = $metadata->getNamedArguments();
     }
 
-The
-:class:`Symfony\\Component\\HttpKernel\\ControllerMetadata\\ControllerMetadata`
-class provides ``getController()``, ``getReflector()`` and ``getAttributes()``.
-The
-:class:`Symfony\\Component\\HttpKernel\\ControllerMetadata\\ControllerArgumentsMetadata`
-subclass (available from ``kernel.controller_arguments`` onwards) additionally
-provides ``getArguments()`` and ``getNamedArguments()``.
-
 .. versionadded:: 8.1
 
-    The ``getControllerMetadata()`` method on kernel events was introduced in
-    Symfony 8.1.
+    The ``controllerMetadata`` property was introduced in Symfony 8.1.
 
 ``kernel.view``
 ~~~~~~~~~~~~~~~
