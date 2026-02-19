@@ -67,9 +67,9 @@ The argument mode (required, optional, array) is inferred from the parameter typ
 * **Optional**: Parameters with a default value (e.g. ``string $name = ''`` or ``?string $name = null``);
 * **Array**: Parameters with the ``array`` type (e.g. ``array $names = []``);
 
-You can also use ``BackedEnum`` types for arguments. The string input is
-automatically converted to the enum case using ``BackedEnum::from()``, and
-autocompletion is provided based on the enum cases.
+You can also use ``BackedEnum`` types for arguments and options. The string
+input is automatically converted to the corresponding enum case using
+``BackedEnum::from()``, and autocompletion is provided based on the enum cases.
 
 Given a backed enum like this::
 
@@ -79,7 +79,7 @@ Given a backed enum like this::
     enum Format: string
     {
         case Json = 'json';
-        case Xml = 'xml';
+        case Csv = 'csv';
     }
 
 You can type-hint it directly in your command::
@@ -101,7 +101,7 @@ You can type-hint it directly in your command::
         }
     }
 
-If the user provides a value that doesn't match any enum case, a clear error
+If the user provides a value that doesn't match any enum case, an error
 message is displayed along with the list of valid values.
 
 .. versionadded:: 7.4
