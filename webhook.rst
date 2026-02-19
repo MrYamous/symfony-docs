@@ -5,16 +5,13 @@ Webhook
 
     The Webhook component was introduced in Symfony 6.3.
 
-In web-development a Webhook is a remote-notification mechanism, typically
-delivered via HTTP POST requests.
-Webhooks enable real-time updates between systems.
+A webhook is a mechanism for sending event notifications between systems,
+typically delivered via HTTP POST requests.
 
 The Webhook component provides two primary capabilities:
 
-1. **Consuming**: Receive and process webhook calls from remote systems;
-2. **Sending**: Dispatch webhook callbacks to registered endpoints when events occur.
-
-This document covers both capabilities in the context of a full-stack Symfony application.
+#. **Consuming**: receive and process webhook calls from remote systems;
+#. **Sending**: dispatch webhook callbacks to registered endpoints when events occur.
 
 Installation
 ------------
@@ -26,18 +23,27 @@ Installation
 Consuming Webhooks
 ------------------
 
-The Webhook component, combined with RemoteEvent, enables you to receive and process webhooks through three key phases:
+The Webhook component, combined with RemoteEvent, enables you to receive and
+process webhooks through three phases:
 
-1. Receiving the webhook via a dedicated endpoint
-2. Verifying the webhook and converting it to a RemoteEvent object
-3. Consuming the event in your application logic
+#. Receiving the webhook via a dedicated endpoint
+#. Verifying the webhook and converting it to a RemoteEvent object
+#. Consuming the event in your application logic
+
+.. admonition:: Screencast
+    :class: screencast
+
+    Like video tutorials? Check out the `Webhook Component for Email Events screencast`_.
 
 A Centralized Webhook Endpoint
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`Symfony\\Component\\Webhook\\Controller\\WebhookController` provides a single entry point for receiving all incoming webhooks, regardless of their source (third-party services, custom APIs, etc.).
+The :class:`Symfony\\Component\\Webhook\\Controller\\WebhookController`
+provides a single entry point for receiving all incoming webhooks, regardless
+of their source (third-party services, custom APIs, etc.).
 
-By default, any URL prefixed with ``/webhook`` routes to this controller. You can customize this prefix in your routing configuration:
+By default, any URL prefixed with ``/webhook`` routes to this controller. You
+can customize this prefix in your routing configuration:
 
 .. configuration-block::
 
@@ -69,9 +75,8 @@ By default, any URL prefixed with ``/webhook`` routes to this controller. You ca
                 ->prefix('/webhook');
         };
 
-Next, configure the parser services that will handle incoming webhooks.
-The controller uses a routing mechanism to map incoming requests to the
-appropriate parser:
+Next, configure the parser services that will handle incoming webhooks. The
+controller uses a routing mechanism to map incoming requests to the appropriate parser:
 
 .. configuration-block::
 
@@ -119,33 +124,33 @@ appropriate parser:
 
 The routing name becomes part of the webhook URL (e.g.,
 ``https://example.com/webhook/acme_webhook``). Each routing name must be
-unique and connects the webhook source to your consumer code.
+unique as it connects the webhook source to your consumer code.
 
 All parsers are automatically injected into the WebhookController.
 
 Parsing Webhook Requests
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once a webhook request arrives at your endpoint, it must be parsed and validated before
-your application can process it. Parsing involves verifying the request's authenticity
-(typically via signature validation), extracting the payload, and converting it into a
-:class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` object that your application can work with.
+Once a webhook request arrives at your endpoint, it must be parsed and validated
+before your application can process it. Parsing involves verifying the request's
+authenticity (typically via signature validation), extracting the payload, and
+converting it into a :class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` object.
 
 Symfony provides two approaches to handle parsing:
 
-1. **Built-in Parser**: Use the standard :class:`Symfony\\Component\\Webhook\\Client\\RequestParser` for webhooks from other Symfony applications
-2. **Custom Parser**: Create your own parser for webhooks from third-party services or custom APIs
-
-Choose the approach that best fits your webhook source.
+* **Built-in parser**: use the standard
+  :class:`Symfony\\Component\\Webhook\\Client\\RequestParser` for webhooks
+  from other Symfony applications;
+* **Custom parser**: create your own parser for webhooks from third-party
+  services or custom APIs.
 
 Using the Built-in Parser
-^^^^^^^^^^^^^^^^^^^^^^^^^
+·························
 
-For webhooks originating from other Symfony applications, you can use the built-in
-:class:`Symfony\\Component\\Webhook\\Client\\RequestParser` instead of creating a custom parser.
-
-This parser handles the standard Symfony webhook request format and is perfect for
-consuming webhooks from Symfony applications:
+For webhooks originating from other Symfony applications, you can use the
+built-in :class:`Symfony\\Component\\Webhook\\Client\\RequestParser` instead
+of creating a custom parser. This parser handles the standard Symfony webhook
+request format:
 
 .. configuration-block::
 
@@ -187,9 +192,11 @@ The built-in parser automatically handles request validation and signature verif
 allowing you to focus on consuming the RemoteEvent in your application logic.
 
 Creating a Custom Parser
-^^^^^^^^^^^^^^^^^^^^^^^^
+························
 
-For webhooks from custom APIs, implement a parser using the :class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface` or extend :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser`.
+For webhooks from custom APIs, implement a parser using
+:class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface` or
+extend :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser`.
 
 The easiest way is using the maker command:
 
@@ -199,11 +206,16 @@ The easiest way is using the maker command:
 
 .. tip::
 
-    Starting in `MakerBundle`_ ``v1.58.0``, the ``make:webhook`` command generates both the parser and consumer classes, and updates your configuration automatically.
+    Starting in `MakerBundle`_ ``v1.58.0``, the ``make:webhook`` command generates
+    both the parser and consumer classes and updates your configuration automatically.
 
-When extending :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser`, you need to implement two methods:
+When extending :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser`,
+you need to implement two methods:
 
-:method:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser::getRequestMatcher` - Validate the incoming request format:
+* :method:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser::getRequestMatcher`
+  to validate the incoming request format;
+* :method:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser::doParse`
+  to verify the webhook and parse it into a RemoteEvent.
 
 ::
 
@@ -242,26 +254,21 @@ When extending :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParse
         }
     }
 
-:method:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser::doParse`
-- Verify the webhook and parse it into a RemoteEvent:
+The ``doParse()`` method receives the request and the secret. You should:
 
-The method receives the request and secret. You should:
-
-- Validate the request signature (typically HMAC-SHA256)
-- Parse and validate the payload
-- Throw :class:`Symfony\\Component\\Webhook\\Exception\\RejectWebhookException` for invalid requests
-- Return a :class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` on success
+* Validate the request signature (typically HMAC-SHA256)
+* Parse and validate the payload
+* Throw a :class:`Symfony\\Component\\Webhook\\Exception\\RejectWebhookException`
+  for invalid requests
+* Return a :class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` on success
 
 Testing Your Parser
-^^^^^^^^^^^^^^^^^^^
+···················
 
-Test your custom parser using :class:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest`.
-:class:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest` runs
-:method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::testParse` with data from
-:method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getPayloads`,
-which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expectation file.
-
-::
+Test your custom parser by extending :class:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest`.
+This base class runs :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::testParse`
+with data from :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getPayloads`,
+which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expectation file::
 
     // tests/Webhook/AcmeWebhookRequestParserTest.php
     namespace App\Tests\Webhook;
@@ -277,7 +284,7 @@ which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expect
             return new AcmeWebhookRequestParser();
         }
 
-        // Default createRequest() builds a POST request with Content-Type: application/json
+        // default createRequest() builds a POST request with Content-Type: application/json
         // override it to add provider-specific headers (e.g., webhook signatures) or change the method
         protected function createRequest(string $payload): Request
         {
@@ -290,16 +297,18 @@ which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expect
         }
     }
 
-.. code-block:: text
+Create the fixture files that the base test expects (e.g. in
+``tests/Webhook/Fixtures/resource.created.json``):
 
-    // tests/Webhook/Fixtures/resource.created.json
+.. code-block:: json
+
     {
         "event_type": "resource.created",
         "event_id": "550e8400-e29b-41d4-a716-446655440000",
         "email": "user@example.com"
     }
 
-::
+and::
 
     // tests/Webhook/Fixtures/resource.created.php
     use Symfony\Component\RemoteEvent\RemoteEvent;
@@ -314,25 +323,23 @@ which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expect
         ]
     );
 
+Your test must implement :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::createRequestParser`
+to return an instance of your :class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface`
+implementation.
 
-- Your test must implement
-  :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::createRequestParser`
-  to return an instance of your :class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface`
-  implementation
-- Override :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getSecret`
+You can also override the following methods in your test:
+
+* :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getSecret`
   if your parser validates signatures
-- Override :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getFixtureExtension`
-  if your fixtures are not ``.json`` (e.g., .txt for form-encoded payloads)
-
+* :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getFixtureExtension`
+  if your fixtures are not ``.json`` (e.g., ``.txt`` for form-encoded payloads)
 
 Handling Complex Payload Transformations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+········································
 
-For complex webhook payloads, use the
+For complex webhook payloads, use
 :class:`Symfony\\Component\\RemoteEvent\\PayloadConverterInterface` to
-encapsulate transformation logic:
-
-::
+encapsulate transformation logic::
 
     // src/RemoteEvent/AcmeWebhookPayloadConverter.php
     namespace App\RemoteEvent;
@@ -344,7 +351,7 @@ encapsulate transformation logic:
     {
         public function convert(array $payload): RemoteEvent
         {
-            // Map external event names to your domain events
+            // map external event names to your domain events
             $eventName = match ($payload['event_type']) {
                 'resource.created' => 'acme.resource_created',
                 'resource.updated' => 'acme.resource_updated',
@@ -352,56 +359,61 @@ encapsulate transformation logic:
                 default => 'acme.unknown_event',
             };
 
-            return new RemoteEvent(
-                $eventName,
-                $payload['event_id'],
-                $payload
-            );
+            return new RemoteEvent($eventName, $payload['event_id'], $payload);
         }
     }
 
-Then use it in your parser:
+Then inject it into your parser::
 
-::
+// src/Webhook/AcmeWebhookRequestParser.php
+    namespace App\Webhook;
 
     use App\RemoteEvent\AcmeWebhookPayloadConverter;
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\RemoteEvent\PayloadConverterInterface;
+    use Symfony\Component\RemoteEvent\RemoteEvent;
+    use Symfony\Component\Webhook\Client\AbstractRequestParser;
     use Symfony\Component\Webhook\Exception\RejectWebhookException;
+    use Symfony\DependencyInjection\Attribute\Autowire;
 
-    public function __construct(
-        #[Autowire(service: AcmeWebhookPayloadConverter::class)]
-        private readonly PayloadConverterInterface $payloadConverter,
-    ) {}
+    final class AcmeWebhookRequestParser extends AbstractRequestParser
+    {
+        public function __construct(
+            #[Autowire(service: AcmeWebhookPayloadConverter::class)]
+            private readonly PayloadConverterInterface $converter,
+        ) {
+        }
 
-    protected function doParse(
-        Request $request,
-        #[\SensitiveParameter] string $secret
-    ): ?RemoteEvent {
-        try {
-            $payload = $request->toArray();
+        // ... getRequestMatcher() as before
 
-            return $this->converter->convert($payload);
-        } catch (ParseException|JsonException $e) {
-            throw new RejectWebhookException(
-                406,
-                $e->getMessage(),
-                $e
-            );
+        protected function doParse(
+            Request $request,
+            #[\SensitiveParameter] string $secret,
+        ): ?RemoteEvent {
+            try {
+                return $this->converter->convert($request->toArray());
+            } catch (ParseException|\JsonException $e) {
+                throw new RejectWebhookException(406, $e->getMessage(), $e);
+            }
         }
     }
+
+.. tip::
+
+    For inspiration, look at the built-in
+    :class:`Symfony\\Component\\Mailer\\Bridge\\Mailgun\\RemoteEvent\\MailgunPayloadConverter`.
 
 Consuming the RemoteEvent
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Whether processed synchronously or asynchronously (via Messenger), you
-need a consumer implementing
+Whether processed synchronously or asynchronously (via Messenger), you need
+a consumer implementing
 :class:`Symfony\\Component\\RemoteEvent\\Consumer\\ConsumerInterface`.
 
 The ``make:webhook`` command generates one automatically. Otherwise, create
 it manually using the
 :class:`Symfony\\Component\\RemoteEvent\\Attribute\\AsRemoteEventConsumer`
-attribute:
-
-::
+attribute::
 
     // src/RemoteEvent/AcmeWebhookConsumer.php
     namespace App\RemoteEvent;
@@ -415,20 +427,19 @@ attribute:
     {
         public function consume(RemoteEvent $event): void
         {
-            // Handle the event based on your business logic
+            // handle the event based on your business logic
         }
     }
 
-The routing name in the attribute must match the configuration entry of the
-webhook routing.
+The name passed to the ``AsRemoteEventConsumer`` attribute must match the
+routing name defined in your webhook configuration.
 
 Asynchronous Consuming
-^^^^^^^^^^^^^^^^^^^^^^
+······················
 
-By default, webhook consumers are invoked synchronously when the
-RemoteEvent is dispatched. To process webhooks asynchronously using
-Messenger, configure routing for the
-:class:`Symfony\\Component\\RemoteEvent\\Messenger\\ConsumeRemoteEventMessage`:
+By default, webhook consumers are invoked synchronously when the RemoteEvent
+is dispatched. To process webhooks asynchronously, configure Messenger routing
+for :class:`Symfony\\Component\\RemoteEvent\\Messenger\\ConsumeRemoteEventMessage`:
 
 .. configuration-block::
 
@@ -474,31 +485,39 @@ Messenger, configure routing for the
 
 With this configuration, consumers are invoked asynchronously via the
 message bus. Without it, consumers are processed synchronously during
-the webhook handling.
+the webhook request.
 
 Built-in Integrations
 ~~~~~~~~~~~~~~~~~~~~~
 
-Symfony provides pre-built parsers for common services, so you don't need to create custom parsers for them.
+Symfony provides pre-built parsers for common services, so you don't need to
+create custom parsers for them. You still need to create your own consumer
+to handle the RemoteEvent according to your business logic.
 
 Mailer Webhooks
 ^^^^^^^^^^^^^^^
 
 Receive delivery and engagement notifications from third-party mailers:
 
-============== ==========================================
-Mailer Service Parser service name
-============== ==========================================
-Brevo          ``mailer.webhook.request_parser.brevo``
-Mailgun        ``mailer.webhook.request_parser.mailgun``
-Mailjet        ``mailer.webhook.request_parser.mailjet``
-Postmark       ``mailer.webhook.request_parser.postmark``
-Sendgrid       ``mailer.webhook.request_parser.sendgrid``
-============== ==========================================
+==============  ==========================================
+Mailer Service  Parser service name
+==============  ==========================================
+Brevo           ``mailer.webhook.request_parser.brevo``
+Mailgun         ``mailer.webhook.request_parser.mailgun``
+Mailjet         ``mailer.webhook.request_parser.mailjet``
+Postmark        ``mailer.webhook.request_parser.postmark``
+Sendgrid        ``mailer.webhook.request_parser.sendgrid``
+==============  ==========================================
 
 .. versionadded:: 6.4
 
     Support for Brevo, Mailjet, and Sendgrid was added in Symfony 6.4.
+
+.. note::
+
+    Install the third-party mailer provider you want to use as described in
+    the documentation of the :ref:`Mailer component <mailer_3rd_party_transport>`.
+    Mailgun is used as the provider in this document as an example.
 
 Configure the routing:
 
@@ -538,11 +557,12 @@ Configure the routing:
                 ->secret('%env(MAILER_MAILGUN_SECRET)%');
         };
 
-The routing name becomes part of your webhook URL (e.g., ``https://example.com/webhook/mailer_mailgun``). Configure this URL at your mailer provider and store the webhook secret in your environment.
+The routing name becomes part of your webhook URL (e.g.,
+``https://example.com/webhook/mailer_mailgun``). Configure this URL at your
+mailer provider and store the webhook secret in your environment (via the
+:doc:`secrets management system </configuration/secrets>` or in a ``.env`` file).
 
-Then create a consumer to handle delivery and engagement events:
-
-::
+Then create a consumer to handle delivery and engagement events::
 
     // src/RemoteEvent/MailerWebhookConsumer.php
     namespace App\RemoteEvent;
@@ -577,7 +597,7 @@ Then create a consumer to handle delivery and engagement events:
     }
 
 Notifier Webhooks
-^^^^^^^^^^^^^^^^^
+·················
 
 Receive SMS status notifications from providers:
 
@@ -589,9 +609,7 @@ Vonage       ``notifier.webhook.request_parser.vonage``
 ============ ==========================================
 
 Configure similarly to mailers, then consume
-:class:`Symfony\\Component\\RemoteEvent\\Event\\Sms\\SmsEvent`:
-
-::
+:class:`Symfony\\Component\\RemoteEvent\\Event\\Sms\\SmsEvent`::
 
     // src/RemoteEvent/SmsWebhookConsumer.php
     namespace App\RemoteEvent;
@@ -620,65 +638,66 @@ Configure similarly to mailers, then consume
 Sending Webhooks
 ----------------
 
-The Webhook component also enables your application to invoke webhooks on
-remote endpoints. This is useful, as an example, when building APIs that notify
+The Webhook component also enables your application to dispatch webhook
+callbacks to remote endpoints. This is useful when building APIs that notify
 subscribers of important events.
 
-.. note::
+To send webhooks, ensure you have installed both the HttpClient and Serializer components:
 
-    To send webhooks, ensure you have installed both the HttpClient and Serializer
-    component via ``composer require symfony/http-client symfony/serializer``.
+.. code-block:: terminal
+
+    $ composer require symfony/http-client symfony/serializer
 
 Basic Usage
 ~~~~~~~~~~~
 
 To send a webhook, dispatch a
 :class:`Symfony\\Component\\Webhook\\Messenger\\SendWebhookMessage` via
-the Messenger component:
-
-::
+the Messenger component::
 
     use Symfony\Component\Messenger\MessageBusInterface;
     use Symfony\Component\RemoteEvent\RemoteEvent;
     use Symfony\Component\Webhook\Messenger\SendWebhookMessage;
     use Symfony\Component\Webhook\Subscriber;
 
-    // In a service or controller
+    class StockNotifier
+    {
+        public function __construct(
+            private readonly MessageBusInterface $messageBus,
+        ) {
+        }
 
-    $subscriber = new Subscriber(
-        url: 'https://example.com/webhook/symfony',
-        secret: 'your-shared-secret'
-    );
+        public function notifyOutOfStock(int $productId): void
+        {
+            $subscriber = new Subscriber(
+                url: 'https://example.com/webhook/stock',
+                secret: 'your-shared-secret',
+            );
 
-    $event = new RemoteEvent(
-        name: 'resource.created',
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        payload: [
-            'resource_id' => 12345,
-            'email' => 'user@example.com',
-            'created_at' => time(),
-        ]
-    );
+            $event = new RemoteEvent(
+                name: 'product.out_of_stock',
+                id: '550e8400-e29b-41d4-a716-446655440000',
+                payload: [
+                    'product_id' => $productId,
+                    'occurred_at' => time(),
+                ],
+            );
 
-    $this->messageBus->dispatch(
-        new SendWebhookMessage($subscriber, $event)
-    );
+            $this->messageBus->dispatch(
+                new SendWebhookMessage($subscriber, $event)
+            );
+        }
+    }
 
-The message will be queued and processed by the
-:class:`Symfony\\Component\\Webhook\\Messenger\\SendWebhookHandler`,
-which:
+The message is processed by
+:class:`Symfony\\Component\\Webhook\\Messenger\\SendWebhookHandler`, which:
 
-1. Constructs the HTTP request body (JSON-encoded payload)
-2. Adds standard headers:
-
-   - ``Webhook-Event``: The event name
-   - ``Webhook-Id``: The event ID
-   - ``Webhook-Signature``: HMAC-SHA256 signature (configurable) of the
-     concatenated event name, ID, and body
-   - ``Content-Type``: application/json
-
-3. Signs the request using the subscriber's secret
-4. Sends the HTTP request by using the Symfony HttpClient component
+#. Constructs the HTTP request body (JSON-encoded payload)
+#. Adds standard headers: ``Webhook-Event`` (event name), ``Webhook-Id``
+   (event ID), ``Webhook-Signature`` (HMAC-SHA256 signature of the concatenated
+   event name, ID, and body), and ``Content-Type: application/json``
+#. Signs the request using the subscriber's secret
+#. Sends the HTTP request using the Symfony HttpClient component
 
 Resulting HTTP Request
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -700,15 +719,16 @@ When the webhook is sent, it generates an HTTP POST request with the following f
         "created_at": 1234567890
     }
 
-By default, the signature uses HMAC-SHA256 of the concatenated event name, event ID, and JSON body,
-encoded in base64. Receiving endpoints should verify this signature using the shared secret
-to ensure webhook authenticity.
+By default, the signature uses HMAC-SHA256 of the concatenated event name,
+event ID, and JSON body. Receiving endpoints should verify this signature
+using the shared secret to ensure webhook authenticity.
 
 Custom Sending Logic
 ~~~~~~~~~~~~~~~~~~~~
 
-For advanced use cases, you can build a custom sending logic by implementing the
-:class:`Symfony\\Component\\Webhook\\Server\\TransportInterface`.
-
+For advanced use cases, you can implement custom sending logic using
+:class:`Symfony\\Component\\Webhook\\Server\\TransportInterface` to control
+header generation, signing, and HTTP transport.
 
 .. _`MakerBundle`: https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html
+.. _`Webhook Component for Email Events screencast`: https://symfonycasts.com/screencast/mailtrap/email-event-webhook
