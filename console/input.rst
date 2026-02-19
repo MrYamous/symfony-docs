@@ -100,11 +100,6 @@ You can type-hint it directly in your command::
 If the user provides a value that doesn't match any enum case, an error
 message is displayed along with the list of valid values.
 
-.. versionadded:: 7.4
-
-    Support for ``BackedEnum`` in ``#[Argument]`` and ``#[Option]`` was
-    introduced in Symfony 7.4.
-
 Using the Classic configure() Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
