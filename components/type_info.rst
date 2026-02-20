@@ -237,9 +237,7 @@ resolved by the type resolver::
 
     class Product
     {
-        /**
-         * @var MoneyAmount
-         */
+        /** @var MoneyAmount */
         public mixed $price;
     }
 
