@@ -605,12 +605,45 @@ For older PHPUnit versions, register the listener instead:
         <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
     </listeners>
 
+You can also use the
+:class:`Symfony\\Bridge\\PhpUnit\\Attribute\\TimeSensitive` attribute instead
+of the annotation. The attribute accepts the class whose namespace should be
+mocked, which replaces the need for manual ``ClockMock::register()`` calls:
+
+.. code-block:: php-attributes
+
+    use PHPUnit\Framework\TestCase;
+    use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
+    use Symfony\Component\Stopwatch\Stopwatch;
+
+    #[TimeSensitive(Stopwatch::class)]
+    class MyTest extends TestCase
+    {
+        public function testSomething(): void
+        {
+            $stopwatch = new Stopwatch();
+
+            $stopwatch->start('event_name');
+            sleep(10);
+            $duration = $stopwatch->stop('event_name')->getDuration();
+
+            $this->assertEquals(10000, $duration);
+        }
+    }
+
+The attribute can also be applied to individual test methods.
+
+.. versionadded:: 7.3
+
+    The ``#[TimeSensitive]`` attribute was introduced in Symfony 7.3.
+
 .. note::
 
-    If you don't want to use the ``@group time-sensitive`` annotation, you can
-    register the ``ClockMock`` class manually by calling
-    ``ClockMock::register(__CLASS__)`` and ``ClockMock::withClockMock(true)``
-    before the test and ``ClockMock::withClockMock(false)`` after the test.
+    If you don't want to use the ``@group time-sensitive`` annotation or the
+    ``#[TimeSensitive]`` attribute, you can register the ``ClockMock`` class
+    manually by calling ``ClockMock::register(__CLASS__)`` and
+    ``ClockMock::withClockMock(true)`` before the test and
+    ``ClockMock::withClockMock(false)`` after the test.
 
 As a result, the following is guaranteed to work and is no longer a transient
 test::
@@ -727,16 +760,18 @@ associated to a valid host::
     }
 
 In order to avoid making a real network connection, add the ``@group dns-sensitive``
-annotation to the class and use the ``DnsMock::withMockedHosts()`` to configure
-the data you expect to get for the given hosts::
+annotation or the ``#[DnsSensitive]`` attribute to the class and use the
+``DnsMock::withMockedHosts()`` to configure the data you expect to get for the
+given hosts:
+
+.. code-block:: php-attributes
 
     use App\Validator\DomainValidator;
     use PHPUnit\Framework\TestCase;
+    use Symfony\Bridge\PhpUnit\Attribute\DnsSensitive;
     use Symfony\Bridge\PhpUnit\DnsMock;
 
-    /**
-     * @group dns-sensitive
-     */
+    #[DnsSensitive(DomainValidator::class)]
     class DomainValidatorTest extends TestCase
     {
         public function testEmails(): void
@@ -782,6 +817,10 @@ conditions::
             ],
         ],
     ]);
+
+.. versionadded:: 7.3
+
+    The ``#[DnsSensitive]`` attribute was introduced in Symfony 7.3.
 
 Class Existence Based Tests
 ---------------------------
