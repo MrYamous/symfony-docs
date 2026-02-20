@@ -625,9 +625,10 @@ using the ``type`` option of the attribute::
 .. warning::
 
     When using custom types (e.g. enums) in your DTO properties, denormalization
-    errors may expose internal class names to the end user. To avoid leaking
-    implementation details, use built-in PHP types (``string``, ``int``, etc.)
-    and validate the values with constraints::
+    errors may expose internal class names to the end user. This was fixed in
+    Symfony 8.1. In earlier versions, to avoid leaking implementation details,
+    use built-in PHP types (``string``, ``int``, etc.) and validate the values
+    with constraints::
 
         use Symfony\Component\Validator\Constraints as Assert;
 
