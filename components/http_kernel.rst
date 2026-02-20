@@ -281,6 +281,16 @@ Another typical use-case for this event is to retrieve the attributes from
 the controller using the :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::getAttributes`
 method. See the Symfony section below for some examples.
 
+Controller attributes are stored in the ``_controller_attributes`` request
+attribute. This decouples them from the controller source code, allowing
+listeners to override attributes at runtime (e.g. to change caching behavior
+for specific requests without modifying the controller).
+
+.. versionadded:: 8.1
+
+    Storing controller attributes in the ``_controller_attributes`` request
+    attribute was introduced in Symfony 8.1.
+
 Listeners to this event can also change the controller callable completely
 by calling :method:`ControllerEvent::setController <Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::setController>`
 on the event object that's passed to listeners on this event.
