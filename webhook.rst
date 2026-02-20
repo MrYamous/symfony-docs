@@ -145,7 +145,7 @@ Symfony provides two approaches to handle parsing:
   services or custom APIs.
 
 Using the Built-in Parser
-·························
+.........................
 
 For webhooks originating from other Symfony applications, you can use the
 built-in :class:`Symfony\\Component\\Webhook\\Client\\RequestParser` instead
@@ -192,7 +192,7 @@ The built-in parser automatically handles request validation and signature verif
 allowing you to focus on consuming the RemoteEvent in your application logic.
 
 Creating a Custom Parser
-························
+........................
 
 For webhooks from custom APIs, implement a parser using
 :class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface` or
@@ -263,7 +263,7 @@ The ``doParse()`` method receives the request and the secret. You should:
 * Return a :class:`Symfony\\Component\\RemoteEvent\\RemoteEvent` on success
 
 Testing Your Parser
-···················
+...................
 
 Test your custom parser by extending :class:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest`.
 This base class runs :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::testParse`
@@ -335,7 +335,7 @@ You can also override the following methods in your test:
   if your fixtures are not ``.json`` (e.g., ``.txt`` for form-encoded payloads)
 
 Handling Complex Payload Transformations
-········································
+........................................
 
 For complex webhook payloads, use
 :class:`Symfony\\Component\\RemoteEvent\\PayloadConverterInterface` to
@@ -435,7 +435,7 @@ The name passed to the ``AsRemoteEventConsumer`` attribute must match the
 routing name defined in your webhook configuration.
 
 Asynchronous Consuming
-······················
+......................
 
 By default, webhook consumers are invoked synchronously when the RemoteEvent
 is dispatched. To process webhooks asynchronously, configure Messenger routing
@@ -495,7 +495,7 @@ create custom parsers for them. You still need to create your own consumer
 to handle the RemoteEvent according to your business logic.
 
 Mailer Webhooks
-^^^^^^^^^^^^^^^
+...............
 
 Receive delivery and engagement notifications from third-party mailers:
 
@@ -597,7 +597,7 @@ Then create a consumer to handle delivery and engagement events::
     }
 
 Notifier Webhooks
-·················
+.................
 
 Receive SMS status notifications from providers:
 
@@ -675,12 +675,13 @@ the Messenger component::
             );
 
             $event = new RemoteEvent(
-                name: 'product.out_of_stock',
+                name: 'resource.created',
                 id: '550e8400-e29b-41d4-a716-446655440000',
                 payload: [
-                    'product_id' => $productId,
-                    'occurred_at' => time(),
-                ],
+                    'resource_id' => 12345,
+                    'email' => 'user@example.com',
+                    'created_at' => time(),
+                ]
             );
 
             $this->messageBus->dispatch(
