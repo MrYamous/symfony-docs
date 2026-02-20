@@ -633,10 +633,6 @@ mocked, which replaces the need for manual ``ClockMock::register()`` calls:
 
 The attribute can also be applied to individual test methods.
 
-.. versionadded:: 7.3
-
-    The ``#[TimeSensitive]`` attribute was introduced in Symfony 7.3.
-
 .. note::
 
     If you don't want to use the ``@group time-sensitive`` annotation or the
@@ -817,10 +813,6 @@ conditions::
             ],
         ],
     ]);
-
-.. versionadded:: 7.3
-
-    The ``#[DnsSensitive]`` attribute was introduced in Symfony 7.3.
 
 Class Existence Based Tests
 ---------------------------
