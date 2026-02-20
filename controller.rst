@@ -903,8 +903,8 @@ the :phpfunction:`json_encode` function is used.
 Serializing Controller Return Values Automatically
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Instead of manually calling the serializer and building a response, you can use
-the :class:`Symfony\\Component\\HttpKernel\\Attribute\\Serialize` attribute on
+Instead of manually calling the serializer and building a response, you can add
+the :class:`Symfony\\Component\\HttpKernel\\Attribute\\Serialize` attribute to
 your controller method. The controller can then return any object or array, and
 Symfony will serialize it automatically based on the request format (defaulting
 to JSON)::
@@ -920,7 +920,7 @@ to JSON)::
         }
     }
 
-You can customize the HTTP status code, headers and serialization context::
+You can also customize the HTTP status code, headers, and serialization context::
 
     use Symfony\Component\HttpKernel\Attribute\Serialize;
 
@@ -946,8 +946,8 @@ The ``#[Serialize]`` attribute accepts the following arguments:
     (e.g. ``['groups' => ['read']]``).
 
 The response format is determined by the request format (``$request->getRequestFormat()``),
-defaulting to ``json``. The ``Content-Type`` header is set automatically based
-on the format. If the format is not supported by the serializer, a
+which defaults to ``json``. The ``Content-Type`` header is set automatically
+based on the format. If the format is not supported by the serializer, a
 ``415 Unsupported Media Type`` response is returned.
 
 .. note::
