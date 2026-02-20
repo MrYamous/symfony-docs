@@ -273,12 +273,6 @@ and apply the ``#[HasNamedArguments]`` attribute to the constructor::
         }
     }
 
-.. deprecated:: 7.4
-
-    In previous Symfony versions, you could define mandatory options by overriding
-    the ``getRequiredOptions()`` and ``getDefaultOption()`` methods. In Symfony 7.4
-    both methods are deprecated in favor of mandatory constructor arguments.
-
 Then, inside the validator class you can access these options directly via the
 constraint class passed to the ``validate()`` method::
 
