@@ -274,10 +274,9 @@ with the necessary ``validator.constraint_validator``. This means you can
 Constraint Validators with Custom Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want to add some configuration options to your custom constraint, first
-define those options as public properties on the constraint class. Use the
-``#[HasNamedArguments]`` attribute and define mandatory options as required
-constructor arguments::
+If your custom constraint defines configuration options, declare them as public
+properties on the constraint class, add them as mandatory constructor arguments,
+and apply the ``#[HasNamedArguments]`` attribute to the constructor::
 
     // src/Validator/Foo.php
     namespace App\Validator;
@@ -308,9 +307,9 @@ constructor arguments::
 
 .. deprecated:: 7.4
 
-    Overriding the ``getDefaultOption()`` and ``getRequiredOptions()`` methods
-    is deprecated since Symfony 7.4. Use mandatory constructor arguments instead
-    of ``getRequiredOptions()``.
+    In previous Symfony versions, you could define mandatory options by overriding
+    the ``getRequiredOptions()`` and ``getDefaultOption()`` methods. In Symfony 7.4
+    both methods are deprecated in favor of mandatory constructor arguments.
 
 Then, inside the validator class you can access these options directly via the
 constraint class passed to the ``validate()`` method::
