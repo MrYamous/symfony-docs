@@ -224,32 +224,47 @@ Deploy Secrets to Production
 Due to the fact that decryption keys should never be committed, you will need to
 manually store this file somewhere and deploy it. There are 2 ways to do that:
 
-#. Uploading the file
+**(1) Uploading the file**
 
-   The first option is to copy the **production decryption key** -
-   ``config/secrets/prod/prod.decrypt.private.php`` to your server.
+The first option is to copy the **production decryption key** -
+``config/secrets/prod/prod.decrypt.private.php`` to your server.
 
-#. Using an Environment Variable
+**(2) Using an Environment Variable**
 
-   The second way is to set the ``SYMFONY_DECRYPTION_SECRET`` environment variable
-   to the base64 encoded value of the **production decryption key**. A fancy way to
-   fetch the value of the key is:
+The second way is to set the ``SYMFONY_DECRYPTION_SECRET`` environment variable
+to the base64 encoded value of the **production decryption key**. A fancy way to
+fetch the value of the key is:
 
-   .. code-block:: terminal
+.. code-block:: terminal
 
-       # this command only gets the value of the key; you must also set an env var
-       # in your system with this value (e.g. `export SYMFONY_DECRYPTION_SECRET=...`)
-       $ php -r 'echo base64_encode(require "config/secrets/prod/prod.decrypt.private.php");'
+   # this command only gets the value of the key; you must also set an env var
+   # in your system with this value (e.g. `export SYMFONY_DECRYPTION_SECRET=...`)
+   $ php -r 'echo base64_encode(require "config/secrets/prod/prod.decrypt.private.php");'
 
-   To improve performance (i.e. avoid decrypting secrets at runtime), you can decrypt
-   your secrets during deployment to the "local" vault:
+To improve performance (i.e. avoid decrypting secrets at runtime), you can decrypt
+your secrets during deployment to the "local" vault:
 
-   .. code-block:: terminal
+.. code-block:: terminal
 
-       $ APP_RUNTIME_ENV=prod php bin/console secrets:decrypt-to-local --force
+   $ APP_RUNTIME_ENV=prod php bin/console secrets:decrypt-to-local --force
 
-   This will write all the decrypted secrets into the ``.env.prod.local`` file.
-   After doing this, the decryption key does *not* need to remain on the server(s).
+This will write all the decrypted secrets into a ``%kernel.project_dir%/.env.<environment>.local``
+file (in this example, ``.env.prod.local``). After doing this, the decryption key
+does *not* need to remain on the server(s).
+
+.. tip::
+
+    If your application stores environment files in a custom directory, override
+    the ``secrets.local_vault`` service to point to the correct location:
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            secrets.local_vault:
+                class: Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault
+                arguments:
+                    - '%kernel.project_dir%/env/.env.%kernel.environment%.local'
 
 .. tip::
 
