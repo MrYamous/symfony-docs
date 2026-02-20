@@ -190,39 +190,21 @@ These aliases are available everywhere in the type resolver, without needing
                     MoneyAmount: int
                     UserData: 'array{name: string, email: string, age: int}'
 
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony
-                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-
-            <framework:config>
-                <framework:type-info>
-                    <framework:alias name="MoneyAmount">int</framework:alias>
-                    <framework:alias name="UserData">array{name: string, email: string, age: int}</framework:alias>
-                </framework:type-info>
-            </framework:config>
-        </container>
-
     .. code-block:: php
 
-        // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        // config/packages/cache.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->typeInfo()
-                ->aliases([
-                    'MoneyAmount' => 'int',
-                    'UserData' => 'array{name: string, email: string, age: int}',
-                ])
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'type_info' => [
+                    'aliases' => [
+                        'MoneyAmount' => 'int',
+                        'UserData' => 'array{name: string, email: string, age: int}',
+                    ],
+                ],
+            ],
+        ]);
 
 Once configured, these aliases can be used in PHPDoc annotations and will be
 resolved by the type resolver::
