@@ -168,6 +168,43 @@ that define your bundles, your services and your routes:
     as shown above. That's why this method is commonly used only to load external
     routing files (e.g. from bundles) as shown below.
 
+Restricting Allowed Environments
+--------------------------------
+
+The ``MicroKernelTrait`` provides a ``getAllowedEnvs()`` method that lets you
+restrict which environment names are valid for your application. By default,
+this method returns an empty array, which means any environment is allowed (the
+same behavior as previous Symfony versions).
+
+When you override ``getAllowedEnvs()`` to return a non-empty array, the kernel
+will throw an ``InvalidArgumentException`` at boot time if the current
+environment (typically set via the ``APP_ENV`` environment variable) is not in
+the list::
+
+    // src/Kernel.php
+    namespace App;
+
+    use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+    use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
+    class Kernel extends BaseKernel
+    {
+        use MicroKernelTrait;
+
+        private function getAllowedEnvs(): array
+        {
+            return ['dev', 'prod', 'test'];
+        }
+    }
+
+With this configuration, booting the kernel with ``APP_ENV=staging`` would
+throw an exception. This is useful to catch typos or misconfiguration early,
+especially in deployment pipelines.
+
+.. versionadded:: 8.1
+
+    The ``getAllowedEnvs()`` method was introduced in Symfony 8.1.
+
 Adding Interfaces to "Micro" Kernel
 -----------------------------------
 
