@@ -320,14 +320,15 @@ Using Objects as Default Values
 
 .. versionadded:: 8.1
 
-    The support for objects as default values was introduced in Symfony 8.1.
+    Support for objects as default values was introduced in Symfony 8.1.
 
 You can use objects as default values for arguments and options in invokable
-commands. This is useful when you need complex default values that can be
-resolved at runtime::
+commands. This is useful when you need complex default values that are resolved
+at runtime::
 
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Attribute\Option;
+    use Symfony\Component\Console\Command\Command;
     use Symfony\Component\Console\Style\SymfonyStyle;
 
     #[AsCommand(name: 'app:report')]
@@ -341,7 +342,7 @@ resolved at runtime::
             $io->info(sprintf(
                 'Generating report from %s to %s',
                 $from->format('Y-m-d'),
-                $to->format('Y-m-d')
+                $to->format('Y-m-d'),
             ));
 
             return Command::SUCCESS;
@@ -350,10 +351,10 @@ resolved at runtime::
 
 .. note::
 
-    Options must always have a default value when using invokable commands,
-    so there is no way to work around this in userland. Object default values
-    are especially useful in this context because they allow you to define
-    complex, runtime-resolved defaults directly in the method signature.
+    In invokable commands, options must always have a default value. Object
+    default values are especially useful in this context because they allow
+    you to define complex, runtime-resolved defaults directly in the method
+    signature.
 
 Using the Classic addOption() Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
