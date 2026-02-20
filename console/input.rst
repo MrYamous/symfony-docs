@@ -315,6 +315,46 @@ The option mode is inferred from the parameter type and default value:
     value combinations. See :ref:`Option Attribute Constraints <console-option-constraints>`
     for the complete list of rules and examples.
 
+Using Objects as Default Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The support for objects as default values was introduced in Symfony 8.1.
+
+You can use objects as default values for arguments and options in invokable
+commands. This is useful when you need complex default values that can be
+resolved at runtime::
+
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\Option;
+    use Symfony\Component\Console\Style\SymfonyStyle;
+
+    #[AsCommand(name: 'app:report')]
+    class ReportCommand
+    {
+        public function __invoke(
+            SymfonyStyle $io,
+            #[Option] \DateTimeImmutable $from = new \DateTimeImmutable('-1 week'),
+            #[Option] \DateTimeImmutable $to = new \DateTimeImmutable(),
+        ): int {
+            $io->info(sprintf(
+                'Generating report from %s to %s',
+                $from->format('Y-m-d'),
+                $to->format('Y-m-d')
+            ));
+
+            return Command::SUCCESS;
+        }
+    }
+
+.. note::
+
+    Options must always have a default value when using invokable commands,
+    so there is no way to work around this in userland. Object default values
+    are especially useful in this context because they allow you to define
+    complex, runtime-resolved defaults directly in the method signature.
+
 Using the Classic addOption() Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
