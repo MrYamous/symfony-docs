@@ -38,19 +38,41 @@ There are several ways to achieve that:
 Using Access Control Lists (ACL) permissions is the most safe and
 recommended method to make the ``var/`` directory writable. You may need to
 install ``setfacl`` and `enable ACL support`_ on your disk partition before
-using this method. Then, use the following script to determine your web
-server user and grant the needed permissions:
+using this method.
+
+First, determine the user that your web server runs as. This depends on
+your web server and operating system:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Web Server
+      - Default User (Debian/Ubuntu)
+      - Default User (RHEL/Fedora/Arch)
+    * - Apache
+      - ``www-data``
+      - ``apache`` / ``http``
+    * - nginx
+      - ``www-data``
+      - ``nginx``
+    * - Caddy
+      - ``caddy``
+      - ``caddy``
+    * - FrankenPHP
+      - ``frankenphp``
+      - ``frankenphp``
+
+Then, grant the needed permissions (replace ``www-data`` with the web
+server user from the table above):
 
 .. code-block:: terminal
-
-    $ HTTPDUSER=$(ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1)
 
     # if the following commands don't work, try adding `-n` option to `setfacl`
 
     # set permissions for future files and folders
-    $ sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
+    $ sudo setfacl -dR -m u:"www-data":rwX -m u:$(whoami):rwX var
     # set permissions on the existing files and folders
-    $ sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
+    $ sudo setfacl -R -m u:"www-data":rwX -m u:$(whoami):rwX var
 
 Both of these commands assign permissions for the system user (the one
 running these commands) and the web server user.
