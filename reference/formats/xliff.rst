@@ -14,7 +14,12 @@ some content. This context can be provided with notes, which are a collection of
 comments used to store end user readable information. The only format that
 supports loading and dumping notes is XLIFF version 2.
 
-If the XLIFF 2.0 document contains ``<notes>`` nodes, they are automatically
+.. versionadded:: 8.1
+
+    Support for XLIFF versions 2.1 and 2.2 was introduced in Symfony 8.1.
+    Previously, only XLIFF 1.2 and 2.0 were supported.
+
+If the XLIFF 2 document contains ``<notes>`` nodes, they are automatically
 loaded/dumped inside a Symfony application:
 
 .. code-block:: xml
@@ -37,4 +42,4 @@ loaded/dumped inside a Symfony application:
         </file>
     </xliff>
 
-.. _XLIFF: https://docs.oasis-open.org/xliff/xliff-core/v2.0/xliff-core-v2.0.html
+.. _XLIFF: https://docs.oasis-open.org/xliff/
