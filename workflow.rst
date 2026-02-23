@@ -607,47 +607,13 @@ if you are using Doctrine, the matching column definition should use the type ``
 Accessing the Workflow in a Class
 ---------------------------------
 
-Symfony creates a service for each workflow you define. You have two ways of
-injecting each workflow in any service or controller:
-
-**(1) Use a specific argument name**
-
-Type-hint your constructor/method argument with ``WorkflowInterface`` and name the
-argument using this pattern: "workflow name in camelCase" + ``Workflow`` suffix.
-If it is a state machine type, use the ``StateMachine`` suffix.
+Symfony creates a service for each workflow you define. Use the ``#[Target]``
+attribute to inject a specific workflow in any service or controller. Symfony
+creates a target with the same name as each workflow.
 
 For example, to inject the ``blog_publishing`` workflow defined earlier::
 
     use App\Entity\BlogPost;
-    use Symfony\Component\Workflow\WorkflowInterface;
-
-    class MyClass
-    {
-        public function __construct(
-            private WorkflowInterface $blogPublishingWorkflow,
-        ) {
-        }
-
-        public function toReview(BlogPost $post): void
-        {
-            try {
-                // update the currentState on the post
-                $this->blogPublishingWorkflow->apply($post, 'to_review');
-            } catch (LogicException $exception) {
-                // ...
-            }
-            // ...
-        }
-    }
-
-**(2) Use the ``#[Target]`` attribute**
-
-When :ref:`dealing with multiple implementations of the same type <autowiring-multiple-implementations-same-type>`
-the ``#[Target]`` attribute helps you select which one to inject. Symfony creates
-a target with the same name as each workflow.
-
-For example, to select the ``blog_publishing`` workflow defined earlier::
-
     use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -658,8 +624,22 @@ For example, to select the ``blog_publishing`` workflow defined earlier::
         ) {
         }
 
-        // ...
+        public function toReview(BlogPost $post): void
+        {
+            try {
+                // update the currentState on the post
+                $this->workflow->apply($post, 'to_review');
+            } catch (LogicException $exception) {
+                // ...
+            }
+            // ...
+        }
     }
+
+.. tip::
+
+    If it is a state machine type, use the state machine name as the target
+    (e.g. ``#[Target('my_state_machine')]``).
 
 To get the enabled transition of a Workflow, you can use
 :method:`Symfony\\Component\\Workflow\\WorkflowInterface::getEnabledTransition`
@@ -1405,23 +1385,27 @@ Then you can access this metadata in your controller as follows::
 
     // src/App/Controller/BlogPostController.php
     use App\Entity\BlogPost;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\Workflow\WorkflowInterface;
     // ...
 
-    public function myAction(WorkflowInterface $blogPublishingWorkflow, BlogPost $post): Response
+    public function myAction(
+        #[Target('blog_publishing')] WorkflowInterface $workflow,
+        BlogPost $post,
+    ): Response
     {
-        $title = $blogPublishingWorkflow
+        $title = $workflow
             ->getMetadataStore()
             ->getWorkflowMetadata()['title'] ?? 'Default title'
         ;
 
-        $maxNumOfWords = $blogPublishingWorkflow
+        $maxNumOfWords = $workflow
             ->getMetadataStore()
             ->getPlaceMetadata('draft')['max_num_of_words'] ?? 500
         ;
 
-        $aTransition = $blogPublishingWorkflow->getDefinition()->getTransitions()[0];
-        $priority = $blogPublishingWorkflow
+        $aTransition = $workflow->getDefinition()->getTransitions()[0];
+        $priority = $workflow
             ->getMetadataStore()
             ->getTransitionMetadata($aTransition)['priority'] ?? 0
         ;

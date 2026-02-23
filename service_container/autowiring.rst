@@ -382,18 +382,20 @@ type hinted, but use the ``UppercaseTransformer`` implementation in some
 specific cases. To do so, you can create a normal alias from the
 ``TransformerInterface`` interface to ``Rot13Transformer``, and then
 create a *named autowiring alias* from a special string containing the
-interface followed by an argument name matching the one you use when doing
-the injection::
+interface followed by a variable name. Then, use the ``#[Target]``
+attribute on the argument to tell Symfony which named alias to inject::
 
     // src/Service/MastodonClient.php
     namespace App\Service;
 
     use App\Util\TransformerInterface;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
 
     class MastodonClient
     {
         public function __construct(
-            private TransformerInterface $shoutyTransformer,
+            #[Target('shoutyTransformer')]
+            private TransformerInterface $transformer,
         ) {
         }
 
@@ -480,24 +482,35 @@ the injection::
 
 Thanks to the ``App\Util\TransformerInterface`` alias, any argument type-hinted
 with this interface will be passed the ``App\Util\Rot13Transformer`` service.
-If the argument is named ``$shoutyTransformer``,
-``App\Util\UppercaseTransformer`` will be used instead.
-But, you can also manually wire any *other* service by specifying the argument
+When the ``#[Target('shoutyTransformer')]`` attribute is used,
+``App\Util\UppercaseTransformer`` will be injected instead.
+You can also manually wire any *other* service by specifying the argument
 under the arguments key.
 
-Another option is to use the ``#[Target]`` attribute. By adding this attribute
-to the argument you want to autowire, you can specify which service to inject by
-passing the name of the argument used in the named alias. This way, you can have
-multiple services implementing the same interface and keep the argument name
-separate from any implementation name (like shown in the example above). In addition,
-you'll get an exception in case you make any typo in the target name.
+.. deprecated:: 8.1
+
+    Relying solely on the parameter name to match a named autowiring alias
+    (i.e. without using the ``#[Target]`` attribute) is deprecated since
+    Symfony 8.1. Always use ``#[Target]`` to select a named autowiring alias.
 
 .. warning::
 
     The ``#[Target]`` attribute only accepts the name of the argument used in the
     named alias; it **does not** accept service ids or service aliases.
 
-You can get a list of named autowiring aliases by running the ``debug:autowiring`` command::
+.. tip::
+
+    Since the ``#[Target]`` attribute normalizes the string passed to it to its
+    camelCased form, name variations (e.g. ``shouty.transformer``) also work.
+
+.. note::
+
+    Some IDEs will show an error when using ``#[Target]``:
+    *"Attribute cannot be applied to a property because it does not contain the 'Attribute::TARGET_PROPERTY' flag"*.
+    The reason is that thanks to `PHP constructor promotion`_ this constructor
+    argument is both a parameter and a class property. You can safely ignore this error message.
+
+You can get a list of named autowiring aliases by running the ``debug:autowiring`` command:
 
 .. code-block:: terminal
 
@@ -517,36 +530,6 @@ You can get a list of named autowiring aliases by running the ``debug:autowiring
      Psr\Log\LoggerInterface $mailerLogger - alias:monolog.logger.mailer
 
      [...]
-
-Suppose you want to inject the ``App\Util\UppercaseTransformer`` service. You would use
-the ``#[Target]`` attribute by passing the name of the ``$shoutyTransformer`` argument::
-
-    // src/Service/MastodonClient.php
-    namespace App\Service;
-
-    use App\Util\TransformerInterface;
-    use Symfony\Component\DependencyInjection\Attribute\Target;
-
-    class MastodonClient
-    {
-        public function __construct(
-            #[Target('shoutyTransformer')]
-            private TransformerInterface $transformer,
-        ) {
-        }
-    }
-
-.. tip::
-
-    Since the ``#[Target]`` attribute normalizes the string passed to it to its
-    camelCased form, name variations (e.g. ``shouty.transformer``) also work.
-
-.. note::
-
-    Some IDEs will show an error when using ``#[Target]`` as in the previous example:
-    *"Attribute cannot be applied to a property because it does not contain the 'Attribute::TARGET_PROPERTY' flag"*.
-    The reason is that thanks to `PHP constructor promotion`_ this constructor
-    argument is both a parameter and a class property. You can safely ignore this error message.
 
 .. _autowire-attribute:
 

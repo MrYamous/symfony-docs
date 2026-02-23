@@ -224,27 +224,8 @@ and need to inject a specific one based on context::
         // ...
     }
 
-The container will now match the ``target`` value against the argument name,
-so naming the constructor parameter accordingly is enough::
-
-    class UserNotificationService
-    {
-        public function __construct(
-            private MailerInterface $notificationMailer,
-        ) {
-        }
-    }
-
-    class OrderConfirmationService
-    {
-        public function __construct(
-            private MailerInterface $transactionalMailer,
-        ) {
-        }
-    }
-
-If you prefer to decouple the argument name from the target, use the
-:ref:`#[Target] attribute <autowiring-multiple-implementations-same-type>` instead::
+Then use the :ref:`#[Target] attribute <autowiring-multiple-implementations-same-type>`
+to inject the desired implementation::
 
     use Symfony\Component\DependencyInjection\Attribute\Target;
 
