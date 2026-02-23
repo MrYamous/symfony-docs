@@ -255,6 +255,13 @@ Progress Bar Methods
         // displays a 100-step length progress bar
         $io->progressStart(100);
 
+        // displays a 100-step progress bar with a custom format
+        $io->progressStart(100, ' %current%/%max% [%bar%] %memory:6s%');
+
+    .. versionadded:: 8.1
+
+        The ``$format`` argument of ``progressStart()`` was introduced in Symfony 8.1.
+
 :method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::progressAdvance`
     It makes the progress bar advance the given number of steps (or ``1`` step
     if no argument is passed)::
@@ -281,9 +288,40 @@ Progress Bar Methods
             // ... do some work
         }
 
+    Pass a custom format string as the third argument to override the default
+    progress bar appearance::
+
+        foreach ($io->progressIterate($iterable, null, ' %current%/%max% [%bar%] %memory:6s%') as $value) {
+            // ... do some work
+        }
+
+    .. versionadded:: 8.1
+
+        The ``$format`` argument of ``progressIterate()`` was introduced in Symfony 8.1.
+
+    .. seealso::
+
+        See the :ref:`custom formats <progressbar-custom-formats>` documentation for
+        the list of all available placeholders to use in your format strings.
+
 :method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::createProgressBar`
     Creates an instance of :class:`Symfony\\Component\\Console\\Helper\\ProgressBar`
-    styled according to the Symfony Style Guide.
+    styled according to the Symfony Style Guide::
+
+        $progressBar = $io->createProgressBar(100);
+
+    Pass a format string as the second argument to use a custom progress bar format::
+
+        $progressBar = $io->createProgressBar(100, ' %current%/%max% [%bar%] %memory:6s%');
+
+    .. versionadded:: 8.1
+
+        The ``$format`` argument of ``createProgressBar()`` was introduced in Symfony 8.1.
+
+    .. seealso::
+
+        See the :ref:`custom formats <progressbar-custom-formats>` documentation for
+        the list of all available placeholders to use in your format strings.
 
 .. _symfony-style-questions:
 

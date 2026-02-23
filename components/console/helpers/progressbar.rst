@@ -210,6 +210,8 @@ variants:
 * ``very_verbose_nomax``
 * ``debug_nomax``
 
+.. _progressbar-custom-formats:
+
 Custom Formats
 ~~~~~~~~~~~~~~
 
