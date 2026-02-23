@@ -212,6 +212,11 @@ You can combine ``IS_ARRAY`` with ``REQUIRED`` or ``OPTIONAL`` like this::
         )
     ;
 
+.. deprecated:: 8.1
+
+    Combining ``InputArgument::REQUIRED`` and ``InputArgument::OPTIONAL`` was
+    deprecated in Symfony 8.1.
+
 Using Command Options
 ---------------------
 
@@ -477,6 +482,11 @@ You need to combine ``VALUE_IS_ARRAY`` with ``VALUE_REQUIRED`` or
             ['blue', 'red']
         )
     ;
+
+.. deprecated:: 8.1
+
+    Using any combination of ``InputOption::VALUE_NONE``, ``InputOption::VALUE_REQUIRED`` and
+    ``InputOption::VALUE_OPTIONAL`` was deprecated in Symfony 8.1.
 
 .. _console-input-map-input:
 
