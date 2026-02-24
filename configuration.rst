@@ -91,6 +91,12 @@ readable. These are the main advantages and disadvantages of each format:
 
     Array shapes were introduced in Symfony 7.4.
 
+.. deprecated:: 7.4
+
+    Using ``$this`` or accessing the internal scope of the file loader in PHP
+    config files was deprecated in Symfony 7.4. Use the ``$loader`` variable
+    instead, which only exposes the loader's public API.
+
 Importing Configuration Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
