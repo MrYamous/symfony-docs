@@ -34,84 +34,6 @@ class, which in turn requires another class to manage the storage::
     $store = new RedisStore($redis);
     $factory = new SemaphoreFactory($store);
 
-.. tip::
-
-    You can also use the :class:`Symfony\\Component\\Semaphore\\Store\\LockStore`
-    to use any :doc:`Lock component </lock>` backend (flock, Redis, PDO, etc.)
-    as a semaphore store:
-
-    .. code-block:: php-standalone
-
-        use Symfony\Component\Lock\LockFactory;
-        use Symfony\Component\Lock\Store\FlockStore;
-        use Symfony\Component\Semaphore\SemaphoreFactory;
-        use Symfony\Component\Semaphore\Store\LockStore;
-
-        $lockFactory = new LockFactory(new FlockStore());
-        $store = new LockStore($lockFactory);
-        $factory = new SemaphoreFactory($store);
-
-    When using the FrameworkBundle, you can configure this with the ``lock://``
-    DSN:
-
-    .. configuration-block::
-
-        .. code-block:: yaml
-
-            # config/packages/semaphore.yaml
-            framework:
-                lock: 'flock'
-                semaphore: 'lock://'
-
-        .. code-block:: php
-
-            // config/packages/semaphore.php
-            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
-
-            return App::config([
-                'framework' => [
-                    'lock' => 'flock',
-                    'semaphore' => 'lock://',
-                ],
-            ]);
-
-    You can also reference a specific named lock resource using ``lock://name``:
-
-    .. configuration-block::
-
-        .. code-block:: yaml
-
-            # config/packages/semaphore.yaml
-            framework:
-                lock:
-                    default: 'flock'
-                    my_locks: '%env(REDIS_DSN)%'
-                semaphore:
-                    default: 'lock://'          # uses lock.default.factory
-                    other: 'lock://my_locks'    # uses lock.my_locks.factory
-
-        .. code-block:: php
-
-            // config/packages/semaphore.php
-            namespace Symfony\Component\DependencyInjection\Loader\Configurator;
-
-            return App::config([
-                'framework' => [
-                    'lock' => [
-                        'default' => 'flock',
-                        'my_locks' => env('REDIS_DSN'),
-                    ],
-                    'semaphore' => [
-                        'default' => 'lock://',         // uses lock.default.factory
-                        'other' => 'lock://my_locks',   // uses lock.my_locks.factory
-                    ],
-                ],
-            ]);
-
-    .. versionadded:: 8.1
-
-        The ``LockStore`` was introduced in Symfony 8.1.
-
 The semaphore is created by calling the
 :method:`Symfony\\Component\\Semaphore\\SemaphoreFactory::createSemaphore`
 method. Its first argument is an arbitrary string that represents the locked
@@ -147,5 +69,81 @@ already acquired.
     automatically on instance destruction. In some cases, it can be useful to
     lock a resource across several requests. To disable the automatic release
     behavior, set the fifth argument of the ``createSemaphore()`` method to ``false``.
+
+Using Locks as Semaphore Stores
+-------------------------------
+
+You can also use the :class:`Symfony\\Component\\Semaphore\\Store\\LockStore`
+to use any :doc:`Lock component </lock>` backend (flock, Redis, PDO, etc.)
+as a semaphore store::
+
+    use Symfony\Component\Lock\LockFactory;
+    use Symfony\Component\Lock\Store\FlockStore;
+    use Symfony\Component\Semaphore\SemaphoreFactory;
+    use Symfony\Component\Semaphore\Store\LockStore;
+
+    $lockFactory = new LockFactory(new FlockStore());
+    $store = new LockStore($lockFactory);
+    $factory = new SemaphoreFactory($store);
+
+When using the FrameworkBundle, you can configure this with the ``lock://`` DSN:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/semaphore.yaml
+        framework:
+            lock: 'flock'
+            semaphore: 'lock://'
+
+    .. code-block:: php
+
+        // config/packages/semaphore.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'lock' => 'flock',
+                'semaphore' => 'lock://',
+            ],
+        ]);
+
+You can also reference a specific named lock resource using ``lock://name``:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/semaphore.yaml
+        framework:
+            lock:
+                default: 'flock'
+                my_locks: '%env(REDIS_DSN)%'
+            semaphore:
+                default: 'lock://'          # uses lock.default.factory
+                other: 'lock://my_locks'    # uses lock.my_locks.factory
+
+    .. code-block:: php
+
+        // config/packages/semaphore.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'lock' => [
+                    'default' => 'flock',
+                    'my_locks' => env('REDIS_DSN'),
+                ],
+                'semaphore' => [
+                    'default' => 'lock://',         // uses lock.default.factory
+                    'other' => 'lock://my_locks',   // uses lock.my_locks.factory
+                ],
+            ],
+        ]);
+
+.. versionadded:: 8.1
+
+    The ``LockStore`` was introduced in Symfony 8.1.
 
 .. _`semaphores`: https://en.wikipedia.org/wiki/Semaphore_(programming)
