@@ -949,26 +949,33 @@ If you *do* need to support very old browsers, you should use a tool like
 .. note::
 
     The `import statement`_ can't be polyfilled or shimmed to work on *every*
-    browser. However, only the **oldest** browsers don't support it - basically
-    IE 11 (which is no longer supported by Microsoft and has less than .4%
-    of global usage).
+    browser. However, only the **oldest** browsers don't support it.
 
     The ``importmap`` feature **is** shimmed to work in **all** browsers by the
-    AssetMapper component. However, the shim doesn't work with "dynamic" imports:
+    AssetMapper component (using `es-module-shims`_). However, this shim only
+    polyfills **import map** support; it does **not** polyfill the ``import()``
+    syntax itself, which is a native JavaScript feature.
+
+    AssetMapper correctly rewrites dynamic imports when the path is a string literal:
 
     .. code-block:: javascript
 
-        // this works
+        // static import: works everywhere (shimmed)
         import { add } from './math.js';
 
-        // this will not work in the oldest browsers
+        // dynamic import with a string literal: rewritten by AssetMapper,
+        // but requires the browser to support import() natively
         import('./math.js').then(({ add }) => {
             // ...
         });
 
-    If you want to use dynamic imports and need to support certain older browsers
-    (https://caniuse.com/import-maps), you can use an ``importShim()`` function
-    from the shim: https://www.npmjs.com/package/es-module-shims#user-content-polyfill-edge-case-dynamic-import
+    Browsers without `native import support`_ will fail regardless of AssetMapper.
+    For those browsers, you can use `the importShim() function`_ provided by the shim.
+
+    If you use a transpiler (e.g. Babel, TypeScript) that transforms ``import()``
+    calls, make sure to run it **before** AssetMapper compiles the assets.
+    Otherwise the file hashes will change after transpilation and the versioned
+    URLs will break.
 
 Can I Use it with Sass or Tailwind?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1387,6 +1394,9 @@ command as part of your CI to be warned anytime a new vulnerability is found.
 .. _strict-dynamic: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src#strict-dynamic
 .. _kocal/biome-js-bundle: https://github.com/Kocal/BiomeJsBundle
 .. _`SensioLabs Minify Bundle`: https://github.com/sensiolabs/minify-bundle
+.. _`es-module-shims`: https://www.npmjs.com/package/es-module-shims
+.. _`native import support`: https://caniuse.com/es6-module-dynamic-import)
+.. _`the importShim() function`: https://www.npmjs.com/package/es-module-shims#polyfill-edge-case-dynamic-import
 .. _`Brotli`: https://en.wikipedia.org/wiki/Brotli
 .. _`Zstandard`: https://en.wikipedia.org/wiki/Zstd
 .. _`gzip`: https://en.wikipedia.org/wiki/Gzip
