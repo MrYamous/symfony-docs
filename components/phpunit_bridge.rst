@@ -45,24 +45,6 @@ Installation
     always use its very latest stable major version to get the most accurate
     deprecation report.
 
-If you plan to :ref:`write assertions about deprecations <write-assertions-about-deprecations>` and use the regular
-PHPUnit script (not the modified PHPUnit script provided by Symfony), you have
-to register a new `test listener`_ called ``SymfonyTestsListener``:
-
-.. code-block:: xml
-
-    <!-- https://phpunit.de/manual/6.0/en/appendixes.configuration.html -->
-    <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.0/phpunit.xsd"
-    >
-
-        <!-- ... -->
-
-        <listeners>
-            <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-        </listeners>
-    </phpunit>
-
 Usage
 -----
 
@@ -1158,6 +1140,5 @@ not find the SUT:
 .. _`environment variable`: https://docs.phpunit.de/en/9.6/configuration.html#the-env-element
 .. _`@-silencing operator`: https://www.php.net/manual/en/language.operators.errorcontrol.php
 .. _`Travis CI`: https://travis-ci.org/
-.. _`test listener`: https://docs.phpunit.de/en/9.6/configuration.html#the-extensions-element
 .. _`@covers`: https://docs.phpunit.de/en/9.6/annotations.html#covers
 .. _`PHP namespace resolutions rules`: https://www.php.net/manual/en/language.namespaces.rules.php
