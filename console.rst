@@ -654,6 +654,15 @@ Symfony will now collect data about the command execution, which is helpful to
 debug errors or check other issues. When the command execution is over, the
 profile is accessible through the web page of the profiler.
 
+The Performance panel of the profiler also displays the duration of each
+argument value resolver used during the command execution, which helps spot
+slow resolvers.
+
+.. versionadded:: 8.1
+
+    The tracing of console argument value resolvers in the profiler's
+    Performance panel was introduced in Symfony 8.1.
+
 .. tip::
 
     If you run the command in verbose mode (adding the ``-v`` option), Symfony
