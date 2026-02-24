@@ -462,7 +462,18 @@ There are five option variants you can use:
 
 ``InputOption::VALUE_NEGATABLE``
     Accept either the flag (e.g. ``--yell``) or its negation (e.g.
-    ``--no-yell``).
+    ``--no-yell``). You can set a boolean default value on negatable options::
+
+        $this
+            // ...
+            ->addOption('yell', null, InputOption::VALUE_NEGATABLE, 'Whether to yell', false)
+        ;
+
+    .. versionadded:: 8.1
+
+        The support for setting a boolean default value on
+        ``InputOption::VALUE_NEGATABLE`` options (including when combined with
+        ``InputOption::VALUE_NONE``) was introduced in Symfony 8.1.
 
 You need to combine ``VALUE_IS_ARRAY`` with ``VALUE_REQUIRED`` or
 ``VALUE_OPTIONAL`` like this::
