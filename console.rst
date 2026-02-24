@@ -603,6 +603,14 @@ call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``
     :class:`Symfony\\Component\\Console\\Application`
     and extend the normal ``\PHPUnit\Framework\TestCase``.
 
+.. note::
+
+    The ``CommandTester`` class does not implement ``ConsoleOutputInterface``,
+    so methods like ``section()`` are not directly accessible. To test them,
+    use the ``capture_stderr_separately`` option of the ``execute()`` method::
+
+        $commandTester->execute([], ['capture_stderr_separately' => true]);
+
 When testing your commands, it could be useful to understand how your command
 reacts on different settings like the width and the height of the terminal, or
 even the color mode being used. You have access to such information thanks to the
