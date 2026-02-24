@@ -901,7 +901,7 @@ the :phpfunction:`json_encode` function is used.
 .. _controller_serialize:
 
 Serializing Controller Return Values Automatically
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of manually calling the serializer and building a response, you can add
 the :class:`Symfony\\Component\\HttpKernel\\Attribute\\Serialize` attribute to
