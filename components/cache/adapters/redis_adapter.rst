@@ -63,8 +63,8 @@ helper method allows creating and configuring the Redis client class instance us
     );
 
 The DSN can specify either an IP/host (and an optional port) or a socket path, as well as a
-password and a database index. To enable TLS for connections, the scheme ``redis`` must be
-replaced by ``rediss`` (the second ``s`` means "secure").
+username, password and a database index. To enable TLS for connections, the scheme ``redis``
+must be replaced by ``rediss`` (the second ``s`` means "secure").
 
 .. note::
 
@@ -100,7 +100,10 @@ Below are common examples of valid DSNs showing a combination of available value
     RedisAdapter::createConnection('redis:?host[redis1:6379]&dbindex=3');
 
     // providing credentials with alternate DSN syntax
-    RedisAdapter::createConnection('redis:default:verysecurepassword@?host[redis1:6379]&dbindex=3');
+    RedisAdapter::createConnection('redis:myusername:verysecurepassword@?host[redis1:6379]&dbindex=3');
+
+    // providing credentials with auth parameters
+    RedisAdapter::createConnection('redis://host?auth[]=myusername&auth[]=verysecurepassword');
 
     // a single DSN can also define multiple servers
     RedisAdapter::createConnection(
@@ -125,6 +128,31 @@ parameter to set the name of your service group::
         'redis:default:verysecurepassword@?host[redis1:26379]&host[redis2:26379]&host[redis3:26379]&redis_sentinel=mymaster&dbindex=3'
     );
 
+When the Redis master and the sentinels use different credentials, provide the
+master credentials in the DSN userinfo and the sentinel credentials via the
+``auth`` query parameter or option::
+
+    // master password in userinfo, sentinel password in auth query parameter
+    RedisAdapter::createConnection(
+        'redis://master-password@?host[redis1:26379]&host[redis2:26379]&redis_sentinel=mymaster&auth=sentinel-password'
+    );
+
+    // master user+password in userinfo, sentinel user+password in auth query parameter (ACL)
+    RedisAdapter::createConnection(
+        'redis://master-user:master-pass@?host[redis1:26379]&host[redis2:26379]&redis_sentinel=mymaster&auth[]=sentinel-user&auth[]=sentinel-pass'
+    );
+
+    // or using the auth option
+    RedisAdapter::createConnection(
+        'redis://master-password@?host[redis1:26379]&host[redis2:26379]&redis_sentinel=mymaster',
+        ['auth' => ['sentinel-user', 'sentinel-pass']]
+    );
+
+.. versionadded:: 7.4
+
+    Support for separate sentinel and master authentication was introduced in
+    Symfony 7.4.
+
 .. note::
 
     See the :class:`Symfony\\Component\\Cache\\Traits\\RedisTrait` for more options
@@ -147,6 +175,7 @@ array of ``key => value`` pairs representing option names and their respective v
         // associative array of configuration options
         [
             'class' => null,
+            'auth' => null,
             'persistent' => 0,
             'persistent_id' => null,
             'timeout' => 30,
@@ -171,6 +200,21 @@ Available Options
     If none is specified, fallback value is in following order, depending which one is available first:
     ``\Redis``, ``\Relay\Relay``, ``\Predis\Client``. Explicitly set this to ``\Predis\Client`` for Sentinel if you are
     running into issues when retrieving master information.
+
+``auth`` (type: ``string|string[]``, default: ``null``)
+    Specifies the authentication credentials for the Redis connection. Use a string
+    for password-only authentication or an array with two elements ``[username, password]``
+    for ACL-based authentication. When ``null``, the credentials are extracted from
+    the DSN (e.g. ``redis://user:password@host``).
+
+    When using Redis Sentinel, this option is used for the **sentinel** credentials.
+    The **master** credentials should be provided via the DSN userinfo
+    (e.g. ``redis://master-pass@host``).
+
+    .. note::
+
+        When using `Predis`_, this option is ignored. Provide credentials via the
+        DSN instead.
 
 ``persistent`` (type: ``int``, default: ``0``)
     Enables or disables use of persistent connections. A value of ``0`` disables persistent
