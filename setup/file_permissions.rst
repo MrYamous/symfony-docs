@@ -43,7 +43,7 @@ server user and grant the needed permissions:
 
 .. code-block:: terminal
 
-    $ HTTPDUSER=$(ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1)
+    $ HTTPDUSER=$(ps axo user,comm | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx|[c]addy|[f]rankenphp' | grep -v root | head -1 | cut -d\  -f1)
 
     # if the following commands don't work, try adding `-n` option to `setfacl`
 
@@ -51,6 +51,15 @@ server user and grant the needed permissions:
     $ sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
     # set permissions on the existing files and folders
     $ sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:$(whoami):rwX var
+
+.. tip::
+
+    If ``$HTTPDUSER`` is empty (e.g. the web server is not running or the
+    script doesn't work on your system), replace ``$HTTPDUSER`` with the web
+    server user manually. Check your web server's configuration or use the
+    common default user names: ``www-data`` for Apache/nginx on Debian/Ubuntu,
+    ``apache`` or ``nginx`` on RHEL/Fedora, ``caddy`` for Caddy, and
+    ``frankenphp`` for FrankenPHP.
 
 Both of these commands assign permissions for the system user (the one
 running these commands) and the web server user.
