@@ -2462,6 +2462,31 @@ Otherwise, a ``MappingException`` is thrown during container compilation.
 You can use any serialization attribute on the source class properties, including
 ``#[Groups]``, ``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, and others.
 
+Compile-Time Attribute Metadata
+...............................
+
+When using the Symfony framework with :ref:`autoconfiguration <services-autoconfigure>`,
+classes that use serializer attributes (such as ``#[Groups]``,
+``#[SerializedName]``, ``#[MaxDepth]``, ``#[Ignore]``, ``#[Context]``,
+``#[SerializedPath]`` or ``#[DiscriminatorMap]``) are automatically discovered
+at compile time. This allows the attribute loader to only process the classes
+that are known to have serializer attributes, improving performance in
+production.
+
+If you need to explicitly register a class that uses serializer attributes
+(e.g. from a third-party library that is not part of your service
+definitions), tag it with ``serializer.attribute_metadata`` and
+``container.excluded``:
+
+.. code-block:: yaml
+
+    # config/services.yaml
+    services:
+        Vendor\Library\SomeModel:
+            tags:
+                - { name: container.excluded }
+                - { name: serializer.attribute_metadata }
+
 .. _serializer-enabling-metadata-cache:
 
 Configuring the Metadata Cache

@@ -1646,11 +1646,6 @@ The Redis transport DSN may looks like this:
     # Redis Sentinel with ACL credentials for both master and sentinel
     MESSENGER_TRANSPORT_DSN=redis://master-user:master-pass@?host[redis1:26379]&host[redis2:26379]&sentinel_master=db&auth[]=sentinel-user&auth[]=sentinel-pass
 
-.. versionadded:: 7.4
-
-    Support for separate sentinel and master authentication was introduced in
-    Symfony 7.4.
-
 A number of options can be configured via the DSN or via the ``options`` key
 under the transport in ``messenger.yaml``:
 
