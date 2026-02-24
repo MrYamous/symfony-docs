@@ -1543,6 +1543,8 @@ to check that the translation contents are also correct:
         # checks the contents of the translation catalogues for Italian (it) and Japanese (ja) locales
         $ php bin/console lint:translations --locale=it --locale=ja
 
+.. _translation-pseudo-localization:
+
 Pseudo-localization translator
 ------------------------------
 
