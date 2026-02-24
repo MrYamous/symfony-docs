@@ -1110,27 +1110,29 @@ this is configurable for each transport:
 
     .. code-block:: yaml
 
-      # config/packages/messenger.yaml
-      framework:
-          messenger:
-              transports:
-                  async_priority_high:
-                      dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+        # config/packages/messenger.yaml
+        framework:
+            messenger:
+                transports:
+                    async_priority_high:
+                        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
 
-                      # retry strategy configuration
-                      retry_strategy:
-                          max_retries: 3          # maximum number of retries
-                          delay: 1000             # initial delay in milliseconds
-                          multiplier: 2           # increases delay exponentially before each retry
-                          max_delay: 10000        # maximum delay in milliseconds
-                          jitter: 0.1             # randomness to avoid thundering herd effect
-                          # service: null         # optionally override with a custom RetryStrategyInterface service
-
-    .. note::
-
-      You can configure the retry strategy for a Messenger transport using options like
-      ``max_retries``, ``delay``, ``multiplier``, ``max_delay`` and ``jitter``.
-      This allows controlling how failed messages are retried and the delay between attempts.
+                        # retry strategy configuration
+                        retry_strategy:
+                            max_retries: 3
+                            # time to wait before the first retry (in milliseconds)
+                            delay: 1000
+                            # multiplier applied to the delay on each subsequent retry
+                            # (e.g. with a 1000 ms delay, a 2 multiplier means: 1s, 2s, 4s, ...)
+                            multiplier: 2
+                            # maximum delay allowed regardless of the multiplier (0 means no limit)
+                            max_delay: 10000
+                            # randomness factor (between 0 and 1.0) added to each delay to
+                            # prevent multiple failed messages from being retried simultaneously
+                            jitter: 0.1
+                            # override the entire retry strategy with a custom service that
+                            # implements Symfony\Component\Messenger\Retry\RetryStrategyInterface
+                            # service: null
 
     .. code-block:: xml
 
@@ -1166,16 +1168,17 @@ this is configurable for each transport:
                 // default configuration
                 ->retryStrategy()
                     ->maxRetries(3)
-                    // milliseconds delay
+                    // time to wait before the first retry (in milliseconds)
                     ->delay(1000)
-                    // causes the delay to be higher before each retry
-                    // e.g. 1 second delay, 2 seconds, 4 seconds
+                    // multiplier applied to the delay on each subsequent retry
+                    // (e.g. with a 1000 ms delay, a 2 multiplier means: 1s, 2s, 4s, ...)
                     ->multiplier(2)
+                    // maximum delay allowed regardless of the multiplier (0 means no limit)
                     ->maxDelay(0)
-                    // applies randomness to the delay that can prevent the thundering herd effect
-                    // the value (between 0 and 1.0) is the percentage of 'delay' that will be added/subtracted
+                    // randomness factor (between 0 and 1.0) added to each delay to
+                    // prevent multiple failed messages from being retried simultaneously
                     ->jitter(0.1)
-                    // override all of this with a service that
+                    // override the entire retry strategy with a custom service that
                     // implements Symfony\Component\Messenger\Retry\RetryStrategyInterface
                     ->service(null)
             ;
