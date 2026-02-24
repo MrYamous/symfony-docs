@@ -995,19 +995,20 @@ this is configurable for each transport:
                     async_priority_high:
                         dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
 
-                        # default configuration
+                        # retry strategy configuration
                         retry_strategy:
                             max_retries: 3
-                            # milliseconds delay
+                            # time to wait before the first retry (in milliseconds)
                             delay: 1000
-                            # causes the delay to be higher before each retry
-                            # e.g. 1 second delay, 2 seconds, 4 seconds
+                            # multiplier applied to the delay on each subsequent retry
+                            # (e.g. with a 1000 ms delay, a 2 multiplier means: 1s, 2s, 4s, ...)
                             multiplier: 2
-                            max_delay: 0
-                            # applies randomness to the delay that can prevent the thundering herd effect
-                            # the value (between 0 and 1.0) is the percentage of 'delay' that will be added/subtracted
+                            # maximum delay allowed regardless of the multiplier (0 means no limit)
+                            max_delay: 10000
+                            # randomness factor (between 0 and 1.0) added to each delay to
+                            # prevent multiple failed messages from being retried simultaneously
                             jitter: 0.1
-                            # override all of this with a service that
+                            # override the entire retry strategy with a custom service that
                             # implements Symfony\Component\Messenger\Retry\RetryStrategyInterface
                             # service: null
 
@@ -1025,16 +1026,17 @@ this is configurable for each transport:
                         ],
                         'retry_strategy' => [
                             'max_retries' => 3,
-                            // milliseconds delay
+                            // time to wait before the first retry (in milliseconds)
                             'delay' => 1000,
-                            // causes the delay to be higher before each retry
-                            // e.g. 1 second delay, 2 seconds, 4 seconds
+                            // multiplier applied to the delay on each subsequent retry
+                            // (e.g. with a 1000 ms delay, a 2 multiplier means: 1s, 2s, 4s, ...)
                             'multiplier' => 2,
+                            // maximum delay allowed regardless of the multiplier (0 means no limit)
                             'max_delay' => 0,
-                            // applies randomness to the delay that can prevent the thundering herd effect
-                            // the value (between 0 and 1.0) is the percentage of 'delay' that will be added/subtracted
+                            // randomness factor (between 0 and 1.0) added to each delay to
+                            // prevent multiple failed messages from being retried simultaneously
                             'jitter' => 0.1,
-                            // override all of this with a service that
+                            // override the entire retry strategy with a custom service that
                             // implements Symfony\Component\Messenger\Retry\RetryStrategyInterface
                             // 'service' => null,
                         ],
