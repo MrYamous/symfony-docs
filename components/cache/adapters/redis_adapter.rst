@@ -148,11 +148,6 @@ master credentials in the DSN userinfo and the sentinel credentials via the
         ['auth' => ['sentinel-user', 'sentinel-pass']]
     );
 
-.. versionadded:: 7.4
-
-    Support for separate sentinel and master authentication was introduced in
-    Symfony 7.4.
-
 .. note::
 
     See the :class:`Symfony\\Component\\Cache\\Traits\\RedisTrait` for more options
