@@ -1645,8 +1645,8 @@ to wrap your HTTP client, open a connection to a server that responds with a
 Interoperability
 ----------------
 
-The component is interoperable with four different abstractions for HTTP
-clients: `Symfony Contracts`_, `PSR-18`_, `HTTPlug`_ v1/v2 and native PHP streams.
+The component is interoperable with five different abstractions for HTTP
+clients: `Symfony Contracts`_, `PSR-18`_, `HTTPlug`_ v1/v2, `Guzzle`_ and native PHP streams.
 If your application uses libraries that need any of them, the component is compatible
 with all of them. They also benefit from :ref:`autowiring aliases <service-autowiring-alias>`
 when the :doc:`framework bundle </reference/configuration/framework>` is used.
@@ -1881,6 +1881,90 @@ You can also pass a set of default options to your client thanks to the
 
 See the :ref:`auto_upgrade_http_version <auto-upgrade-http-version>` option for
 details about how the HTTP protocol version selection works.
+
+Guzzle
+~~~~~~
+
+Many third-party SDKs are tightly coupled to `Guzzle`_. The
+:class:`Symfony\\Component\\HttpClient\\GuzzleHttpHandler` replaces Guzzle's
+transport layer with Symfony's HttpClient, giving you access to features such
+as HTTP/2, retry, tracing, scoping and mocking for every request made through
+these SDKs.
+
+.. code-block:: terminal
+
+    $ composer require guzzlehttp/guzzle
+
+Once installed, create a handler and pass it to Guzzle::
+
+    use GuzzleHttp\Client;
+    use Symfony\Component\HttpClient\GuzzleHttpHandler;
+
+    $guzzle = new Client(['handler' => new GuzzleHttpHandler()]);
+
+    $response = $guzzle->request('GET', 'https://symfony.com/versions.json');
+
+When using the Symfony framework, you can register the handler as a service
+and inject any :class:`Symfony\\Contracts\\HttpClient\\HttpClientInterface`
+(including scoped clients) into it:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            GuzzleHttp\Client:
+                arguments:
+                    - handler: !service { class: Symfony\Component\HttpClient\GuzzleHttpHandler }
+            GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'
+
+    .. code-block:: php
+
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use GuzzleHttp\Client;
+        use GuzzleHttp\ClientInterface;
+        use Symfony\Component\HttpClient\GuzzleHttpHandler;
+
+        return function (ContainerConfigurator $container): void {
+            $services = $container->services();
+
+            $services->set(Client::class)
+                ->args([['handler' => inline_service(GuzzleHttpHandler::class)]]);
+
+            $services->alias(ClientInterface::class, Client::class);
+        };
+
+The handler also provides two methods for controlling the event loop when
+sending concurrent requests::
+
+    use GuzzleHttp\Client;
+    use Symfony\Component\HttpClient\GuzzleHttpHandler;
+
+    $handler = new GuzzleHttpHandler();
+    $guzzle = new Client(['handler' => $handler]);
+
+    // Queue several async requests
+    $promises = [
+        $guzzle->requestAsync('GET', 'https://example.com/api/users'),
+        $guzzle->requestAsync('GET', 'https://example.com/api/posts'),
+    ];
+
+    // Process a single batch of I/O without blocking
+    $handler->tick();
+
+    // Or block until all pending requests are complete
+    $handler->execute();
+
+The ``tick()`` method processes a single batch of network activity and Guzzle
+callbacks — useful when integrating with an existing event loop. The
+``execute()`` method blocks until every pending request has completed.
+
+.. versionadded:: 8.1
+
+    The ``GuzzleHttpHandler`` class was introduced in Symfony 8.1.
 
 Native PHP Streams
 ~~~~~~~~~~~~~~~~~~
@@ -2491,6 +2575,7 @@ body::
 .. _`PSR-17`: https://www.php-fig.org/psr/psr-17/
 .. _`PSR-18`: https://www.php-fig.org/psr/psr-18/
 .. _`HTTPlug`: https://github.com/php-http/httplug/#readme
+.. _`Guzzle`: https://github.com/guzzle/guzzle
 .. _`Symfony Contracts`: https://github.com/symfony/contracts
 .. _`libcurl`: https://curl.haxx.se/libcurl/
 .. _`amphp/http-client`: https://packagist.org/packages/amphp/http-client
