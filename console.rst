@@ -469,6 +469,12 @@ as a service, you can use normal dependency injection. Imagine you have a
         }
     }
 
+.. seealso::
+
+    Read :doc:`/console/value_resolver` for more information about advanced
+    service injection features (such as ``#[Autowire]``, ``#[Target]``, and
+    custom value resolvers).
+
 Command Lifecycle
 -----------------
 
