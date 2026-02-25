@@ -374,76 +374,54 @@ impersonator's provider and the impersonated user's provider:
                     provider: user_provider
                     # ...
 
-    .. code-block:: xml
-
-        <!-- config/packages/security.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <srv:container xmlns="http://symfony.com/schema/dic/security"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:srv="http://symfony.com/schema/dic/services"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/security
-                https://symfony.com/schema/dic/security/security-1.0.xsd">
-
-            <config>
-                <provider name="admin_provider">
-                    <entity class="App\Entity\Admin" property="username"/>
-                </provider>
-                <provider name="user_provider">
-                    <entity class="App\Entity\User" property="email"/>
-                </provider>
-                <provider name="all_users">
-                    <chain>
-                        <provider>admin_provider</provider>
-                        <provider>user_provider</provider>
-                    </chain>
-                </provider>
-
-                <firewall name="admin" pattern="^/admin" context="my_context" provider="admin_provider">
-                    <switch-user provider="all_users"/>
-                    <!-- ... -->
-                </firewall>
-                <firewall name="main" pattern="^/" context="my_context" provider="user_provider">
-                    <!-- ... -->
-                </firewall>
-            </config>
-        </srv:container>
-
     .. code-block:: php
 
         // config/packages/security.php
-        use Symfony\Config\SecurityConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (SecurityConfig $security): void {
-            $security->provider('admin_provider')
-                ->entity()
-                    ->class('App\Entity\Admin')
-                    ->property('username')
-            ;
-            $security->provider('user_provider')
-                ->entity()
-                    ->class('App\Entity\User')
-                    ->property('email')
-            ;
-            $security->provider('all_users')
-                ->chain()
-                    ->providers(['admin_provider', 'user_provider'])
-            ;
+        use App\Entity\Admin;
+        use App\Entity\User;
 
-            $security->firewall('admin')
-                ->pattern('^/admin')
-                ->context('my_context')
-                ->provider('admin_provider')
-                ->switchUser()
-                    ->provider('all_users')
-            ;
-            $security->firewall('main')
-                ->pattern('^/')
-                ->context('my_context')
-                ->provider('user_provider')
-            ;
-        };
+        return App::config([
+            'security' => [
+                // ...
+                'providers' => [
+                    'admin_provider' => [
+                        'entity' => [
+                            'class' => Admin::class,
+                            'property' => 'username',
+                        ],
+                    ],
+                    'user_provider' => [
+                        'entity' => [
+                            'class' => User::class,
+                            'property' => 'email',
+                        ],
+                    ],
+                    'all_users' => [
+                        'chain' => [
+                            'providers' => ['admin_provider', 'user_provider'],
+                        ],
+                    ],
+                ],
+
+                'firewalls' => [
+                    'admin' => [
+                        'pattern' => '^/admin',
+                        'provider' => 'admin_provider',
+                        'context' => 'my_context',
+                        'switch_user' => [
+                            'provider' => 'all_users',
+                        ],
+                    ],
+                    'main' => [
+                        'pattern' => '^/',
+                        'provider' => 'user_provider',
+                        'context' => 'my_context',
+                    ],
+                ],
+            ],
+        ]);
 
 The chain provider ``all_users`` allows the ``switch_user`` listener to load
 both admin users (when exiting impersonation) and regular users (when starting
