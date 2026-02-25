@@ -1246,6 +1246,28 @@ the ``failure_transport`` configured at the transport level.
     # remove a message without retrying it from "failure_transport"
     $ php bin/console messenger:failed:remove 20 --transport=failure_transport
 
+Handling Decode Failures
+........................
+
+Previously, when a message could not be decoded (e.g. because its PHP class was
+removed or renamed after a deployment), Messenger would throw a
+``MessageDecodingFailedException`` inside the receiver and the message was
+silently deleted from the queue, making it unrecoverable.
+
+Since Symfony 8.1, decode failures are handled like any other failure: the
+undecodable message is wrapped in an envelope and routed through the normal
+retry/failure transport pipeline. Once the underlying issue is fixed (e.g. the
+missing class is restored after a new deployment), retrying the message from the
+failure transport will automatically re-decode it.
+
+This works out of the box with the default middleware stack — no additional
+configuration is needed.
+
+.. versionadded:: 8.1
+
+    Routing decode failures through the retry/failure transport was introduced
+    in Symfony 8.1.
+
 .. _messenger-transports-config:
 
 Transport Configuration
@@ -2931,6 +2953,14 @@ for each bus looks like this:
 #. ``failed_message_processing_middleware`` - processes messages that are being
    retried via the :ref:`failure transport <messenger-failure-transport>` to make
    them properly function as if they were being received from their original transport;
+
+#. ``decode_failed_message`` - when a message cannot be decoded (e.g. its class
+   was removed), this middleware attempts to re-decode it using the transport's
+   serializer, enabling recovery after a fix is deployed;
+
+   .. versionadded:: 8.1
+
+       The ``decode_failed_message`` middleware was introduced in Symfony 8.1.
 
 #. Your own collection of middleware_;
 
