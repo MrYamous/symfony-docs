@@ -92,38 +92,28 @@ Then configure the replicas in your Doctrine configuration:
                         replica1:
                             url: '%env(resolve:DATABASE_REPLICA_URL)%'
 
-    .. code-block:: xml
-
-        <!-- config/packages/doctrine.xml -->
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:doctrine="http://symfony.com/schema/dic/doctrine"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/doctrine
-                https://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
-
-            <doctrine:config>
-                <doctrine:dbal url="%env(resolve:DATABASE_URL)%">
-                    <doctrine:replica name="replica1"
-                        url="%env(resolve:DATABASE_REPLICA_URL)%"/>
-                </doctrine:dbal>
-            </doctrine:config>
-        </container>
-
     .. code-block:: php
 
         // config/packages/doctrine.php
-        use Symfony\Config\DoctrineConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (DoctrineConfig $doctrine): void {
-            $connection = $doctrine->dbal()
-                ->connection('default')
-                ->url('%env(resolve:DATABASE_URL)%');
-
-            $connection->replica('replica1')
-                ->url('%env(resolve:DATABASE_REPLICA_URL)%');
-        };
+        return App::config([
+            'doctrine' => [
+                'dbal' => [
+                    'connections' => [
+                        'default' => [
+                            'url' => env('DATABASE_URL')->resolve(),
+                            'replica' => [
+                                'replica1' => [
+                                    'url' => env('DATABASE_REPLICA_URL')->resolve(),
+                                ],
+                            ],
+                        ],
+                    ],
+                    'default_connection' => 'default',
+                ],
+            ],
+        ]);
 
 You can add as many replicas as needed (e.g. ``replica2``, ``replica3``). When
 multiple replicas are configured, Doctrine randomly selects one when connecting
