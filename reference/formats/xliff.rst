@@ -45,13 +45,18 @@ loaded/dumped inside a Symfony application:
 Plural, Gender and Select (PGS)
 -------------------------------
 
+.. versionadded:: 8.1
+
+    Support for the XLIFF PGS module was introduced in Symfony 8.1.
+
 XLIFF 2.2 introduces the `PGS module`_ (Plural, Gender and Select) to handle
 plural, gender and select variations directly in the translation file. When the
 XLIFF loader encounters PGS attributes, it automatically converts them into
 ICU MessageFormat strings and registers them in the ``+intl-icu`` domain.
 
-See :doc:`/reference/formats/message_format` for more details on the
-ICU MessageFormat syntax.
+.. seealso::
+
+    Read more about :doc:`using ICU message format in Symfony </reference/formats/message_format>`.
 
 Here is an example of a plural translation using PGS:
 
@@ -116,10 +121,6 @@ Gender variations work the same way:
     Multiple switches can be combined in a single ``pgs:switch`` attribute
     (e.g. ``pgs:switch="gender:host_gender plural:guest_count"``). Symfony
     nests the ICU structures automatically.
-
-.. versionadded:: 8.1
-
-    Support for the XLIFF PGS module was introduced in Symfony 8.1.
 
 .. _XLIFF: https://docs.oasis-open.org/xliff/
 .. _PGS module: https://docs.oasis-open.org/xliff/xliff-core/v2.2/xliff-core-v2.2.html
