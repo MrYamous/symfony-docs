@@ -1885,6 +1885,10 @@ details about how the HTTP protocol version selection works.
 Guzzle
 ~~~~~~
 
+.. versionadded:: 8.1
+
+    The ``GuzzleHttpHandler`` class was introduced in Symfony 8.1.
+
 Many third-party SDKs are tightly coupled to `Guzzle`_. The
 :class:`Symfony\\Component\\HttpClient\\GuzzleHttpHandler` replaces Guzzle's
 transport layer with Symfony's HttpClient, giving you access to features such
@@ -1946,25 +1950,21 @@ sending concurrent requests::
     $handler = new GuzzleHttpHandler();
     $guzzle = new Client(['handler' => $handler]);
 
-    // Queue several async requests
+    // queue several async requests
     $promises = [
         $guzzle->requestAsync('GET', 'https://example.com/api/users'),
         $guzzle->requestAsync('GET', 'https://example.com/api/posts'),
     ];
 
-    // Process a single batch of I/O without blocking
+    // process a single batch of I/O without blocking
     $handler->tick();
 
-    // Or block until all pending requests are complete
+    // or block until all pending requests are complete
     $handler->execute();
 
 The ``tick()`` method processes a single batch of network activity and Guzzle
-callbacks — useful when integrating with an existing event loop. The
+callbacks. This is useful when integrating with an existing event loop. The
 ``execute()`` method blocks until every pending request has completed.
-
-.. versionadded:: 8.1
-
-    The ``GuzzleHttpHandler`` class was introduced in Symfony 8.1.
 
 Native PHP Streams
 ~~~~~~~~~~~~~~~~~~
