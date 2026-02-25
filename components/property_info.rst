@@ -380,7 +380,7 @@ return and scalar types::
     Support for PHP 8.4 property hook settable types in ``ReflectionExtractor``
     was introduced in Symfony 8.1.
 
-The ``ReflectionExtractor`` also supports `PHP 8.4 property hooks`_. When a
+The ``ReflectionExtractor`` also supports `PHP property hooks`_. When a
 property defines a ``set`` hook with a parameter type that differs from the
 property type, ``getType()`` returns the type of the ``set`` hook parameter
 instead.
@@ -580,5 +580,5 @@ service by defining it as a service with one or more of the following
 .. _`symfony/serializer`: https://packagist.org/packages/symfony/serializer
 .. _`symfony/doctrine-bridge`: https://packagist.org/packages/symfony/doctrine-bridge
 .. _`doctrine/orm`: https://packagist.org/packages/doctrine/orm
-.. _`PHP 8.4 property hooks`: https://www.php.net/manual/en/language.oop5.property-hooks.php
+.. _`PHP property hooks`: https://www.php.net/manual/en/language.oop5.property-hooks.php
 .. _`phpDocumentor`: https://www.phpdoc.org/
