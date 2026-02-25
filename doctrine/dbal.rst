@@ -60,6 +60,153 @@ object::
 
 This will pass you the ``database_connection`` service.
 
+.. _doctrine-dbal-read-replicas:
+
+Using Primary/Replica Connections (Read Replicas)
+-------------------------------------------------
+
+When your application uses a database cluster with read replicas, you can
+configure Doctrine to automatically route read queries to a replica and
+write queries to the primary database. This reduces the load on the primary
+database and improves performance for read-heavy applications.
+
+First, define a ``DATABASE_REPLICA_URL`` environment variable in ``.env``:
+
+.. code-block:: text
+
+    # .env
+    DATABASE_REPLICA_URL="mysql://replica_user:replica_password@replica-host:3306/db_name?serverVersion=8.0.37"
+
+Then configure the replicas in your Doctrine configuration:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/doctrine.yaml
+        when@prod:
+            doctrine:
+                dbal:
+                    url: '%env(resolve:DATABASE_URL)%'
+                    replicas:
+                        replica1:
+                            url: '%env(resolve:DATABASE_REPLICA_URL)%'
+
+    .. code-block:: xml
+
+        <!-- config/packages/doctrine.xml -->
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:doctrine="http://symfony.com/schema/dic/doctrine"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/doctrine
+                https://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
+
+            <doctrine:config>
+                <doctrine:dbal url="%env(resolve:DATABASE_URL)%">
+                    <doctrine:replica name="replica1"
+                        url="%env(resolve:DATABASE_REPLICA_URL)%"/>
+                </doctrine:dbal>
+            </doctrine:config>
+        </container>
+
+    .. code-block:: php
+
+        // config/packages/doctrine.php
+        use Symfony\Config\DoctrineConfig;
+
+        return static function (DoctrineConfig $doctrine): void {
+            $connection = $doctrine->dbal()
+                ->connection('default')
+                ->url('%env(resolve:DATABASE_URL)%');
+
+            $connection->replica('replica1')
+                ->url('%env(resolve:DATABASE_REPLICA_URL)%');
+        };
+
+You can add as many replicas as needed (e.g. ``replica2``, ``replica3``). When
+multiple replicas are configured, Doctrine randomly selects one when connecting
+to a replica and keeps using it for subsequent read operations on that connection.
+
+With this configuration, Doctrine uses the ``PrimaryReadReplicaConnection`` wrapper
+class from Doctrine DBAL, which decides where to route each database operation:
+
+* **Read operations** (e.g. ``fetchAllAssociative()``, ``executeQuery()``)
+  are sent to a replica;
+* **Write operations** (e.g. ``executeStatement()``) and transactions are
+  sent to the primary;
+* Once the primary has been used, **all subsequent operations** on that
+  connection use the primary too, ensuring read-your-writes consistency.
+
+.. note::
+
+    The routing is based on which DBAL method your code calls, not on
+    SQL-level detection. If you execute a write query through a read method
+    like ``executeQuery()``, it will be sent to a replica. Always use the
+    appropriate DBAL methods (``executeStatement()`` for writes,
+    ``executeQuery()`` for reads) to ensure correct routing.
+
+.. note::
+
+    In long-running processes (e.g. messenger workers), the connection
+    instance persists across multiple messages, so the "switch to primary"
+    behavior applies for the lifetime of that connection instance, not just
+    a single HTTP request.
+
+.. tip::
+
+    Set the ``keep_replica`` option to ``true`` to keep using the replica
+    for read queries even after a write operation. This is useful when
+    eventual consistency is acceptable for subsequent reads:
+
+    .. code-block:: yaml
+
+        # config/packages/doctrine.yaml
+        when@prod:
+            doctrine:
+                dbal:
+                    url: '%env(resolve:DATABASE_URL)%'
+                    keep_replica: true
+                    replicas:
+                        replica1:
+                            url: '%env(resolve:DATABASE_REPLICA_URL)%'
+
+Forcing the Primary Connection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In some cases, you may need to force the primary connection for a read
+query (e.g. right after a write to ensure data consistency). You can do
+so by calling the ``ensureConnectedToPrimary()`` method::
+
+    // src/Controller/ProductController.php
+    namespace App\Controller;
+
+    use Doctrine\DBAL\Connection;
+    use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class ProductController extends AbstractController
+    {
+        public function index(Connection $connection): Response
+        {
+            if ($connection instanceof PrimaryReadReplicaConnection) {
+                $connection->ensureConnectedToPrimary();
+            }
+
+            // the following query will be executed on the primary
+            $result = $connection->fetchAllAssociative('SELECT * FROM product');
+
+            // ...
+        }
+    }
+
+The ``instanceof`` check ensures the code works in all environments: in
+production where a replica is configured, ``$connection`` is an instance
+of ``PrimaryReadReplicaConnection``; in development without replicas, it
+is a regular ``Connection`` instance.
+
 Registering custom Mapping Types
 --------------------------------
 
