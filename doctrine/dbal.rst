@@ -126,18 +126,33 @@ Then configure the replicas in your Doctrine configuration:
         };
 
 You can add as many replicas as needed (e.g. ``replica2``, ``replica3``). When
-multiple replicas are configured, Doctrine picks one randomly for each
-connection.
+multiple replicas are configured, Doctrine randomly selects one when connecting
+to a replica and keeps using it for subsequent read operations on that connection.
 
-With this configuration, Doctrine uses the
-``PrimaryReadReplicaConnection`` wrapper class from Doctrine DBAL, which
-routes queries automatically:
+With this configuration, Doctrine uses the ``PrimaryReadReplicaConnection`` wrapper
+class from Doctrine DBAL, which decides where to route each database operation:
 
-* **Read queries** (``SELECT``) are sent to a replica;
-* **Write queries** (``INSERT``, ``UPDATE``, ``DELETE``) and transactions
-  are sent to the primary;
-* Once the primary has been used during a request, **all subsequent queries**
-  use the primary too, ensuring read-your-writes consistency.
+* **Read operations** (e.g. ``fetchAllAssociative()``, ``executeQuery()``)
+  are sent to a replica;
+* **Write operations** (e.g. ``executeStatement()``) and transactions are
+  sent to the primary;
+* Once the primary has been used, **all subsequent operations** on that
+  connection use the primary too, ensuring read-your-writes consistency.
+
+.. note::
+
+    The routing is based on which DBAL method your code calls, not on
+    SQL-level detection. If you execute a write query through a read method
+    like ``executeQuery()``, it will be sent to a replica. Always use the
+    appropriate DBAL methods (``executeStatement()`` for writes,
+    ``executeQuery()`` for reads) to ensure correct routing.
+
+.. note::
+
+    In long-running processes (e.g. messenger workers), the connection
+    instance persists across multiple messages, so the "switch to primary"
+    behavior applies for the lifetime of that connection instance, not just
+    a single HTTP request.
 
 .. tip::
 
@@ -161,7 +176,7 @@ Forcing the Primary Connection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In some cases, you may need to force the primary connection for a read
-query (e.g. right after a write, to ensure data consistency). You can do
+query (e.g. right after a write to ensure data consistency). You can do
 so by calling the ``ensureConnectedToPrimary()`` method::
 
     // src/Controller/ProductController.php
