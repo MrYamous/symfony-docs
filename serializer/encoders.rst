@@ -426,4 +426,4 @@ Now you'll be able to serialize and deserialize NEON!
 .. _`DOM XML_* constants`: https://www.php.net/manual/en/dom.constants.php
 .. _`options with libxml`: https://www.php.net/manual/en/libxml.constants.php
 .. _`a CDATA section`: https://en.wikipedia.org/wiki/CDATA
-.. _NEON: https://ne-on.org/
+.. _NEON: https://neon.nette.org/
