@@ -637,7 +637,7 @@ Transforming Values on the Target Class
 The ``transform`` option also works in source-based mapping, allowing you to
 transform values directly on the target class. This is useful when the source
 has no dedicated class (e.g. data decoded from JSON or CSV) or when you want
-to keep transformation logic close to the target.
+to keep the transformation logic close to the target.
 
 Consider a JSON payload where prices contain a currency symbol that must be
 stripped before assignment::
@@ -651,7 +651,7 @@ stripped before assignment::
         public string $price = '';
     }
 
-You can define the mapping and transform on the target::
+You can define the mapping and transformation on the target::
 
     // src/Entity/Product.php
     namespace App\Entity;
@@ -689,7 +689,7 @@ Using it in practice::
 
     All the transformation options described in the
     :ref:`Transforming Values <object_mapper-transforming-values>` section
-    (callables, services implementing ``TransformCallableInterface`` and
+    (callables, services implementing ``TransformCallableInterface``, and
     class-level transforms) are equally supported in source-based mapping.
 
 Handling Recursion
