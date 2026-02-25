@@ -325,6 +325,8 @@ exception. To avoid this, configure Symfony's PropertyAccess component in
 This setting ensures that the mapper skips invalid properties gracefully
 instead of throwing an exception.
 
+.. _object_mapper-transforming-values:
+
 Transforming Values
 -------------------
 
@@ -606,6 +608,67 @@ Using it in practice::
 When using source-based mapping, the ``ObjectMapper`` will automatically use the
 target's ``#[Map(source: ...)]`` attributes if no mapping is defined on the
 source class.
+
+Transforming Values on the Target Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``transform`` option also works in source-based mapping, allowing you to
+transform values directly on the target class. This is useful when the source
+has no dedicated class (e.g. data decoded from JSON or CSV) or when you want
+to keep the transformation logic close to the target.
+
+Consider a JSON payload where prices contain a currency symbol that must be
+stripped before assignment::
+
+    // src/Api/RawProduct.php
+    namespace App\Api;
+
+    class RawProduct
+    {
+        public string $name = '';
+        public string $price = '';
+    }
+
+You can define the mapping and transformation on the target::
+
+    // src/Entity/Product.php
+    namespace App\Entity;
+
+    use App\Api\RawProduct;
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(source: RawProduct::class)]
+    class Product
+    {
+        public string $name = '';
+
+        #[Map(source: 'price', transform: [self::class, 'cleanPrice'])]
+        public int $price = 0;
+
+        public static function cleanPrice(string $value): int
+        {
+            return (int) preg_replace('/[^0-9]/', '', $value);
+        }
+    }
+
+Using it in practice::
+
+    $raw = new RawProduct();
+    $raw->name = 'Widget';
+    $raw->price = '$200';
+
+    $mapper = new ObjectMapper();
+    $product = $mapper->map($raw, Product::class);
+
+    // $product->name = 'Widget'
+    // $product->price = 200
+
+.. tip::
+
+    All the transformation options described in the
+    :ref:`Transforming Values <object_mapper-transforming-values>` section
+    (callables, services implementing ``TransformCallableInterface``, and
+    class-level transforms) are equally supported in source-based mapping.
 
 Handling Recursion
 ------------------
