@@ -79,9 +79,10 @@ the session lasts using a cookie with the ``remember_me`` firewall option:
 
 .. versionadded:: 7.2
 
-    The ``secret`` option is no longer required starting from Symfony 7.2. By
-    default, ``%kernel.secret%`` is used, which is defined using the
-    ``APP_SECRET`` environment variable.
+    The ``secret`` option defaults to ``%kernel.secret%`` and no longer
+    needs to be set explicitly. However, the ``APP_SECRET`` environment
+    variable **must** still be defined in your environment (especially in
+    production), as it is used as the value for ``kernel.secret``.
 
 After enabling the ``remember_me`` system in the configuration, there are a
 couple more things to do before remember me works correctly:
