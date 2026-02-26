@@ -785,7 +785,7 @@ method.
 .. _reference-enabled-locales:
 
 enabled_locales
-...............
+~~~~~~~~~~~~~~~
 
 **type**: ``array`` **default**: ``[]`` (empty array = enable all locales)
 
@@ -855,7 +855,7 @@ For example, if you define this value as ``['ar', 'he', 'ja', 'zh']``, the
 user makes requests with a locale not included in this option, they'll see a 404 error.
 
 set_content_language_from_locale
-................................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **type**: ``boolean`` **default**: ``false``
 
@@ -863,7 +863,7 @@ If this option is set to ``true``, the response will have a ``Content-Language``
 HTTP header set with the ``Request`` locale.
 
 set_locale_from_accept_language
-...............................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **type**: ``boolean`` **default**: ``false``
 
