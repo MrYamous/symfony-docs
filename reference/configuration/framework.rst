@@ -632,6 +632,15 @@ the ``dev`` environment).
     given the adapter they are based on. Internally, a pool wraps the definition
     of an adapter.
 
+default_doctrine_dbal_provider
+..............................
+
+**type**: ``string`` **default**: ``database_connection``
+
+The service ID of the Doctrine DBAL connection to use as the default cache
+provider. The provider is available as the ``cache.default_doctrine_dbal_provider``
+service.
+
 default_doctrine_provider
 .........................
 
@@ -671,6 +680,14 @@ default_redis_provider
 **type**: ``string`` **default**: ``redis://localhost``
 
 The DSN to use by the Redis provider. The provider is available as the ``cache.default_redis_provider``
+service.
+
+default_valkey_provider
+.......................
+
+**type**: ``string`` **default**: ``valkey://localhost``
+
+The DSN to use by the Valkey provider. The provider is available as the ``cache.default_valkey_provider``
 service.
 
 directory
@@ -1849,6 +1866,14 @@ Defines the maximum amount of simultaneously open connections to a single host
 also applies for proxy connections, where the proxy is considered to be the host
 for which this limit is applied.
 
+mock_response_factory
+.....................
+
+**type**: ``string``
+
+The ID of the service that should generate mock responses. The service must
+be either an invokable or an iterable.
+
 max_redirects
 .............
 
@@ -2787,29 +2812,82 @@ rate_limiter
 
 .. _reference-rate-limiter-name:
 
-name
-....
+limiters
+........
 
 **type**: ``prototype``
 
-Name of the rate limiter you want to create.
+A list of rate limiters to create, keyed by the limiter name.
+
+cache_pool
+""""""""""
+
+**type**: ``string`` **default**: ``cache.rate_limiter``
+
+The cache pool to use for storing the current limiter state.
+
+interval
+""""""""
+
+**type**: ``string``
+
+Configures the fixed interval if ``policy`` is set to ``fixed_window`` or
+``sliding_window``. The value must be a number followed by ``second``, ``minute``,
+``hour``, ``day``, ``week`` or ``month`` (or their plural equivalent).
+
+limit
+"""""
+
+**type**: ``integer``
+
+The maximum allowed hits in a fixed interval or burst. Required when the
+``policy`` is not ``compound`` or ``no_limit``.
+
+limiters
+""""""""
+
+**type**: ``array``
+
+The limiter names to use when using the ``compound`` policy.
 
 lock_factory
 """"""""""""
 
-**type**: ``string`` **default:** ``lock.factory``
+**type**: ``string`` **default**: ``auto``
 
-The service that is used to create a lock. The service has to be an instance of
-the :class:`Symfony\\Component\\Lock\\LockFactory` class.
+The service ID of the lock factory used by this limiter (or ``null`` to disable
+locking).
 
 policy
 """"""
 
 **type**: ``string`` **required**
 
-The name of the rate limiting algorithm to use. Example names are ``fixed_window``,
-``sliding_window`` and ``no_limit``. See :ref:`Rate Limiter Policies <rate-limiter-policies>`)
+The name of the rate limiting algorithm to use. Allowed values are ``fixed_window``,
+``token_bucket``, ``sliding_window``, ``compound`` and ``no_limit``.
+See :ref:`Rate Limiter Policies <rate-limiter-policies>`)
 for more information.
+
+rate
+""""
+
+**type**: ``array``
+
+Configures the fill rate if ``policy`` is set to ``token_bucket``.
+
+* ``interval`` (**type**: ``string``) the rate interval. The value must be a
+  number followed by ``second``, ``minute``, ``hour``, ``day``, ``week`` or
+  ``month`` (or their plural equivalent).
+* ``amount`` (**type**: ``integer`` **default**: ``1``) the amount of tokens to
+  add each interval.
+
+storage_service
+"""""""""""""""
+
+**type**: ``string`` **default**: ``null``
+
+The service ID of a custom storage implementation. This takes precedence over
+any configured ``cache_pool``.
 
 remote-event
 ~~~~~~~~~~~~
@@ -2825,7 +2903,6 @@ Whether to enable or not the RemoteEvent support.
 
     For more details, see the :doc:`Webhook </webhook>`
     documentation.
-
 request
 ~~~~~~~
 
@@ -3215,6 +3292,13 @@ paths
 This option allows you to define an array of paths with files or directories where
 the component will look for additional serialization files.
 
+max_depth_handler
+.................
+
+**type**: ``string``
+
+The service ID used as the max depth handler of the default serializer.
+
 .. _reference-serializer-name_converter:
 
 name_converter
@@ -3230,6 +3314,25 @@ value.
 .. seealso::
 
     For more information, see :ref:`serializer-name-conversion`.
+
+named_serializers
+.................
+
+**type**: ``array``
+
+A list of named serializers to create, keyed by the serializer name. The
+``default`` name is reserved and cannot be used.
+
+Each named serializer can define the following options:
+
+* ``name_converter`` (**type**: ``string``) the service ID of a custom name
+  converter.
+* ``default_context`` (**type**: ``array`` **default**: ``[]``) a map with
+  default context options.
+* ``include_built_in_normalizers`` (**type**: ``boolean`` **default**: ``true``)
+  whether to include the built-in normalizers.
+* ``include_built_in_encoders`` (**type**: ``boolean`` **default**: ``true``)
+  whether to include the built-in encoders.
 
 .. _config-framework-session:
 
@@ -3733,6 +3836,21 @@ formatter
 
 The ID of the service used to format translation messages. The service class
 must implement the :class:`Symfony\\Component\\Translation\\Formatter\\MessageFormatterInterface`.
+
+globals
+.......
+
+**type**: ``array``
+
+Global parameters available in all translations. Each global parameter can be
+either a simple value or an array with the following options:
+
+* ``value`` (**type**: ``mixed``) the direct value of the parameter.
+* ``message`` (**type**: ``string``) a translation message key.
+* ``parameters`` (**type**: ``array``) the translation parameters.
+* ``domain`` (**type**: ``string``) the translation domain.
+
+Each global parameter must define either ``value`` or ``message``, but not both.
 
 .. _reference-framework-translator-logging:
 
@@ -4327,12 +4445,12 @@ automatically set to ``true`` when one of the child settings is configured.
 
 .. _reference-workflows-name:
 
-name
-....
+workflows
+.........
 
 **type**: ``prototype``
 
-Name of the workflow you want to create.
+A list of workflows to create, keyed by the workflow name.
 
 audit_trail
 """""""""""
@@ -4341,6 +4459,24 @@ audit_trail
 
 If set to ``true``, the :class:`Symfony\\Component\\Workflow\\EventListener\\AuditTrailListener`
 will be enabled.
+
+definition_validators
+"""""""""""""""""""""
+
+**type**: ``array``
+
+A list of fully-qualified class names of definition validators. Each class must
+implement :class:`Symfony\\Component\\Workflow\\Validator\\DefinitionValidatorInterface`
+and its constructor must have no required parameters.
+
+events_to_dispatch
+""""""""""""""""""
+
+**type**: ``array`` **default**: ``null``
+
+Selects which transition events should be dispatched for this workflow.
+If ``null``, all events are dispatched. Otherwise, it must be an array of
+workflow event names (e.g. ``['workflow.enter', 'workflow.transition']``).
 
 initial_marking
 """""""""""""""
