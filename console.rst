@@ -513,15 +513,13 @@ console::
     // tests/Command/CreateUserCommandTest.php
     namespace App\Tests\Command;
 
-    use Symfony\Bundle\FrameworkBundle\Console\Application;
     use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-    use Symfony\Component\Console\Tester\CommandTester;
 
     class CreateUserCommandTest extends KernelTestCase
     {
         public function testExecute(): void
         {
-            $commandTester = static::executeCommand('app:create-user', [
+            $result = static::runCommand('app:create-user', [
                 // pass arguments to the helper
                 'username' => 'Wouter',
 
@@ -531,21 +529,14 @@ console::
                 // e.g: '--some-option' => ['option_value'],
             ]);
 
-            // this code is equivalent to run commands and was used in previous Symfony versions:
-            // self::bootKernel();
-            // $application = new Application(self::$kernel);
-            // $command = $application->find('app:create-user');
-            // $commandTester = new CommandTester($command);
-            // $commandTester->execute(['username' => 'Wouter']);
-
-            $commandTester->assertCommandIsSuccessful();
+            $this->assertIsSuccessful($result);
 
             // you can also check for a failed or invalid command:
-            // $commandTester->assertCommandFailed();
-            // $commandTester->assertCommandIsInvalid();
+            // $this->assertFailed($result);
+            // $this->assertIsInvalid($result);
 
             // the output of the command in the console
-            $output = $commandTester->getDisplay();
+            $output = $result->getOutput();
             $this->assertStringContainsString('Username: Wouter', $output);
 
             // ...
@@ -554,12 +545,7 @@ console::
 
 .. versionadded:: 8.1
 
-    The ``executeCommand()`` method was introduced in Symfony 8.1.
-
-.. versionadded:: 8.1
-
-    The ``assertCommandFailed()`` and ``assertCommandIsInvalid()`` methods were
-    introduced in Symfony 8.1.
+    The ``runCommand()`` method was introduced in Symfony 8.1.
 
 If you are using a :doc:`single-command application </components/console/single_command_tool>`,
 call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``.
