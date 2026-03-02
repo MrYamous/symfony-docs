@@ -6,7 +6,7 @@ The preferred way to develop your Symfony application is to use
 
 However, when running the application in the production environment, you'll need
 to use a fully-featured web server. This article describes how to use Symfony
-with Apache, Nginx or Caddy.
+with FrankenPHP, Caddy, Nginx or Apache.
 
 .. sidebar:: The public directory
 
@@ -15,17 +15,68 @@ with Apache, Nginx or Caddy.
     also where the front controller (``index.php``) lives.
 
     The public directory serves as the document root when configuring your
-    web server. In the examples below, the ``public/`` directory will be the
-    document root. This directory is ``/var/www/project/public/``.
+    web server. In the examples below, this will be ``/var/www/project/public/``.
 
     If your hosting provider requires you to change the ``public/`` directory to
     another location (e.g. ``public_html/``) make sure you
     :ref:`override the location of the public/ directory <override-web-dir>`.
 
+FrankenPHP / Caddy
+------------------
+
+When using FrankenPHP (which includes the Caddy web server and PHP with Zend
+Thread Safety, also known as PHP-ZTS), you can use a configuration like this:
+
+.. code-block:: nginx
+
+    # /etc/frankenphp/Caddyfile
+    example.com, www.example.com {
+        root * /var/www/project/public
+
+        # serve files directly if they can be found (e.g. CSS or JS files in public/)
+        encode zstd br gzip
+        file_server
+
+        # otherwise, use FrankenPHP's built-in PHP-ZTS
+        php_server {
+            # only fall back to root index.php aka front controller.
+            try_files {path} index.php
+
+            # optionally set the value of the environment variables used in the application
+            # env APP_ENV "prod"
+            # env APP_SECRET "<app-secret-id>"
+            # env DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name"
+
+            # configure the FastCGI to resolve any symlinks in the root path;
+            # this ensures that OpCache is using the destination filenames,
+            # instead of the symlinks, to cache opcodes and php files see
+            # https://caddy.community/t/root-symlink-folder-updates-and-caddy-reload-not-working/10557
+            resolve_root_symlink
+        }
+
+        # return 404 for all other php files not matching the front controller
+        # this prevents access to other php files you don't want to be accessible.
+        @phpFile {
+            path *.php*
+        }
+        error @phpFile "Not found" 404
+    }
+
+If you want to use Caddy without FrankenPHP, you need to configure PHP-FPM (see
+below) and change the ``php_server {`` line in the above Caddyfile to:
+
+.. code-block:: nginx
+
+    # (replace "unix//var/..." with "127.0.0.1:9000" when using TCP)
+    php_fastcgi unix//var/run/php/php8.3-fpm.sock {
+
+See the `FrankenPHP documentation`_ or `Caddy documentation`_ for more examples,
+such as using Caddy in a container infrastructure.
+
 Configuring PHP-FPM
 -------------------
 
-All configuration examples below use the PHP FastCGI process manager
+Both Nginx and Apache use the PHP FastCGI process manager
 (PHP-FPM). Ensure that you have installed PHP-FPM (for example, on a Debian
 based system you have to install the ``php-fpm`` package).
 
@@ -201,49 +252,7 @@ directive to pass requests for PHP files to PHP FPM:
     In production, however, it's recommended to move these rules to the main
     Apache configuration file (as shown above) to improve performance.
 
-Caddy
------
-
-When using Caddy on the server, you can use a configuration like this:
-
-.. code-block:: nginx
-
-    # /etc/caddy/Caddyfile
-    example.com, www.example.com {
-        root * /var/www/project/public
-
-        # serve files directly if they can be found (e.g. CSS or JS files in public/)
-        encode zstd gzip
-        file_server
-
-        # otherwise, use PHP-FPM (replace "unix//var/..." with "127.0.0.1:9000" when using TCP)
-        php_fastcgi unix//var/run/php/php8.3-fpm.sock {
-            # only fall back to root index.php aka front controller.
-            try_files {path} index.php
-
-            # optionally set the value of the environment variables used in the application
-            # env APP_ENV "prod"
-            # env APP_SECRET "<app-secret-id>"
-            # env DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name"
-
-            # Configure the FastCGI to resolve any symlinks in the root path.
-            # This ensures that OpCache is using the destination filenames,
-            # instead of the symlinks, to cache opcodes and php files see
-            # https://caddy.community/t/root-symlink-folder-updates-and-caddy-reload-not-working/10557
-            resolve_root_symlink
-        }
-
-        # return 404 for all other php files not matching the front controller
-        # this prevents access to other php files you don't want to be accessible.
-        @phpFile {
-            path *.php*
-        }
-        error @phpFile "Not found" 404
-    }
-
-See the `official Caddy documentation`_ for more examples, such as using
-Caddy in a container infrastructure.
-
 .. _`Nginx documentation`: https://www.nginx.com/resources/wiki/start/topics/recipes/symfony/
 .. _`How to run Symfony applications using NGINX Unit`: https://unit.nginx.org/howto/symfony/
-.. _`official Caddy documentation`: https://caddyserver.com/docs/
+.. _`FrankenPHP documentation`: https://frankenphp.dev/docs/
+.. _`Caddy documentation`: https://caddyserver.com/docs/
