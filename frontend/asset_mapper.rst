@@ -638,6 +638,81 @@ the page. If you use a dynamic import to lazily-load a JavaScript file and that
 file imports a CSS file (using the non-dynamic ``import`` syntax), that CSS file
 will also be downloaded asynchronously.
 
+Importing JSON files
+--------------------
+
+.. versionadded:: 7.4
+
+    Support for importing JSON assets was added in Symfony 7.4.
+
+AssetMapper allows you to import JSON assets directly from your JavaScript code.
+While modern browsers support the native ``import data from './foo.json' with { type: 'json' }`` syntax,
+this feature is not yet widely supported. AssetMapper provides a fully compatible alternative
+without requiring any bundler.
+
+AssetMapper provides a more compatible alternative by allowing you to import JSON
+files using the standard import syntax:
+
+.. code-block:: javascript
+
+    // assets/app.js
+    import dataPromise from './data.json';
+
+    // The import returns a Promise that resolves to the JSON content
+    const data = await dataPromise;
+    console.log(data.name); // Access your JSON data
+
+Usage Example
+~~~~~~~~~~~~~
+
+Consider a JSON file containing user data:
+
+.. code-block:: json
+
+    {
+        "users": [
+            {"id": 1, "name": "Alice", "email": "alice@example.com"},
+            {"id": 2, "name": "Bob", "email": "bob@example.com"}
+        ]
+    }
+
+You can import and use this data in your JavaScript:
+
+.. code-block:: javascript
+
+    // assets/controllers/user-list-controller.js
+    import usersPromise from '../data/users.json';
+
+    async function displayUsers() {
+        const userData = await usersPromise;
+
+        userData.users.forEach(user => {
+            console.log(`${user.name}: ${user.email}`);
+        });
+    }
+
+    displayUsers();
+
+How it Works
+~~~~~~~~~~~~
+
+When you import a JSON file, AssetMapper:
+
+1. **Detects the JSON import** in your JavaScript files during asset processing
+2. **Creates a JavaScript module** that exports a Promise resolving to the JSON content
+3. **Adds it to the importmap** so your browser can locate and load it correctly
+4. **Versions the file** like any other asset, ensuring proper cache busting
+
+This approach works in all modern browsers without requiring native JSON import
+support, making it a reliable alternative to the newer ``with { type: 'json' }``
+syntax.
+
+.. note::
+
+    Like CSS imports, JSON imports are processed by AssetMapper and added to the
+    importmap automatically. The imported JSON assets are also versioned, so any
+    changes to the JSON content will result in a new versioned filename.
+
 Issues and Debugging
 --------------------
 
