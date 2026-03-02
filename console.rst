@@ -706,6 +706,9 @@ and ``expectedDisplay``. Only the provided arguments are asserted.
     The ``CommandTester::run()`` method, the ``ExecutionResult`` class and the
     ``ConsoleAssertionsTrait`` were introduced in Symfony 8.1.
 
+Getting Terminal Information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 When testing your commands, it could be useful to understand how your command
 reacts on different settings like the width and the height of the terminal, or
 even the color mode being used. You have access to such information thanks to the
