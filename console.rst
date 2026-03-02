@@ -617,6 +617,95 @@ call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``
 
         $commandTester->execute([], ['capture_stderr_separately' => true]);
 
+Result-Based Testing API
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``CommandTester`` also provides a ``run()`` method that returns an
+:class:`Symfony\\Component\\Console\\Tester\\ExecutionResult` object. Unlike
+``execute()``, this method is stateless and gives access to stdout, stderr and
+the combined display at the same time::
+
+    // tests/Command/CreateUserCommandTest.php
+    namespace App\Tests\Command;
+
+    use Symfony\Bundle\FrameworkBundle\Console\Application;
+    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Symfony\Component\Console\Tester\CommandTester;
+
+    class CreateUserCommandTest extends KernelTestCase
+    {
+        public function testExecute(): void
+        {
+            self::bootKernel();
+            $application = new Application(self::$kernel);
+
+            $command = $application->find('app:create-user');
+            $tester = new CommandTester($command);
+
+            $result = $tester->run(['username' => 'Wouter']);
+
+            // the combined output (stdout + stderr interleaved)
+            $result->getDisplay();
+
+            // stdout only
+            $result->getOutput();
+
+            // stderr only
+            $result->getErrorOutput();
+
+            // the exit code
+            $result->statusCode;
+        }
+    }
+
+The ``run()`` method also accepts interactive inputs directly, removing the
+need to call ``setInputs()`` beforehand::
+
+    $result = $tester->run(
+        input: ['command' => 'app:create-user'],
+        interactiveInputs: ['Wouter', 'yes'],
+    );
+
+You can use the :class:`Symfony\\Component\\Console\\Tester\\ConsoleAssertionsTrait`
+in your test cases for convenient assertions on the result::
+
+    use PHPUnit\Framework\TestCase;
+    use Symfony\Component\Console\Tester\CommandTester;
+    use Symfony\Component\Console\Tester\ConsoleAssertionsTrait;
+
+    class CreateUserCommandTest extends TestCase
+    {
+        use ConsoleAssertionsTrait;
+
+        public function testExecute(): void
+        {
+            // ...
+            $result = (new CommandTester($command))->run(['username' => 'Wouter']);
+
+            $this->assertIsSuccessful($result);
+
+            // you can also check for a failed or invalid command:
+            // $this->assertFailed($result);
+            // $this->assertIsInvalid($result);
+
+            // assert multiple expectations at once:
+            $this->assertResultEquals(
+                $result,
+                expectedStatusCode: 0,
+                expectedOutput: 'User "Wouter" was created.',
+            );
+        }
+    }
+
+The ``assertResultEquals()`` method accepts the following named arguments, all
+optional: ``expectedStatusCode``, ``expectedOutput``, ``expectedErrorOutput``
+and ``expectedDisplay``. Only the provided arguments are asserted.
+
+.. versionadded:: 8.1
+
+    The ``CommandTester::run()`` method, the ``ExecutionResult`` class and the
+    ``ConsoleAssertionsTrait`` were introduced in Symfony 8.1.
+
 When testing your commands, it could be useful to understand how your command
 reacts on different settings like the width and the height of the terminal, or
 even the color mode being used. You have access to such information thanks to the
