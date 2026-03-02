@@ -633,10 +633,6 @@ will also be downloaded asynchronously.
 Importing JSON files
 --------------------
 
-.. versionadded:: 7.4
-
-    Support for importing JSON assets was introduced in Symfony 7.4.
-
 Modern browsers support importing JSON files using the
 ``import data from './foo.json' with { type: 'json' }`` syntax, but browser
 support is still limited. AssetMapper provides a compatible alternative that
