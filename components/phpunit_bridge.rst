@@ -70,7 +70,7 @@ After running your PHPUnit tests, you will get a report similar to this one:
     $ ./vendor/bin/simple-phpunit
       PHPUnit by Sebastian Bergmann.
 
-      Configuration read from <your-project>/phpunit.xml.dist
+      Configuration read from <your-project>/phpunit.dist.xml
       .................
 
       Time: 1.77 seconds, Memory: 5.75Mb
@@ -105,7 +105,7 @@ The summary includes:
 
     .. code-block:: xml
 
-        <!-- phpunit.xml.dist -->
+        <!-- phpunit.dist.xml -->
         <!-- ... -->
         <listeners>
             <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
@@ -115,17 +115,17 @@ Running Tests in Parallel
 -------------------------
 
 The modified PHPUnit script allows running tests in parallel by providing
-a directory containing multiple test suites with their own ``phpunit.xml.dist``.
+a directory containing multiple test suites with their own ``phpunit.dist.xml``.
 
 .. code-block:: terminal
 
     ├── tests/
     │   ├── Functional/
     │   │   ├── ...
-    │   │   └── phpunit.xml.dist
+    │   │   └── phpunit.dist.xml
     │   ├── Unit/
     │   │   ├── ...
-    │   │   └── phpunit.xml.dist
+    │   │   └── phpunit.dist.xml
 
 .. code-block:: terminal
 
@@ -133,7 +133,7 @@ a directory containing multiple test suites with their own ``phpunit.xml.dist``.
 
 The modified PHPUnit script will recursively go through the provided directory,
 up to a depth of 3 subdirectories or the value specified by the environment variable
-``SYMFONY_PHPUNIT_MAX_DEPTH``, looking for ``phpunit.xml.dist`` files and then
+``SYMFONY_PHPUNIT_MAX_DEPTH``, looking for ``phpunit.dist.xml`` files and then
 running each suite it finds in parallel, collecting their output and displaying
 each test suite's results in their own section.
 
@@ -351,7 +351,7 @@ time. This can be disabled with the ``debug-class-loader`` option.
 
 .. code-block:: xml
 
-    <!-- phpunit.xml.dist -->
+    <!-- phpunit.dist.xml -->
     <!-- ... -->
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
@@ -581,7 +581,7 @@ For older PHPUnit versions, register the listener instead:
 
 .. code-block:: xml
 
-    <!-- phpunit.xml.dist -->
+    <!-- phpunit.dist.xml -->
     <!-- ... -->
     <listeners>
         <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
@@ -923,12 +923,12 @@ this might be too late.
 
 You can either:
 
-* Declare the namespaces of the tested classes in your ``phpunit.xml.dist``;
+* Declare the namespaces of the tested classes in your ``phpunit.dist.xml``;
 * Register the namespaces at the end of the ``config/bootstrap.php`` file.
 
 .. code-block:: xml
 
-    <!-- phpunit.xml.dist -->
+    <!-- phpunit.dist.xml -->
     <!-- ... -->
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
@@ -962,13 +962,13 @@ its ``bin/simple-phpunit`` command. It has the following features:
   env var is defined: the env var should specify a file name that will be used for
   storing skipped tests on a first run, and replay them on the second run;
 * Parallelizes test suites execution when given a directory as argument, scanning
-  this directory for ``phpunit.xml.dist`` files up to ``SYMFONY_PHPUNIT_MAX_DEPTH``
+  this directory for ``phpunit.dist.xml`` files up to ``SYMFONY_PHPUNIT_MAX_DEPTH``
   levels (specified as an env var, defaults to ``3``);
 
 The script writes the modified PHPUnit it builds in a directory that can be
 configured by the ``SYMFONY_PHPUNIT_DIR`` env var, or in the same directory as
 the ``simple-phpunit`` if it is not provided. It's also possible to set this
-env var in the ``phpunit.xml.dist`` file.
+env var in the ``phpunit.dist.xml`` file.
 
 If you have installed the bridge through Composer, you can run it by calling e.g.:
 
@@ -979,7 +979,7 @@ If you have installed the bridge through Composer, you can run it by calling e.g
 .. tip::
 
     It's possible to change the PHPUnit version by setting the
-    ``SYMFONY_PHPUNIT_VERSION`` env var in the ``phpunit.xml.dist`` file (e.g.
+    ``SYMFONY_PHPUNIT_VERSION`` env var in the ``phpunit.dist.xml`` file (e.g.
     ``<server name="SYMFONY_PHPUNIT_VERSION" value="5.5"/>``). This is the
     preferred method as it can be committed to your version control repository.
 
@@ -995,7 +995,7 @@ If you have installed the bridge through Composer, you can run it by calling e.g
     If you still need to use ``prophecy`` (but not ``symfony/yaml``),
     then set the ``SYMFONY_PHPUNIT_REMOVE`` env var to ``symfony/yaml``.
 
-    It's also possible to set this env var in the ``phpunit.xml.dist`` file.
+    It's also possible to set this env var in the ``phpunit.dist.xml`` file.
 
 .. tip::
 
@@ -1007,7 +1007,7 @@ If you have installed the bridge through Composer, you can run it by calling e.g
 
     .. code-block:: xml
 
-        <!-- phpunit.xml.dist -->
+        <!-- phpunit.dist.xml -->
         <!-- ... -->
         <php>
             <env name="SYMFONY_PHPUNIT_REQUIRE" value="vendor/name:^1.2 vendor/name2:^3"/>
@@ -1070,7 +1070,7 @@ the ``Test`` part of the classname: ``My\Namespace\Tests\FooTest`` ->
 Installation
 ~~~~~~~~~~~~
 
-Add the following configuration to the ``phpunit.xml.dist`` file:
+Add the following configuration to the ``phpunit.dist.xml`` file:
 
 .. code-block:: xml
 
