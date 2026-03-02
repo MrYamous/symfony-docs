@@ -24,8 +24,8 @@ with FrankenPHP, Caddy, Nginx or Apache.
 FrankenPHP / Caddy
 ------------------
 
-When using FrankenPHP (which includes the Caddy webserver, as well as PHP with
-Zend Thread Safety, called PHP-ZTS:) you can use a configuration like this:
+When using FrankenPHP (which includes the Caddy web server and PHP with Zend
+Thread Safety, also known as PHP-ZTS), you can use a configuration like this:
 
 .. code-block:: nginx
 
@@ -37,7 +37,7 @@ Zend Thread Safety, called PHP-ZTS:) you can use a configuration like this:
         encode zstd br gzip
         file_server
 
-        # otherwise, use FrankenPHP's built-in PHP-ZTS:
+        # otherwise, use FrankenPHP's built-in PHP-ZTS
         php_server {
             # only fall back to root index.php aka front controller.
             try_files {path} index.php
@@ -47,8 +47,8 @@ Zend Thread Safety, called PHP-ZTS:) you can use a configuration like this:
             # env APP_SECRET "<app-secret-id>"
             # env DATABASE_URL "mysql://db_user:db_pass@host:3306/db_name"
 
-            # Configure the FastCGI to resolve any symlinks in the root path.
-            # This ensures that OpCache is using the destination filenames,
+            # configure the FastCGI to resolve any symlinks in the root path;
+            # this ensures that OpCache is using the destination filenames,
             # instead of the symlinks, to cache opcodes and php files see
             # https://caddy.community/t/root-symlink-folder-updates-and-caddy-reload-not-working/10557
             resolve_root_symlink
@@ -62,17 +62,16 @@ Zend Thread Safety, called PHP-ZTS:) you can use a configuration like this:
         error @phpFile "Not found" 404
     }
 
-If you want to use Caddy without FrankenPHP, you need to configure PHP-FPM (see below), and
-change the ``php_server {`` line in the above Caddyfile to:
+If you want to use Caddy without FrankenPHP, you need to configure PHP-FPM (see
+below) and change the ``php_server {`` line in the above Caddyfile to:
 
 .. code-block:: nginx
 
     # (replace "unix//var/..." with "127.0.0.1:9000" when using TCP)
     php_fastcgi unix//var/run/php/php8.3-fpm.sock {
 
-See the `FrankenPHP documentation`_ or `Caddy documentation`_ for more examples, such as using
-Caddy in a container infrastructure.
-
+See the `FrankenPHP documentation`_ or `Caddy documentation`_ for more examples,
+such as using Caddy in a container infrastructure.
 
 Configuring PHP-FPM
 -------------------
