@@ -198,16 +198,8 @@ loading all entities.
 
 When the entity identifier is a :doc:`UID </components/uid>` (ULID or UUID),
 this option controls how the UID is rendered as a choice value. By default
-(``null``), ULIDs are rendered in Base32 and UUIDs in RFC 4122 format (via
-``__toString()``).
-
-Set this option to use a different format:
-
-* ``base32`` - renders the UID in Base32 format (e.g. ``01ARZ3NDEKTSV4RRFFQ69G5FAV``)
-* ``base58`` - renders the UID in Base58 format (e.g. ``1BKocMc5BnhMpSSENfEptz``)
-* ``rfc4122`` - renders the UID in RFC 4122 format (e.g. ``550e8400-e29b-41d4-a716-446655440000``)
-
-Example::
+(``null``), ULIDs are rendered in base32 and UUIDs in RFC 4122 format (via
+``__toString()``)::
 
     use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
@@ -215,6 +207,12 @@ Example::
         'class' => Category::class,
         'uid_format' => 'base58',
     ]);
+
+Set this option to use a different format:
+
+* ``base32``: renders the UID in Base32 format (e.g. ``01ARZ3NDEKTSV4RRFFQ69G5FAV``)
+* ``base58``: renders the UID in Base58 format (e.g. ``1BKocMc5BnhMpSSENfEptz``)
+* ``rfc4122``: renders the UID in RFC 4122 format (e.g. ``550e8400-e29b-41d4-a716-446655440000``)
 
 .. versionadded:: 8.1
 
