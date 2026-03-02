@@ -630,6 +630,63 @@ the page. If you use a dynamic import to lazily-load a JavaScript file and that
 file imports a CSS file (using the non-dynamic ``import`` syntax), that CSS file
 will also be downloaded asynchronously.
 
+Importing JSON files
+--------------------
+
+.. versionadded:: 7.4
+
+    Support for importing JSON assets was introduced in Symfony 7.4.
+
+Modern browsers support importing JSON files using the
+``import data from './foo.json' with { type: 'json' }`` syntax, but browser
+support is still limited. AssetMapper provides a compatible alternative that
+works in all modern browsers without requiring any bundler.
+
+Instead of using the native syntax, import JSON files using a standard import:
+
+.. code-block:: javascript
+
+    // assets/app.js
+    import dataPromise from './data.json';
+
+    // The import returns a Promise that resolves to the JSON content
+    const data = await dataPromise;
+    console.log(data.name); // Access your JSON data
+
+Consider a JSON file containing user data:
+
+.. code-block:: json
+
+    {
+        "users": [
+            {"id": 1, "name": "Alice", "email": "alice@example.com"},
+            {"id": 2, "name": "Bob", "email": "bob@example.com"}
+        ]
+    }
+
+You can import and use this data in your JavaScript:
+
+.. code-block:: javascript
+
+    // assets/controllers/user-list-controller.js
+    import usersPromise from '../data/users.json';
+
+    async function displayUsers() {
+        const userData = await usersPromise;
+
+        userData.users.forEach(user => {
+            console.log(`${user.name}: ${user.email}`);
+        });
+    }
+
+    displayUsers();
+
+How it Works? When you import a JSON file, AssetMapper detects the import during
+asset processing, creates a JavaScript module that exports a Promise resolving
+to the JSON content, and adds it to the importmap. The imported JSON file is
+versioned like any other asset, so changes to the JSON content will produce a
+new filename and browsers will load the updated version.
+
 Issues and Debugging
 --------------------
 
