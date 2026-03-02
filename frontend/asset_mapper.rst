@@ -643,15 +643,14 @@ Importing JSON files
 
 .. versionadded:: 7.4
 
-    Support for importing JSON assets was added in Symfony 7.4.
+    Support for importing JSON assets was introduced in Symfony 7.4.
 
-AssetMapper allows you to import JSON assets directly from your JavaScript code.
-While modern browsers support the native ``import data from './foo.json' with { type: 'json' }`` syntax,
-this feature is not yet widely supported. AssetMapper provides a fully compatible alternative
-without requiring any bundler.
+Modern browsers support importing JSON files using the
+``import data from './foo.json' with { type: 'json' }`` syntax, but browser
+support is still limited. AssetMapper provides a compatible alternative that
+works in all modern browsers without requiring any bundler.
 
-AssetMapper provides a more compatible alternative by allowing you to import JSON
-files using the standard import syntax:
+Instead of using the native syntax, import JSON files using a standard import:
 
 .. code-block:: javascript
 
@@ -661,9 +660,6 @@ files using the standard import syntax:
     // The import returns a Promise that resolves to the JSON content
     const data = await dataPromise;
     console.log(data.name); // Access your JSON data
-
-Usage Example
-~~~~~~~~~~~~~
 
 Consider a JSON file containing user data:
 
@@ -693,25 +689,11 @@ You can import and use this data in your JavaScript:
 
     displayUsers();
 
-How it Works
-~~~~~~~~~~~~
-
-When you import a JSON file, AssetMapper:
-
-1. **Detects the JSON import** in your JavaScript files during asset processing
-2. **Creates a JavaScript module** that exports a Promise resolving to the JSON content
-3. **Adds it to the importmap** so your browser can locate and load it correctly
-4. **Versions the file** like any other asset, ensuring proper cache busting
-
-This approach works in all modern browsers without requiring native JSON import
-support, making it a reliable alternative to the newer ``with { type: 'json' }``
-syntax.
-
-.. note::
-
-    Like CSS imports, JSON imports are processed by AssetMapper and added to the
-    importmap automatically. The imported JSON assets are also versioned, so any
-    changes to the JSON content will result in a new versioned filename.
+How it Works? When you import a JSON file, AssetMapper detects the import during
+asset processing, creates a JavaScript module that exports a Promise resolving
+to the JSON content, and adds it to the importmap. The imported JSON file is
+versioned like any other asset, so changes to the JSON content will produce a
+new filename and browsers will load the updated version.
 
 Issues and Debugging
 --------------------
