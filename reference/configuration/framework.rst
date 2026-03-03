@@ -21,6 +21,11 @@ assets
 The following options configure the behavior of the
 :ref:`Twig asset() function <reference-twig-function-asset>`.
 
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
 .. _reference-assets-base-path:
 
 base_path
@@ -1215,6 +1220,11 @@ When the HttpClient component is installed, an HTTP client is available
 as a service named ``http_client`` or using the autowiring alias
 :class:`Symfony\\Contracts\\HttpClient\\HttpClientInterface`.
 
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
 .. _reference-http-client-default-options:
 
 This service can be configured using ``framework.http_client.default_options``:
@@ -2064,6 +2074,11 @@ Name of the lock you want to create.
 mailer
 ~~~~~~
 
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
 .. _mailer-dsn:
 
 dsn
@@ -2323,6 +2338,11 @@ requests (and not on the subrequests).
 property_access
 ~~~~~~~~~~~~~~~
 
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
 magic_call
 ..........
 
@@ -2392,6 +2412,11 @@ using the :ref:`ConstructorExtractor <components-property-information-constructo
 rate_limiter
 ~~~~~~~~~~~~
 
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
+
 .. _reference-rate-limiter-name:
 
 name
@@ -2435,6 +2460,11 @@ Whether to enable or not the RemoteEvent support.
 
 request
 ~~~~~~~
+
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``false``
 
 formats
 .......
@@ -2488,6 +2518,11 @@ default_uri
 
 The default URI used to generate URLs in a non-HTTP context (see
 :ref:`Generating URLs in Commands <router-generate-urls-commands>`).
+
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``false``
 
 http_port
 .........
@@ -3459,6 +3494,11 @@ details about type aliases.
 
 uid
 ~~~
+
+enabled
+.......
+
+**type**: ``boolean`` **default**: ``true`` or ``false`` depending on your installation
 
 Read the :doc:`UID component documentation </components/uid>` for complete
 details about each option.
