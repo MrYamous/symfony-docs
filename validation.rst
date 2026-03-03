@@ -231,6 +231,65 @@ when :ref:`validating OptionsResolver values <optionsresolver-validate-value>`):
 :method:`Symfony\\Component\\Validator\\Validation::createIsValidCallable`
     This returns a closure that returns ``false`` when the constraints aren't matched.
 
+Validating Properties
+~~~~~~~~~~~~~~~~~~~~~
+
+Instead of validating an entire object, you can validate only a single property
+of an object using the ``validateProperty()`` method::
+
+    $violations = $validator->validateProperty($author, 'name');
+
+The ``validateProperty()`` method reads the current value of the property and
+validates it against the constraints defined for that property.
+
+You can also validate a value against the constraints of a property without
+setting it on the object, using the ``validatePropertyValue()`` method::
+
+    $violations = $validator->validatePropertyValue($author, 'name', 'John');
+
+This is useful when you want to check if a value would be valid before actually
+setting it on the object.
+
+.. note::
+
+    By default, ``validateProperty()`` and ``validatePropertyValue()`` silently
+    return zero violations when the given property has no constraints defined.
+    This means that typos or renamed properties won't produce any error.
+
+    You can enable a strict check that throws a
+    :class:`Symfony\\Component\\Validator\\Exception\\ValidatorException` if no
+    metadata is found for the given property.
+
+    When using the Validator component standalone::
+
+        use Symfony\Component\Validator\Validation;
+
+        $validator = Validation::createValidatorBuilder()
+            ->enablePropertyMetadataExistenceCheck()
+            ->getValidator();
+
+        // throws ValidatorException because 'nmae' does not exist
+        $violations = $validator->validateProperty($author, 'nmae');
+
+    When using the FrameworkBundle, register a compiler pass to enable the check::
+
+        use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+        use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+        class EnablePropertyMetadataExistenceCheckPass implements CompilerPassInterface
+        {
+            public function process(ContainerBuilder $container): void
+            {
+                $container->getDefinition('validator.builder')
+                    ->addMethodCall('enablePropertyMetadataExistenceCheck');
+            }
+        }
+
+.. versionadded:: 8.1
+
+    The ``enablePropertyMetadataExistenceCheck()`` method was introduced in
+    Symfony 8.1.
+
 .. _validation-constraints:
 
 Constraints
