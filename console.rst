@@ -605,9 +605,11 @@ If your command requires interactive inputs, pass them as the third argument::
 Legacy Command Tester
 ~~~~~~~~~~~~~~~~~~~~~
 
-Using the ``runCommand()`` command from ``KernelTestCase`` is the recommended way
-of testing commands in modern Symfony applications. However, in some cases you'll
-have to use the legacy command tester::
+Using the ``runCommand()`` method from ``KernelTestCase`` is the recommended way
+of testing commands in Symfony applications. However, you can also use the
+:class:`Symfony\\Component\\Console\\Tester\\CommandTester` class directly,
+which is useful when testing commands outside the Symfony framework or when
+you need lower-level control over the testing setup::
 
     // tests/Command/CreateUserCommandTest.php
     namespace App\Tests\Command;
@@ -647,11 +649,13 @@ have to use the legacy command tester::
         }
     }
 
-The ``CommandTester`` is required when testing :ref:`method-based commands <console-method-based-commands>`::
+.. tip::
+
+    Use PHP's first-class callable syntax to test
+    :ref:`method-based commands <console-method-based-commands>`::
 
     $commands = new UserCommands($userRepository);
 
-    // '...' is the PHP first-class callable syntax
     $tester = new CommandTester($commands->create(...));
     $tester->execute([]);
 
