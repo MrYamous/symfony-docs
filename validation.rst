@@ -234,44 +234,33 @@ when :ref:`validating OptionsResolver values <optionsresolver-validate-value>`):
 Validating Properties
 ~~~~~~~~~~~~~~~~~~~~~
 
-Instead of validating an entire object, you can validate only a single property
-of an object using the ``validateProperty()`` method::
+Instead of validating an entire object, you can validate a single property
+using the ``validateProperty()`` method::
 
     $violations = $validator->validateProperty($author, 'name');
 
-The ``validateProperty()`` method reads the current value of the property and
-validates it against the constraints defined for that property.
+This method reads the current value of the property and validates it against
+the constraints defined for that property.
 
 You can also validate a value against the constraints of a property without
-setting it on the object, using the ``validatePropertyValue()`` method::
+setting it on the object, using ``validatePropertyValue()`` to check whether a
+value would be valid before assigning it::
 
     $violations = $validator->validatePropertyValue($author, 'name', 'John');
 
-This is useful when you want to check if a value would be valid before actually
-setting it on the object.
+By default, ``validateProperty()`` and ``validatePropertyValue()`` silently
+return zero violations when the given property has no constraints defined.
+This means that typos or renamed properties won't produce any error.
 
-.. note::
+You can enable a strict check that throws a
+:class:`Symfony\\Component\\Validator\\Exception\\ValidatorException` if no
+metadata is found for the given property:
 
-    By default, ``validateProperty()`` and ``validatePropertyValue()`` silently
-    return zero violations when the given property has no constraints defined.
-    This means that typos or renamed properties won't produce any error.
+.. configuration-block::
 
-    You can enable a strict check that throws a
-    :class:`Symfony\\Component\\Validator\\Exception\\ValidatorException` if no
-    metadata is found for the given property.
+    .. code-block:: php-symfony
 
-    When using the Validator component standalone::
-
-        use Symfony\Component\Validator\Validation;
-
-        $validator = Validation::createValidatorBuilder()
-            ->enablePropertyMetadataExistenceCheck()
-            ->getValidator();
-
-        // throws ValidatorException because 'nmae' does not exist
-        $violations = $validator->validateProperty($author, 'nmae');
-
-    When using the FrameworkBundle, register a compiler pass to enable the check::
+        // register a compiler pass to enable the check
 
         use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
         use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -284,6 +273,19 @@ setting it on the object.
                     ->addMethodCall('enablePropertyMetadataExistenceCheck');
             }
         }
+
+    .. code-block:: php-standalone
+
+        use Symfony\Component\Validator\Validation;
+
+        $validator = Validation::createValidatorBuilder()
+            ->enablePropertyMetadataExistenceCheck()
+            ->getValidator();
+
+With this configuration, the following code throws a ``ValidatorException``
+because ``'nmae'`` (note the typo) does not exist::
+
+    $violations = $validator->validateProperty($author, 'nmae');
 
 .. versionadded:: 8.1
 
