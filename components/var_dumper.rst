@@ -847,21 +847,23 @@ can use:
 * :class:`Symfony\\Component\\VarDumper\\Caster\\ConstStub` to wrap a value that is
   best represented by a PHP constant;
 * :class:`Symfony\\Component\\VarDumper\\Caster\\ClassStub` to wrap a PHP identifier
-  (*i.e.* a class name, a method name, an interface, *etc.*);
+  (i.e. a class name, a method name, an interface, etc.);
 * :class:`Symfony\\Component\\VarDumper\\Caster\\CutStub` to replace big noisy
-  objects/strings/*etc.* by ellipses;
+  objects/strings/etc. by ellipses;
 * :class:`Symfony\\Component\\VarDumper\\Caster\\CutArrayStub` to keep only some
   useful keys of an array;
 * :class:`Symfony\\Component\\VarDumper\\Caster\\ImgStub` to wrap an image;
 * :class:`Symfony\\Component\\VarDumper\\Caster\\EnumStub` to wrap a set of virtual
-  values (*i.e.* values that do not exist as properties in the original PHP data
+  values (i.e. values that do not exist as properties in the original PHP data
   structure, but are worth listing alongside with real ones);
 * :class:`Symfony\\Component\\VarDumper\\Caster\\LinkStub` to wrap strings that can
   be turned into links by dumpers;
-* :class:`Symfony\\Component\\VarDumper\\Caster\\TraceStub` and their
-* :class:`Symfony\\Component\\VarDumper\\Caster\\FrameStub` and
-* :class:`Symfony\\Component\\VarDumper\\Caster\\ArgsStub` relatives to wrap PHP
-  traces (used by :class:`Symfony\\Component\\VarDumper\\Caster\\ExceptionCaster`).
+* :class:`Symfony\\Component\\VarDumper\\Caster\\TraceStub` to wrap a PHP trace array
+  (e.g. like the one returned by ``Exception->getTrace()``, or ``debug_backtrace()``);
+* :class:`Symfony\\Component\\VarDumper\\Caster\\FrameStub` to wrap a single backtrace frame
+  (i.e. each individual element of a PHP trace array);
+* :class:`Symfony\\Component\\VarDumper\\Caster\\ArgsStub` to wrap a list of function arguments
+  (related to PHP traces wrapping, used by :class:`Symfony\\Component\\VarDumper\\Caster\\ExceptionCaster`);
 
 For example, if you know that your ``Product`` objects have a ``brochure`` property
 that holds a file name or a URL, you can wrap them in a ``LinkStub`` to tell
