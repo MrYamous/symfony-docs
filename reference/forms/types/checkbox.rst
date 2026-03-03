@@ -8,6 +8,38 @@ you can specify an array of values that, if submitted, will be evaluated
 to "false" as well (this differs from what HTTP defines, but can be handy
 if you want to handle submitted values like "0" or "false").
 
+Handling Unchecked Checkboxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a form contains only checkboxes (or a collection of checkboxes),
+unchecked checkboxes are omitted entirely from the HTTP request. This made
+it impossible to distinguish between a user visiting a page that contains the
+form (not a submission) and a user submitting the form with all checkboxes
+unchecked. Starting from Symfony 8.1, the form component automatically
+detects forms containing checkboxes and submits them even when all checkboxes
+are unchecked::
+
+    use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+    // ...
+
+    // Form with a single checkbox, default data = true
+    $form = $factory->createNamed('agree', CheckboxType::class, true);
+
+    // POST request with no body (all checkboxes unchecked)
+    $form->handleRequest($request);
+
+    // Before Symfony 8.1: form was never submitted, data stayed true
+    // Since Symfony 8.1:  form is submitted, data is false
+
+This also works for collections of checkboxes and nested forms containing
+checkboxes. The only exception is ``PATCH`` requests, which are excluded
+because partial updates should leave omitted fields untouched.
+
+.. versionadded:: 8.1
+
+    The support for submitting forms with unchecked checkboxes in request
+    handlers was introduced in Symfony 8.1.
+
 +---------------------------+------------------------------------------------------------------------+
 | Rendered as               | ``input`` ``checkbox`` field                                           |
 +---------------------------+------------------------------------------------------------------------+
