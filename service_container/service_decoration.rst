@@ -315,8 +315,8 @@ name via the ``decoration_inner_name`` option:
 .. note::
 
     All custom :doc:`service tags </service_container/tags>` from the decorated
-    service are removed in the new service. Only certain built-in service tags
-    defined by Symfony are retained: ``container.service_locator``, ``container.service_subscriber``,
+    service are removed and added to the new service. Only certain built-in service tags
+    defined by Symfony are kept: ``container.service_locator``, ``container.service_subscriber``,
     ``kernel.event_subscriber``, ``kernel.event_listener``, ``kernel.locale_aware``,
     and ``kernel.reset``.
 
