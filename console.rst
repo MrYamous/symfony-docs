@@ -505,10 +505,9 @@ command:
 Testing Commands
 ----------------
 
-Symfony provides several tools to help you test your commands. The most
-useful one is the :class:`Symfony\\Component\\Console\\Tester\\CommandTester`
-class. It uses special input and output classes to ease testing without a real
-console::
+In test classes extending :class:`Symfony\\Bundle\\FrameworkBundle\\Test\\KernelTestCase`,
+Symfony provides the ``runCommand()`` method to run console commands and inspect
+their results::
 
     // tests/Command/CreateUserCommandTest.php
     namespace App\Tests\Command;
@@ -527,6 +526,8 @@ console::
                 // e.g: '--some-option' => 'option_value',
                 // use brackets for testing array value,
                 // e.g: '--some-option' => ['option_value'],
+                // use true for options that accept no value (InputOption::VALUE_NONE),
+                // e.g: '--some-option' => true,
             ]);
 
             $this->assertIsSuccessful($result);
@@ -545,36 +546,42 @@ console::
 
 .. versionadded:: 8.1
 
-    The ``runCommand()`` method was introduced in Symfony 8.1.
+    The ``runCommand()`` method and the ``ExecutionResult`` class were
+    introduced in Symfony 8.1.
 
-If you are using a :doc:`single-command application </components/console/single_command_tool>`,
-call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``.
+The ``ExecutionResult`` object gives access to stdout, stderr and the combined
+display separately::
+
+    // stdout only
+    $result->getOutput();
+
+    // stderr only
+    $result->getErrorOutput();
+
+    // the combined output (stdout + stderr interleaved)
+    $result->getDisplay();
+
+    // the exit code
+    $result->statusCode;
+
+You can also assert multiple expectations at once using ``assertResultEquals()``::
+
+    $this->assertResultEquals(
+        $result,
+        expectedStatusCode: 0,
+        expectedOutput: 'User "Wouter" was created.',
+    );
+
+If your command requires interactive inputs, pass them as the third argument::
+
+    $result = static::runCommand('app:create-user', [], ['Wouter', 'yes']);
 
 .. tip::
 
     You can also test a whole console application by using
-    :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`.
-
-.. tip::
-
-    Use PHP's first-class callable syntax to test
-    :ref:`method-based commands <console-method-based-commands>`::
-
-        $commands = new UserCommands($userRepository);
-
-        $tester = new CommandTester($commands->create(...));
-        $tester->execute([]);
-
-.. warning::
-
-    When testing commands using the ``CommandTester`` class, console events are
-    not dispatched. If you need to test those events, use the
-    :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester` instead.
-
-.. warning::
-
-    When testing commands using the :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`
-    class, don't forget to disable the auto exit flag::
+    :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`. When
+    using it (or when testing a :doc:`single-command application </components/console/single_command_tool>`),
+    disable the auto exit flag::
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -583,33 +590,24 @@ call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``
 
 .. warning::
 
-    When testing ``InputOption::VALUE_NONE`` command options, you must pass ``true``
-    to them::
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['--some-option' => true]);
+    When testing commands using the ``CommandTester`` class, console events are
+    not dispatched. If you need to test those events, use the
+    :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester` instead.
 
 .. note::
 
-    When using the Console component in a standalone project, use
-    :class:`Symfony\\Component\\Console\\Application`
-    and extend the normal ``\PHPUnit\Framework\TestCase``.
+    When using the Console component in a standalone project (without the
+    Symfony framework), extend ``\PHPUnit\Framework\TestCase`` instead of
+    ``KernelTestCase`` and use
+    :class:`Symfony\\Component\\Console\\Application` instead of the
+    FrameworkBundle one.
 
-.. note::
+Legacy Command Tester
+~~~~~~~~~~~~~~~~~~~~~
 
-    The ``CommandTester`` class does not implement ``ConsoleOutputInterface``,
-    so methods like ``section()`` are not directly accessible. To test them,
-    use the ``capture_stderr_separately`` option of the ``execute()`` method::
-
-        $commandTester->execute([], ['capture_stderr_separately' => true]);
-
-Result-Based Testing API
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``CommandTester`` also provides a ``run()`` method that returns an
-:class:`Symfony\\Component\\Console\\Tester\\ExecutionResult` object. Unlike
-``execute()``, this method is stateless and gives access to stdout, stderr and
-the combined display at the same time::
+Using the ``runCommand()`` command from ``KernelTestCase`` is the recommended way
+of testing commands in modern Symfony applications. However, in some cases you'll
+have to use the legacy command tester::
 
     // tests/Command/CreateUserCommandTest.php
     namespace App\Tests\Command;
@@ -626,71 +624,44 @@ the combined display at the same time::
             $application = new Application(self::$kernel);
 
             $command = $application->find('app:create-user');
-            $tester = new CommandTester($command);
+            $commandTester = new CommandTester($command);
+            $commandTester->execute([
+                // pass arguments to the helper
+                'username' => 'Wouter',
 
-            $result = $tester->run(['username' => 'Wouter']);
+                // prefix the key with two dashes when passing options,
+                // e.g: '--some-option' => 'option_value',
+                // use brackets for testing array value,
+                // e.g: '--some-option' => ['option_value'],
+                // use true for options that accept no value (InputOption::VALUE_NONE),
+                // e.g: '--some-option' => true,
+            ]);
 
-            // the combined output (stdout + stderr interleaved)
-            $result->getDisplay();
+            $commandTester->assertCommandIsSuccessful();
 
-            // stdout only
-            $result->getOutput();
+            // the output of the command in the console
+            $output = $commandTester->getDisplay();
+            $this->assertStringContainsString('Username: Wouter', $output);
 
-            // stderr only
-            $result->getErrorOutput();
-
-            // the exit code
-            $result->statusCode;
-        }
-    }
-
-The ``run()`` method also accepts interactive inputs directly, removing the
-need to call ``setInputs()`` beforehand::
-
-    $result = $tester->run(
-        input: ['command' => 'app:create-user'],
-        interactiveInputs: ['Wouter', 'yes'],
-    );
-
-You can use the :class:`Symfony\\Component\\Console\\Tester\\ConsoleAssertionsTrait`
-in your test cases for convenient assertions on the result::
-
-    use PHPUnit\Framework\TestCase;
-    use Symfony\Component\Console\Tester\CommandTester;
-    use Symfony\Component\Console\Tester\ConsoleAssertionsTrait;
-
-    class CreateUserCommandTest extends TestCase
-    {
-        use ConsoleAssertionsTrait;
-
-        public function testExecute(): void
-        {
             // ...
-            $result = (new CommandTester($command))->run(['username' => 'Wouter']);
-
-            $this->assertIsSuccessful($result);
-
-            // you can also check for a failed or invalid command:
-            // $this->assertFailed($result);
-            // $this->assertIsInvalid($result);
-
-            // assert multiple expectations at once:
-            $this->assertResultEquals(
-                $result,
-                expectedStatusCode: 0,
-                expectedOutput: 'User "Wouter" was created.',
-            );
         }
     }
 
-The ``assertResultEquals()`` method accepts the following named arguments, all
-optional: ``expectedStatusCode``, ``expectedOutput``, ``expectedErrorOutput``
-and ``expectedDisplay``. Only the provided arguments are asserted.
+The ``CommandTester`` is required when testing :ref:`method-based commands <console-method-based-commands>`::
 
-.. versionadded:: 8.1
+    $commands = new UserCommands($userRepository);
 
-    The ``CommandTester::run()`` method, the ``ExecutionResult`` class and the
-    ``ConsoleAssertionsTrait`` were introduced in Symfony 8.1.
+    // '...' is the PHP first-class callable syntax
+    $tester = new CommandTester($commands->create(...));
+    $tester->execute([]);
+
+.. note::
+
+    The ``CommandTester`` class does not implement ``ConsoleOutputInterface``,
+    so methods like ``section()`` are not directly accessible. To test them,
+    use the ``capture_stderr_separately`` option of the ``execute()`` method::
+
+        $commandTester->execute([], ['capture_stderr_separately' => true]);
 
 Getting Terminal Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
