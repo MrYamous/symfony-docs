@@ -85,14 +85,16 @@ Show all supported formats using `.. configuration-block::`. Format order:
 
 | Context                | Order                          |
 |------------------------|--------------------------------|
-| Configuration/services | YAML, XML, PHP               |
+| Configuration/services | YAML, XML, PHP                 |
 | Routing                | Attributes, YAML, XML, PHP     |
 | Validation             | Attributes, YAML, XML, PHP     |
 | Doctrine Mapping       | Attributes, YAML, XML, PHP     |
 | Translation            | XML, YAML, PHP                 |
-| Code examples          | `php-symfony`, `php-standalone` |
 
 Use `.. tabs::` for non-configuration tabbed content (e.g. showing Webpack Encore vs AssetMapper).
+
+Some docs show examples for both Symfony and non-Symfony PHP apps.
+Use `.. code-block:: php-symfony` and `.. code-block:: php-standalone`.
 
 ## Code Examples
 
