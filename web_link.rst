@@ -51,46 +51,41 @@ Imagine that your application includes a web page like this:
     </html>
 
 In a traditional HTTP workflow, when this page is loaded, browsers make one
-request for the HTML document and another for the linked CSS file. However,
-with HTTP/2, your application can send the CSS file's contents to the browser
-before it requests them.
+request for the HTML document and another for the linked CSS file. With
+preloading, you can hint the browser to start fetching critical resources (like
+stylesheets, fonts or scripts) earlier, before it discovers them in the HTML.
 
-To achieve this, update your template to use the ``preload()`` Twig function
-provided by WebLink. Note that the `"as" attribute`_ is required, as browsers use
-it to prioritize resources correctly and comply with the content security policy:
+This is useful for resources that are not directly linked in the HTML but are
+needed early (e.g. a font file referenced inside a CSS stylesheet).
+
+To preload a resource, use the ``preload()`` Twig function provided by WebLink.
+The `"as" attribute`_ is required, as browsers use it to prioritize resources
+correctly and comply with the content security policy:
 
 .. code-block:: html+twig
 
     <head>
         <!-- ... -->
-        {# note that you must add two <link> tags per asset:
-           one to link to it and the other one to tell the browser to preload it #}
-        <link rel="preload" href="{{ preload('/app.css', {as: 'style'}) }}" as="style">
+        <link rel="preload" href="{{ preload('/fonts/myfont.woff2', {as: 'font', type: 'font/woff2', crossorigin: 'anonymous'}) }}">
         <link rel="stylesheet" href="/app.css">
     </head>
 
-If you reload the page, the perceived performance will improve because the
-server responded with both the HTML page and the CSS file when the browser only
-requested the HTML page.
+The ``preload()`` function adds a ``Link`` HTTP header to the response (e.g.
+``Link: </fonts/myfont.woff2>; rel="preload"; as="font"``). This tells the
+browser — or an HTTP/2 compatible server or CDN — to start fetching the resource
+as early as possible. You can also combine it with the ``asset()`` function:
+
+.. code-block:: html+twig
+
+    <link rel="preload" href="{{ preload(asset('build/app.css'), {as: 'style'}) }}" as="style">
+    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
 
 .. tip::
 
-    When using the :doc:`AssetMapper component </frontend/asset_mapper>` to link
-    to assets (e.g. ``importmap('app')``), there's no need to add the ``<link rel="preload">``
+    When using the :doc:`AssetMapper component </frontend/asset_mapper>` (e.g.
+    ``importmap('app')``), there's no need to add the ``<link rel="preload">``
     tag. The ``importmap()`` Twig function automatically adds the ``Link`` HTTP
     header for you when the WebLink component is available.
-
-.. note::
-
-    You can preload an asset by wrapping it with the ``preload()`` function:
-
-    .. code-block:: html+twig
-
-        <head>
-            <!-- ... -->
-            <link rel="preload" href="{{ preload(asset('build/app.css')) }}" as="style">
-            <!-- ... -->
-        </head>
 
 Additionally, according to `the Priority Hints specification`_, you can signal
 the priority of the resource to download using the ``importance`` attribute:
@@ -107,18 +102,22 @@ How does it work?
 ~~~~~~~~~~~~~~~~~
 
 The WebLink component manages the ``Link`` HTTP headers added to the response.
-When using the ``preload()`` function in the previous example, the following
-header was added to the response: ``Link </app.css>; rel="preload"; as="style"``
-According to `the Preload specification`_, when an HTTP/2 server detects that
-the original (HTTP 1.x) response contains this HTTP header, it will
-automatically trigger a push for the related file in the same HTTP/2 connection.
+When using the ``preload()`` function, a header like this is added to the
+response: ``Link </fonts/myfont.woff2>; rel="preload"; as="font"``
 
-Popular proxy services and CDNs including `Cloudflare`_, `Fastly`_ and `Akamai`_
-also leverage this feature. It means that you can push resources to clients and
-improve performance of your applications in production right now.
+This header is interpreted in two ways depending on the infrastructure:
 
-If you want to prevent the push but let the browser preload the resource by
-issuing an early separate HTTP request, use the ``nopush`` option:
+* **Browser preloading**: Modern browsers read ``Link`` headers and start
+  fetching the resources as early as possible, before parsing the full HTML.
+  This works with both HTTP/1.x and HTTP/2.
+* **HTTP/2 Server Push**: According to `the Preload specification`_, some
+  HTTP/2 servers detect this header and push the resource to the client
+  in the same connection, before the browser even requests it. Popular proxy
+  services and CDNs including `Cloudflare`_, `Fastly`_ and `Akamai`_ also
+  support this.
+
+If you want the browser to preload the resource via an early request but want
+to prevent the server from pushing it, use the ``nopush`` option:
 
 .. code-block:: html+twig
 
