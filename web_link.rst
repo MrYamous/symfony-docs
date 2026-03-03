@@ -66,13 +66,16 @@ correctly and comply with the content security policy:
 
     <head>
         <!-- ... -->
-        <link rel="preload" href="{{ preload('/fonts/myfont.woff2', {as: 'font', type: 'font/woff2', crossorigin: 'anonymous'}) }}">
+        <link rel="preload" href="{{ preload('/fonts/myfont.woff2', {as: 'font'}) }}">
+        <!-- you can add optionally add more attributes to the preload link -->
+        <!-- <link rel="preload" href="{{ preload('/fonts/myfont.woff2', {as: 'font', type: 'font/woff2', crossorigin: 'anonymous'}) }}"> -->
+
         <link rel="stylesheet" href="/app.css">
     </head>
 
 The ``preload()`` function adds a ``Link`` HTTP header to the response (e.g.
 ``Link: </fonts/myfont.woff2>; rel="preload"; as="font"``). This tells the
-browser — or an HTTP/2 compatible server or CDN — to start fetching the resource
+browser (or an HTTP/2 compatible server or CDN) to start fetching the resource
 as early as possible. You can also combine it with the ``asset()`` function:
 
 .. code-block:: html+twig
