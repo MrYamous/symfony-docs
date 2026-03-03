@@ -254,6 +254,24 @@ only, allowing you to notice when *your code* is using deprecated APIs, and to
 keep up with the changes. You can still use ``max[indirect]`` if you want to
 keep indirect deprecations under a given threshold.
 
+The following table summarizes the possible types of deprecations:
+
++------------------------+-----------------------------------------------------+
+| Type                   | Description                                         |
++========================+=====================================================+
+| **self**               | Deprecations triggered in first-party code          |
+|                        | (your own code), regardless of who calls it         |
++------------------------+-----------------------------------------------------+
+| **direct**             | Deprecations triggered in third-party code          |
+|                        | (vendor), but called directly by your code          |
++------------------------+-----------------------------------------------------+
+| **indirect**           | Deprecations triggered in third-party code          |
+|                        | (vendor), called by other third-party code          |
++------------------------+-----------------------------------------------------+
+| **other**              | Deprecations that cannot be clearly classified,     |
+|                        | such as those triggered at autoloading time         |
++------------------------+-----------------------------------------------------+
+
 Here is a summary that should help you pick the right configuration:
 
 +------------------------+-----------------------------------------------------+
@@ -350,7 +368,7 @@ Deprecation Notices at Autoloading Time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the PHPUnit Bridge uses ``DebugClassLoader`` from the
-`ErrorHandler component`_ to throw deprecation notices at class autoloading
+`ErrorHandler component`_ to trigger deprecation notices at class autoloading
 time. This can be disabled with the ``debug-class-loader`` option.
 
 .. code-block:: xml
