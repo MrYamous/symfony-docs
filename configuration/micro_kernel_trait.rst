@@ -171,15 +171,14 @@ that define your bundles, your services and your routes:
 Restricting Allowed Environments
 --------------------------------
 
-The ``MicroKernelTrait`` provides a ``getAllowedEnvs()`` method that lets you
-restrict which environment names are valid for your application. By default,
-this method returns an empty array, which means any environment is allowed (the
-same behavior as previous Symfony versions).
+The ``MicroKernelTrait`` provides a ``getAllowedEnvs()`` method to restrict
+which :ref:`configuration environment <configuration-environments>` names are
+valid for your application. By default, it returns an empty array, meaning any
+environment name is allowed.
 
-When you override ``getAllowedEnvs()`` to return a non-empty array, the kernel
-will throw an ``InvalidArgumentException`` at boot time if the current
-environment (typically set via the ``APP_ENV`` environment variable) is not in
-the list::
+Override ``getAllowedEnvs()`` to return a non-empty array and the kernel will
+throw an ``InvalidArgumentException`` at boot time if the current environment
+(typically set via the ``APP_ENV`` environment variable) is not in the list::
 
     // src/Kernel.php
     namespace App;
@@ -197,9 +196,9 @@ the list::
         }
     }
 
-With this configuration, booting the kernel with ``APP_ENV=staging`` would
-throw an exception. This is useful to catch typos or misconfiguration early,
-especially in deployment pipelines.
+With this configuration, booting the kernel with ``APP_ENV=staging`` throws
+an exception. This helps catch typos or misconfiguration early, especially in
+deployment pipelines.
 
 .. versionadded:: 8.1
 
