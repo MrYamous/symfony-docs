@@ -222,36 +222,14 @@ provides :ref:`named lock <reference-lock-resources-name>`:
             ],
         ]);
 
-After having configured one or more named locks, you have two ways of injecting
-them in any service or controller:
+After having configured one or more named locks, use the ``#[Target]``
+attribute to inject a specific lock factory in any service or controller.
+Symfony creates a target with the same name as the lock.
 
-**(1) Use a specific argument name**
+For example, to inject the ``invoice`` lock defined earlier::
 
-Type-hint your constructor/method argument with ``LockFactory`` and name the
-argument using this pattern: "lock name in camelCase" + ``LockFactory`` suffix.
-For example, to inject the ``invoice`` package defined earlier::
-
-    use Symfony\Component\Lock\LockFactory;
-
-    class SomeService
-    {
-        public function __construct(
-            private LockFactory $invoiceLockFactory
-        ) {
-            // ...
-        }
-    }
-
-**(2) Use the ``#[Target]`` attribute**
-
-When :ref:`dealing with multiple implementations of the same type <autowiring-multiple-implementations-same-type>`
-the ``#[Target]`` attribute helps you select which one to inject. Symfony creates
-a target with the same name as the lock.
-
-For example, to select the ``invoice`` lock defined earlier::
-
-    // ...
     use Symfony\Component\DependencyInjection\Attribute\Target;
+    use Symfony\Component\Lock\LockFactory;
 
     class SomeService
     {

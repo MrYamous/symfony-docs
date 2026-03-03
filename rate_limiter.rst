@@ -194,42 +194,19 @@ Rate Limiting in Action
 Injecting the Rate Limiter Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After having configured one or more rate limiters, you have two ways of injecting
-them in any service or controller:
+After having configured one or more rate limiters, use the ``#[Target]``
+attribute to inject a specific rate limiter in any service or controller.
+Symfony creates a target with the same name as the rate limiter.
 
-**(1) Use a specific argument name**
-
-Type-hint your constructor/method argument with ``RateLimiterFactoryInterface`` and name
-the argument using this pattern: "rate limiter name in camelCase" + ``Limiter`` suffix.
-For example, to inject the ``anonymous_api`` limiter defined earlier, use an
-argument named ``$anonymousApiLimiter``::
+For example, to inject the ``anonymous_api`` limiter defined earlier::
 
     // src/Controller/ApiController.php
     namespace App\Controller;
 
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\HttpFoundation\Response;
     use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
-
-    class ApiController extends AbstractController
-    {
-        public function index(RateLimiterFactoryInterface $anonymousApiLimiter): Response
-        {
-            // ...
-        }
-    }
-
-**(2) Use the ``#[Target]`` attribute**
-
-When :ref:`dealing with multiple implementations of the same type <autowiring-multiple-implementations-same-type>`
-the ``#[Target]`` attribute helps you select which one to inject. Symfony creates
-a target with the same name as the rate limiter.
-
-For example, to select the ``anonymous_api`` limiter defined earlier, use
-``anonymous_api.limiter`` as the target::
-
-    // ...
-    use Symfony\Component\DependencyInjection\Attribute\Target;
 
     class ApiController extends AbstractController
     {
@@ -253,6 +230,7 @@ to the API::
     namespace App\Controller;
 
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
     use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -260,13 +238,14 @@ to the API::
 
     class ApiController extends AbstractController
     {
-        // the argument name here is important; read the previous section about
-        // how to inject a specific rate limiter service
-        public function index(Request $request, RateLimiterFactoryInterface $anonymousApiLimiter): Response
+        public function index(
+            Request $request,
+            #[Target('anonymous_api')] RateLimiterFactoryInterface $rateLimiter,
+        ): Response
         {
             // create a limiter based on a unique identifier of the client
             // (e.g. the client's IP address, a username/email, an API key, etc.)
-            $limiter = $anonymousApiLimiter->create($request->getClientIp());
+            $limiter = $rateLimiter->create($request->getClientIp());
 
             // the argument of consume() is the number of tokens to consume
             // and returns an object of type Limit
@@ -303,16 +282,20 @@ using the ``reserve()`` method::
     namespace App\Controller;
 
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
     use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
     class ApiController extends AbstractController
     {
-        public function registerUser(Request $request, RateLimiterFactoryInterface $authenticatedApiLimiter): Response
+        public function registerUser(
+            Request $request,
+            #[Target('authenticated_api')] RateLimiterFactoryInterface $rateLimiter,
+        ): Response
         {
             $apiKey = $request->headers->get('apikey');
-            $limiter = $authenticatedApiLimiter->create($apiKey);
+            $limiter = $rateLimiter->create($apiKey);
 
             // this blocks the application until the given number of tokens can be consumed
             $limiter->reserve(1)->wait();
@@ -545,15 +528,19 @@ Then, inject and use as normal::
     namespace App\Controller;
 
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
     use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
     class ContactController extends AbstractController
     {
-        public function registerUser(Request $request, RateLimiterFactoryInterface $contactFormLimiter): Response
+        public function registerUser(
+            Request $request,
+            #[Target('contact_form')] RateLimiterFactoryInterface $rateLimiter,
+        ): Response
         {
-            $limiter = $contactFormLimiter->create($request->getClientIp());
+            $limiter = $rateLimiter->create($request->getClientIp());
 
             if (false === $limiter->consume(1)->isAccepted()) {
                 // either of the two limiters has been reached
