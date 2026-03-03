@@ -3558,7 +3558,7 @@ This option defines the directory where session files are stored when using
 the native file session handler (i.e. when ``handler_id`` is ``null`` and no
 DSN is configured). It overrides PHP's `session.save_path`_ directive.
 
-By default, Symfony stores session files in ``%kernel.cache_dir%/sessions``.
+By default, Symfony stores session files in ``%kernel.cache_dir%/sessions/``.
 If you set this option to ``null``, PHP's default path from ``php.ini`` will
 be used instead:
 
