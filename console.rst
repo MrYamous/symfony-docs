@@ -654,10 +654,10 @@ you need lower-level control over the testing setup::
     Use PHP's first-class callable syntax to test
     :ref:`method-based commands <console-method-based-commands>`::
 
-    $commands = new UserCommands($userRepository);
+        $commands = new UserCommands($userRepository);
 
-    $tester = new CommandTester($commands->create(...));
-    $tester->execute([]);
+        $tester = new CommandTester($commands->create(...));
+        $tester->execute([]);
 
 .. note::
 
