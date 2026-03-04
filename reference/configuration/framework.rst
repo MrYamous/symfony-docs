@@ -1247,6 +1247,17 @@ a stale response while it revalidates it in the background.
 This setting is overridden by the stale-while-revalidate HTTP Cache-Control
 extension (see RFC 5861).
 
+terminate_on_cache_hit
+......................
+
+**type**: ``boolean``
+
+.. deprecated:: 8.1
+
+    The ``terminate_on_cache_hit`` option is deprecated since Symfony 8.1
+    because the underlying ``HttpCache`` option it configured was removed in
+    Symfony 7.0. Remove it from your configuration.
+
 trace_header
 ............
 
