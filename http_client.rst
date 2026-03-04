@@ -1405,35 +1405,6 @@ so the :doc:`Cache component </components/cache>` must be installed in your appl
                         adapter: cache.adapter.redis_tag_aware
                         tags: true
 
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-
-            <framework:config>
-                <framework:http-client>
-                    <framework:scoped-client name="example.client"
-                        base-uri="https://example.com"
-                    >
-                        <framework:caching cache-pool="example_cache_pool"/>
-                    </framework:scoped-client>
-                </framework:http-client>
-
-                <framework:cache>
-                    <framework:pool name="example_cache_pool"
-                        adapter="cache.adapter.redis_tag_aware"
-                        tags="true"
-                    />
-                </framework:cache>
-            </framework:config>
-        </container>
-
     .. code-block:: php
 
         // config/packages/framework.php

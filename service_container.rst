@@ -271,19 +271,6 @@ You can limit service registration to specific environments as follows:
             services:
                 App\Service\AnotherClass: ~
 
-    .. code-block:: xml
-
-        <!-- config/services.xml -->
-        <services>
-            <service id="App\Service\SomeClass"/>
-
-            <when env="dev">
-                <services>
-                    <service id="App\Service\AnotherClass"/>
-                </services>
-            </when>
-        </services>
-
     .. code-block:: php
 
         // config/services.php
