@@ -111,6 +111,8 @@ exclude_rule_for_file:
       rule_name: argument_variable_must_match_type
     - path: contributing/documentation/format.rst
       rule_name: no_relative_doc_path
+    - path: components/phpunit_bridge.rst
+      rule_name: indention
 
 # do not report as violation
 whitelist:
