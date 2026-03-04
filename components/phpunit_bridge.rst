@@ -272,8 +272,7 @@ Value              Recommended situation
 =================  =====================================================================================
 ``max[total]=0``   Recommended for actively maintained projects with robust/no dependencies
 ``max[direct]=0``  Recommended for projects with dependencies that fail to keep up with new deprecations
-``max[self]=0``    Recommended for libraries that use the deprecation system themselves
-                   and cannot afford to use one of the modes above
+``max[self]=0``    Recommended for libraries that use the deprecation system themselves and cannot afford to use one of the modes above
 =================  =====================================================================================
 
 Ignoring Deprecations
@@ -369,6 +368,33 @@ time. This can be disabled with the ``debug-class-loader`` option.
             </arguments>
         </listener>
     </listeners>
+
+Namespace Remapping for DebugClassLoader
+........................................
+
+.. versionadded:: 8.1
+
+    The namespace remapping feature was introduced in Symfony 8.1.
+
+By default, ``DebugClassLoader`` uses the first namespace segment (e.g.
+``Acme\``) to determine vendor boundaries. Deprecation notices between classes
+that share the same vendor prefix are silently suppressed.
+
+This can be a problem when a library (``Acme\Library\*``) and its Symfony
+integration bundle (``Acme\Bundle\*``) share the same top-level namespace but
+are developed independently. To expose deprecations between them, pass a
+namespace mapping to ``DebugClassLoader::enable()``::
+
+    use Symfony\Component\ErrorHandler\DebugClassLoader;
+
+    DebugClassLoader::enable([
+        // treat Acme\Bundle as a different vendor from Acme\Library
+        'Acme\Bundle' => 'Acme\Bundle',
+        'Acme\Library' => 'Acme\Library',
+    ]);
+
+Each key is a class name or namespace prefix. Its value is the vendor string
+used for comparison instead of the default first segment.
 
 Compile-time Deprecations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
