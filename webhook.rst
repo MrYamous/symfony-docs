@@ -50,17 +50,6 @@ can customize this prefix in your routing configuration:
             resource: '@FrameworkBundle/Resources/config/routing/webhook.xml'
             prefix: /webhook  # customize as needed
 
-    .. code-block:: xml
-
-        <!-- config/routes/webhook.xml -->
-        <routes xmlns="http://symfony.com/schema/routing"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://symfony.com/schema/routing
-                https://symfony.com/schema/routing/routing-1.0.xsd">
-            <import resource="@FrameworkBundle/Resources/config/routing/webhook.xml"
-                prefix="/webhook"/>
-        </routes>
-
     .. code-block:: php
 
         // config/routes/webhook.php
@@ -85,26 +74,6 @@ controller uses a routing mechanism to map incoming requests to the appropriate 
                     acme_webhook:  # routing name, maps to /webhook/acme_webhook
                         service: App\Webhook\AcmeWebhookRequestParser
                         secret: '%env(WEBHOOK_SECRET)%'  # optional
-
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony
-                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-            <framework:config>
-                <framework:webhook enabled="true">
-                    <framework:routing type="acme_webhook">
-                        <framework:service>App\Webhook\AcmeWebhookRequestParser</framework:service>
-                        <framework:secret>%env(WEBHOOK_SECRET)%</framework:secret>
-                    </framework:routing>
-                </framework:webhook>
-            </framework:config>
-        </container>
 
     .. code-block:: php
 
@@ -159,18 +128,6 @@ request format:
                     acme_webhook:
                         service: Symfony\Component\Webhook\Client\RequestParser
                         secret: '%env(WEBHOOK_SECRET)%'
-
-    .. code-block:: xml
-
-        <!-- config/packages/framework.xml -->
-        <framework:config>
-            <framework:webhook enabled="true">
-                <framework:routing type="acme_webhook">
-                    <framework:service>Symfony\Component\Webhook\Client\RequestParser</framework:service>
-                    <framework:secret>%env(WEBHOOK_SECRET)%</framework:secret>
-                </framework:routing>
-            </framework:webhook>
-        </framework:config>
 
     .. code-block:: php
 
@@ -446,26 +403,6 @@ for :class:`Symfony\\Component\\RemoteEvent\\Messenger\\ConsumeRemoteEventMessag
             messenger:
                 routing:
                     'Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventMessage': async
-
-    .. code-block:: xml
-
-        <!-- config/packages/messenger.xml -->
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony
-                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-            <framework:config>
-                <framework:messenger>
-                    <framework:routing
-                        message-class="Symfony\Component\RemoteEvent\Messenger\ConsumeRemoteEventMessage">
-                        <framework:sender service="async"/>
-                    </framework:routing>
-                </framework:messenger>
-            </framework:config>
-        </container>
 
     .. code-block:: php
 
