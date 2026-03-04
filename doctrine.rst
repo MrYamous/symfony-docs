@@ -227,7 +227,8 @@ add/remove fields, add/remove methods or update configuration.
 
 Doctrine supports a wide variety of field types, each with their own options.
 Check out the `list of Doctrine mapping types`_ in the Doctrine documentation.
-If you want to use XML instead of attributes, add ``type: xml`` and
+Symfony also provides :doc:`additional field types </doctrine/field_types_reference>`
+for UIDs and DatePoints. If you want to use XML instead of attributes, add ``type: xml`` and
 ``dir: '%kernel.project_dir%/config/doctrine'`` to the entity mappings in your
 ``config/packages/doctrine.yaml`` file.
 
@@ -1163,6 +1164,7 @@ Learn more
     doctrine/custom_dql_functions
     doctrine/dbal
     doctrine/multiple_entity_managers
+    doctrine/field_types_reference
     doctrine/resolve_target_entity
     testing/database
 
