@@ -623,6 +623,16 @@ and only the first one stored the CSRF token in the session.
     :ref:`handler_id <config-framework-session-handler-id>` config option, you can
     add the ``prefix`` and ``ttl`` options as query string parameters in the DSN.
 
+.. tip::
+
+    When using `Valkey`_ servers, you can use the ``valkey:`` or ``valkeys:``
+    DSN schemes instead of ``redis:`` or ``rediss:`` in the session handler
+    configuration.
+
+    .. versionadded:: 7.3
+
+        Support for Valkey DSN schemes was introduced in Symfony 7.3.
+
 .. _session-database-pdo:
 
 Store Sessions in a Relational Database (MariaDB, MySQL, PostgreSQL)
@@ -1592,6 +1602,7 @@ the example below:
     has not been started before Symfony is initialized.
 
 .. _`Twig Live Component`: https://symfony.com/bundles/ux-live-component/current/index.html
+.. _`Valkey`: https://valkey.io/
 .. _`phpredis extension`: https://github.com/phpredis/phpredis
 .. _`DoctrineMongoDBBundle configuration`: https://symfony.com/doc/master/bundles/DoctrineMongoDBBundle/config.html
 .. _`MongoDB shell`: https://docs.mongodb.com/manual/mongo/
