@@ -356,6 +356,18 @@ above.
 See ":ref:`twig-reference-form-variables`" to learn about the ``variables``
 argument.
 
+.. versionadded:: 7.4
+
+    The automatic ``aria-invalid`` and ``aria-describedby`` attributes were
+    introduced in Symfony 7.4.
+
+When a form field has validation errors, all built-in form themes automatically
+add the ``aria-invalid="true"`` attribute to the ``<input>`` element and link
+it to its error messages using ``aria-describedby``. If the field also has a
+help text, both the help and error IDs are included in the ``aria-describedby``
+value. This improves accessibility for screen readers without any extra
+configuration.
+
 .. _reference-forms-twig-rest:
 
 form_rest(form_view, variables)
