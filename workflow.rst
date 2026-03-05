@@ -251,8 +251,13 @@ what actions are allowed on a blog post::
     // See a specific available transition for the post in the current state
     $transition = $workflow->getEnabledTransition($post, 'publish');
 
-Using Enums as Workflow Places
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _using-enums-as-workflow-places:
+
+Using Enums in Workflows
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using Enums is Workflow Definitions
+...................................
 
 When using a state machine, you can use PHP backend enums as places in your
 workflows. First, define your enum with backed values::
@@ -397,6 +402,45 @@ when needed and vice-versa when working with your objects::
                     ],
                 ],
             ]);
+
+Using Enums is Marking Stores
+.............................
+
+When using a single state marking store, you can type-hint the property with a
+``BackedEnum`` instead of a string. The ``MethodMarkingStore`` will automatically
+convert between the enum and its backing value::
+
+    // src/Entity/Status.php
+    namespace App\Entity;
+
+    enum Status: string
+    {
+        case Draft = 'draft';
+        case Reviewed = 'reviewed';
+        case Published = 'published';
+    }
+
+    // src/Entity/BlogPost.php
+    namespace App\Entity;
+
+    class BlogPost
+    {
+        public ?Status $currentPlace = null;
+
+        public function getCurrentPlace(): ?Status
+        {
+            return $this->currentPlace;
+        }
+
+        public function setCurrentPlace(Status $currentPlace, array $context = []): void
+        {
+            $this->currentPlace = $currentPlace;
+        }
+    }
+
+.. versionadded:: 7.4
+
+    Support for ``BackedEnum`` in ``MethodMarkingStore`` was introduced in Symfony 7.4.
 
 Using Weighted Transitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
