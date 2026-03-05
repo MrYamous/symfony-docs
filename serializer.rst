@@ -1884,6 +1884,7 @@ by custom callables. This is especially useful when serializing entities
 having unique identifiers::
 
     use Symfony\Component\Serializer\Exception\CircularReferenceException;
+    use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
     $context = [
         AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function (object $object, ?string $format, array $context): string {
