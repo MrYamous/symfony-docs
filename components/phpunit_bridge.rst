@@ -272,8 +272,7 @@ Value              Recommended situation
 =================  =====================================================================================
 ``max[total]=0``   Recommended for actively maintained projects with robust/no dependencies
 ``max[direct]=0``  Recommended for projects with dependencies that fail to keep up with new deprecations
-``max[self]=0``    Recommended for libraries that use the deprecation system themselves
-                   and cannot afford to use one of the modes above
+``max[self]=0``    Recommended for libraries that use the deprecation system themselves and cannot afford to use one of the modes above
 =================  =====================================================================================
 
 Ignoring Deprecations
