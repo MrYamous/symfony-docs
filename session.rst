@@ -629,10 +629,6 @@ and only the first one stored the CSRF token in the session.
     DSN schemes instead of ``redis:`` or ``rediss:`` in the session handler
     configuration.
 
-    .. versionadded:: 7.3
-
-        Support for Valkey DSN schemes was introduced in Symfony 7.3.
-
 .. _session-database-pdo:
 
 Store Sessions in a Relational Database (MariaDB, MySQL, PostgreSQL)
