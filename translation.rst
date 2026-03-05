@@ -1210,11 +1210,12 @@ Computing Fallback Locales Programmatically
 
     The ``LocaleFallbackProvider`` class was introduced in Symfony 8.1.
 
-The locale fallback logic (ICU parent locale chain, sub-tag shortening,
-configured fallback locales) is encapsulated in the
-:class:`Symfony\\Component\\Translation\\LocaleFallbackProvider` class. You can
-use it directly when you need to compute the fallback chain for a given locale
-outside of the ``Translator``::
+Symfony determines locale fallbacks using several rules, such as the ICU parent
+locale chain, `locale subtag`_ shortening, and configured fallback locales.
+
+This logic is encapsulated in the :class:`Symfony\\Component\\Translation\\LocaleFallbackProvider`
+class. You can use this class when you need to compute the fallback chain for a
+locale outside of the ``Translator``::
 
     use Symfony\Component\Translation\LocaleFallbackProvider;
 
@@ -1719,3 +1720,4 @@ Learn more
 .. _`Lokalise`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Translation/Bridge/Lokalise/README.md
 .. _`Phrase`: https://github.com/symfony/symfony/blob/{version}/src/Symfony/Component/Translation/Bridge/Phrase/README.md
 .. _`AST`: https://en.wikipedia.org/wiki/Abstract_syntax_tree
+.. _`locale subtag`: https://datatracker.ietf.org/doc/html/rfc4646
