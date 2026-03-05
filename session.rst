@@ -721,14 +721,13 @@ and only the first one stored the CSRF token in the session.
 
 .. tip::
 
-    .. versionadded:: 7.3
-
-        Support for the ``valkey:`` and ``valkeys:`` DSN schemes in session
-        handlers was introduced in Symfony 7.3.
-
     When using `Valkey`_ servers, you can use the ``valkey:`` or ``valkeys:``
     DSN schemes instead of ``redis:`` or ``rediss:`` in the session handler
     configuration.
+
+    .. versionadded:: 7.3
+
+        Support for Valkey DSN schemes was introduced in Symfony 7.3.
 
 .. _session-database-pdo:
 
