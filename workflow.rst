@@ -438,10 +438,6 @@ convert between the enum and its backing value::
         }
     }
 
-.. versionadded:: 7.4
-
-    Support for ``BackedEnum`` in ``MethodMarkingStore`` was introduced in Symfony 7.4.
-
 Using Weighted Transitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
