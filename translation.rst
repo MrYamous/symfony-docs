@@ -1203,6 +1203,32 @@ checks translation resources for several locales:
     add the missing translation to the log file. For details,
     see :ref:`reference-framework-translator-logging`.
 
+Computing Fallback Locales Programmatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``LocaleFallbackProvider`` class was introduced in Symfony 8.1.
+
+The locale fallback logic (ICU parent locale chain, sub-tag shortening,
+configured fallback locales) is encapsulated in the
+:class:`Symfony\\Component\\Translation\\LocaleFallbackProvider` class. You can
+use it directly when you need to compute the fallback chain for a given locale
+outside of the ``Translator``::
+
+    use Symfony\Component\Translation\LocaleFallbackProvider;
+
+    $provider = new LocaleFallbackProvider(['en']);
+    $fallbacks = $provider->computeFallbackLocales('es_AR');
+    // ['es_419', 'es', 'en']
+
+The class also provides a method to validate locale strings::
+
+    use Symfony\Component\Translation\LocaleFallbackProvider;
+
+    // throws InvalidArgumentException if the locale contains invalid characters
+    LocaleFallbackProvider::validateLocale($locale);
+
 .. _locale-switcher:
 
 Switch Locale Programmatically
