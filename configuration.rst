@@ -952,37 +952,37 @@ already existing ``.env`` files).
 Environment Variables in Bundle Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you use ``%env(...)%`` in bundle configuration (e.g.
-``config/packages/doctrine.yaml``), the value is **not** read at compile time.
-Instead, Symfony replaces it with a unique placeholder. The actual environment
-variable is only resolved at runtime, when the service using it is instantiated.
+When you use ``%env(...)%`` in bundle configuration (e.g. ``config/packages/doctrine.yaml``),
+the value is **not** read at compile time. Instead, Symfony replaces it with a
+unique placeholder. The actual environment variable is only resolved at runtime,
+when the service using it is instantiated.
 
-This means that bundle authors must follow certain rules to ensure their bundle
-supports runtime env vars correctly:
+**Bundle authors** must follow certain rules to ensure their bundle supports
+runtime env vars correctly:
 
-**In the Configuration class (TreeBuilder):**
+**In the Configuration class** (``TreeBuilder``):
 
-* Don't write ``beforeNormalization()`` steps that inspect or transform the
-  *values* of settings (steps that only move keys around without looking at
-  values, like DoctrineBundle's shortcut config, are fine);
-* Don't write ``validate()`` steps that check the *values* of settings
-  (at compile time, the value is still a placeholder string, not the real value).
+* Don't write ``beforeNormalization()`` steps that inspect or transform config
+  option *values* (steps that only reorganize keys without reading values are fine);
+* Don't write ``validate()`` steps that check config option *values* (at compile
+  time, the value is still a placeholder string, not the real value).
 
-**In the DI extension (``load()`` method):**
+**In the DI extension** (``load()`` method):
 
-* Don't write logic that inspects the values of processed settings before
-  injecting them into DI parameters or service definition arguments. At compile
-  time, these values are placeholder strings, not the real env var values.
+* Don't write logic that inspects processed config option values before injecting
+  them into DI parameters or service definition arguments. At compile time, those
+  values are placeholder strings, not the actual env var values.
 
 .. tip::
 
     The general rule is: **wire the value into the container, don't inspect it**.
-    As long as you pass env var values through to service arguments or parameters
-    without interpreting them, runtime resolution works automatically.
+    Passing env var values through to service arguments or parameters without
+    interpreting them is enough for runtime resolution to work automatically.
 
-**Handling DSNs and values that need parsing:**
+Handling DSNs and Values that Need Parsing
+..........................................
 
-If a service needs a parsed version of a DSN (e.g. extracting the host, port
+If a service needs a parsed version of a DSN (e.g. extracting the host, port,
 and credentials from a database URL), don't parse it in the DI extension during
 container compilation. Instead, create a **factory service** that parses the DSN
 at runtime::
