@@ -929,7 +929,7 @@ The ``file()`` helper provides some arguments to configure its behavior::
 Sending Early Hints
 ~~~~~~~~~~~~~~~~~~~
 
-You can improve performance by sending ``103`` Early Hints responses to hint
+You can improve performance by sending ``103`` Early Hints responses to ask
 the browser to start downloading assets before the full response is ready.
 See :ref:`early-hints` for details.
 
