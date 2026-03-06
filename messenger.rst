@@ -1588,11 +1588,11 @@ event subscriber that is registered automatically when using the Doctrine
 transport with PostgreSQL. The listener hooks into the worker lifecycle:
 
 * On ``WorkerStartedEvent``: validates that all PostgreSQL transports share the
-  same DBAL connection and table name, registers ``LISTEN`` on the first
-  connection only (the others mark ``get()`` as externally handled to avoid
-  accumulating unread notifications).
-* On ``WorkerRunningEvent`` (idle): blocks on ``waitForNotify()`` using the active
-  connection with a smart timeout that is capped by:
+  same DBAL connection and table name, then registers ``LISTEN`` on the first
+  connection only. The others mark ``get()`` as externally handled to avoid
+  accumulating unread notifications.
+* On ``WorkerRunningEvent`` (idle): blocks on ``waitForNotify()`` using the
+  active connection with a smart timeout that is capped by:
 
   * the ``get_notify_timeout`` transport option;
   * the earliest delayed message across all PostgreSQL queues, so the worker
@@ -1602,13 +1602,13 @@ transport with PostgreSQL. The listener hooks into the worker lifecycle:
     so those transports are still polled regularly.
 
 This way, the worker's main loop checks all transports in priority order on
-every iteration, and only blocks *after* all queues have been found empty.
+every iteration and only blocks *after* all queues have been found empty.
 
 .. warning::
 
     When consuming from multiple PostgreSQL transports, all transports must
     share the same DBAL connection and the same ``table_name``. Otherwise, a
-    ``LogicException`` is thrown at worker startup.
+    ``LogicException`` is thrown when the worker starts.
 
 .. versionadded:: 8.1
 
