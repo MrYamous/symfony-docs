@@ -250,6 +250,14 @@ depend on the authentication mechanism, which can be any of these:
                         # ...
                     http_digest:
                         # ...
+                    access_token:
+                        # ...
+                    login_link:
+                        # ...
+                    login_throttling:
+                        # ...
+                    remember_me:
+                        # ...
 
 You can view actual information about the firewalls in your application with
 the ``debug:firewall`` command:
@@ -836,6 +844,331 @@ user
 **type**: ``string`` **default**: ``REMOTE_USER``
 
 The name of the ``$_SERVER`` parameter holding the user identifier.
+
+``access_token`` Authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the ``access_token`` authentication mechanism beneath a firewall,
+the application authenticates users based on an API token sent with the request.
+For even more details, see :doc:`/security/access_token`.
+
+token_handler
+.............
+
+**type**: ``string`` | ``array``
+
+The service id of the token handler or an array of options for a built-in
+handler (e.g. ``oidc``, ``oidc_user_info``). This option is required.
+
+token_extractors
+................
+
+**type**: ``array`` **default**: ``['security.access_token_extractor.header']``
+
+The list of service ids used to extract the token from the request. By default,
+the token is extracted from the ``Authorization`` request header.
+
+realm
+.....
+
+**type**: ``string`` **default**: ``null``
+
+The "realm" for the ``WWW-Authenticate`` response header returned when
+authentication fails.
+
+provider
+........
+
+**type**: ``string``
+
+The service id of the user provider that should be used by this authenticator.
+
+success_handler
+...............
+
+**type**: ``string``
+
+The service id of a service that implements
+:class:`Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationSuccessHandlerInterface`.
+
+failure_handler
+...............
+
+**type**: ``string``
+
+The service id of a service that implements
+:class:`Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationFailureHandlerInterface`.
+
+
+``login_link`` Authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the ``login_link`` authentication mechanism beneath a firewall,
+users are authenticated via a unique, signed URL sent to them (e.g. by email).
+For even more details, see :doc:`/security/login_link`.
+
+check_route
+...........
+
+**type**: ``string``
+
+The route name that the login link URL will point to. This option is required.
+
+check_post_only
+...............
+
+**type**: ``boolean`` **default**: ``false``
+
+If ``true``, the login link is only accepted via ``POST`` requests.
+
+signature_properties
+....................
+
+**type**: ``array``
+
+An array of user properties used to create the login link signature. This option
+is required and must contain at least one property (e.g. ``['email']``).
+
+lifetime
+........
+
+**type**: ``integer`` **default**: ``600``
+
+The lifetime of the login link in seconds.
+
+max_uses
+........
+
+**type**: ``integer`` **default**: ``null``
+
+The maximum number of times a login link can be used. ``null`` means unlimited.
+
+used_link_cache
+...............
+
+**type**: ``string``
+
+The service id of the cache pool used to track used login links. This is required
+when ``max_uses`` is set.
+
+secret
+......
+
+**type**: ``string`` **default**: ``%kernel.secret%``
+
+The secret used to sign the login link URL.
+
+provider
+........
+
+**type**: ``string``
+
+The service id of the user provider that should be used by this authenticator.
+
+success_handler
+...............
+
+**type**: ``string``
+
+The service id of a service that implements
+:class:`Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationSuccessHandlerInterface`.
+
+failure_handler
+...............
+
+**type**: ``string``
+
+The service id of a service that implements
+:class:`Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationFailureHandlerInterface`.
+
+.. _reference-security-firewall-login-throttling:
+
+``login_throttling``
+~~~~~~~~~~~~~~~~~~~~
+
+Login throttling limits the number of failed login attempts over a given period of
+time. This helps protect against brute-force attacks. For even more details, see
+:doc:`/security` and :doc:`/rate_limiter`.
+
+limiter
+.......
+
+**type**: ``string``
+
+The service id of a custom rate limiter implementing
+:class:`Symfony\\Component\\HttpFoundation\\RateLimiter\\RequestRateLimiterInterface`.
+When set, all other options below are ignored because the provided limiter is used
+directly.
+
+max_attempts
+............
+
+**type**: ``integer`` **default**: ``5``
+
+The maximum number of failed login attempts before the login is throttled.
+
+interval
+........
+
+**type**: ``string`` **default**: ``'1 minute'``
+
+The period of time in which the ``max_attempts`` are counted (e.g. ``'1 minute'``,
+``'30 seconds'``).
+
+lock_factory
+............
+
+**type**: ``string`` **default**: ``null``
+
+The service id of the lock factory used by the rate limiter. Set to ``null`` to
+disable locking.
+
+cache_pool
+..........
+
+**type**: ``string`` **default**: ``'cache.rate_limiter'``
+
+The cache pool service id used to store the rate limiter state.
+
+storage_service
+...............
+
+**type**: ``string`` **default**: ``null``
+
+The service id of a custom storage service for the rate limiter. When set, this
+takes precedence over ``cache_pool``.
+
+.. _reference-security-firewall-remember-me:
+
+``remember_me``
+~~~~~~~~~~~~~~~
+
+The "remember me" authentication mechanism allows users to stay authenticated
+across browser sessions by storing a special cookie. For even more details, see
+:doc:`/security/remember_me`.
+
+secret
+......
+
+**type**: ``string`` **default**: ``%kernel.secret%``
+
+The secret used to encode the cookie content. It's common to use the
+``kernel.secret`` parameter.
+
+service
+.......
+
+**type**: ``string``
+
+The service id of a custom remember-me handler implementing
+:class:`Symfony\\Component\\Security\\Http\\RememberMe\\RememberMeHandlerInterface`.
+
+token_provider
+..............
+
+**type**: ``string`` | ``array``
+
+A service id (as a string) or an array with the following sub-options:
+
+* ``service`` (**type**: ``string``): the service id of a custom token provider.
+* ``doctrine`` (**type**: ``array``): enables the Doctrine token provider with an
+  optional ``connection`` sub-option (**type**: ``string``, **default**: ``null``)
+  to define the Doctrine connection to use.
+
+token_verifier
+..............
+
+**type**: ``string``
+
+The service id of a custom token verifier service.
+
+signature_properties
+....................
+
+**type**: ``array`` **default**: ``['password']``
+
+An array of user properties used to verify the remember-me cookie. At least one
+property is required. When any of these properties change, existing remember-me
+cookies are invalidated automatically.
+
+catch_exceptions
+................
+
+**type**: ``boolean`` **default**: ``true``
+
+If ``true``, exceptions thrown during the remember-me authentication are caught
+and the user is not authenticated (instead of returning a server error).
+
+**Cookie Options**
+
+name
+....
+
+**type**: ``string`` **default**: ``'REMEMBERME'``
+
+The name of the cookie used for the remember-me feature.
+
+lifetime
+........
+
+**type**: ``integer`` **default**: ``31536000``
+
+The lifetime of the cookie in seconds (``31536000`` is one year).
+
+path
+....
+
+**type**: ``string`` **default**: ``'/'``
+
+The path of the cookie.
+
+domain
+......
+
+**type**: ``string`` **default**: ``null``
+
+The domain of the cookie. If ``null``, the current domain from the request
+is used.
+
+secure
+......
+
+**type**: ``boolean`` | ``string`` **default**: ``false``
+
+If ``true``, the cookie is only sent over HTTPS. Set to ``'auto'`` to use the
+same value as the session cookie.
+
+httponly
+........
+
+**type**: ``boolean`` **default**: ``true``
+
+If ``true``, the cookie is accessible only through the HTTP protocol (it can't
+be accessed by scripting languages like JavaScript).
+
+samesite
+........
+
+**type**: ``string`` **default**: ``null``
+
+If set, the ``SameSite`` attribute of the cookie is set with this value. Valid
+values are ``'lax'``, ``'strict'`` and ``'none'``.
+
+always_remember_me
+..................
+
+**type**: ``boolean`` **default**: ``false``
+
+If ``true``, the remember-me feature is always active, regardless of whether
+the user checks a "remember me" checkbox in the login form.
+
+remember_me_parameter
+.....................
+
+**type**: ``string`` **default**: ``'_remember_me'``
+
+The name of the form field or request parameter checked to determine whether
+the "remember me" feature should be activated.
 
 .. _reference-security-firewall-context:
 
