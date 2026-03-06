@@ -253,13 +253,13 @@ via its ``ExceptionEvent`` class::
         public static function getSubscribedEvents(): array
         {
             // return the subscribed events, their methods and priorities
-            return App::config([
+            return [
                 ExceptionEvent::class => [
                     ['processException', 10],
                     ['logException', 0],
                     ['notifyException', -10],
                 ],
-            ]);
+            ];
         }
 
         public function processException(ExceptionEvent $event): void
