@@ -352,6 +352,22 @@ official YAML specification but are useful in Symfony applications:
       data:
           operator_types: !php/enum App\Operator\Enum\Type
 
+* The ``@=`` prefix is used by the :doc:`Dependency Injection </service_container>`
+  component to inject values computed by :doc:`expressions </reference/formats/expression_language>`.
+  In YAML configuration files, any string starting with ``@=`` is treated as an
+  expression:
+
+  .. code-block:: yaml
+
+      services:
+          App\Mailer:
+              arguments:
+                  - '@=service("App\\Mail\\MailerConfiguration").getMailerMethod()'
+
+  Expressions have access to the ``service()``, ``parameter()`` and ``env()``
+  functions among others. See :doc:`/service_container/expression_language` for
+  full details.
+
 Unsupported YAML Features
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
