@@ -1478,6 +1478,44 @@ so the :doc:`Cache component </components/cache>` must be installed in your appl
         $client = HttpClient::createForBaseUri('https://example.com');
         $cachingClient = new CachingHttpClient($client, $cache);
 
+By default, cached responses are limited to a maximum TTL of 86400 seconds
+(24 hours) to prevent eternal cache items when the origin server doesn't send
+explicit cache-control directives. You can customize this value using the
+``max_ttl`` option:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/framework.yaml
+        framework:
+            http_client:
+                scoped_clients:
+                    example.client:
+                        caching:
+                            max_ttl: 3600
+
+    .. code-block:: php
+
+        // config/packages/framework.php
+        use Symfony\Config\FrameworkConfig;
+
+        return static function (FrameworkConfig $framework): void {
+            $framework->httpClient()->scopedClient('example.client')
+                ->caching()
+                    ->maxTtl(3600)
+            ;
+        };
+
+    .. code-block:: php-standalone
+
+        $cachingClient = new CachingHttpClient($client, $cache, maxTtl: 3600);
+
+.. deprecated:: 8.1
+
+    Before Symfony 8.1, ``max_ttl`` defaulted to ``null`` (no cap). Passing
+    ``null`` is deprecated since Symfony 8.1. Use a positive integer instead.
+
 .. tip::
 
     It is strongly recommended to configure a

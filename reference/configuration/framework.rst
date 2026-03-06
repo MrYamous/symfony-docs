@@ -1727,11 +1727,15 @@ users. Set it to ``false`` to use a `private cache`_.
 max_ttl
 """""""
 
-**type**: ``integer`` **default**: ``null``
+**type**: ``integer`` **default**: ``86400``
 
-The maximum time-to-live (in seconds) for cached responses. By default, responses
-are cached for as long as the TTL specified by the server. When this option is
-set, server-provided TTLs are capped to this value.
+The maximum time-to-live (in seconds) for cached responses. Server-provided
+TTLs are capped to this value to prevent eternal cache items.
+
+.. deprecated:: 8.1
+
+    Setting ``max_ttl`` to ``null`` is deprecated since Symfony 8.1. Use a
+    positive integer instead.
 
 cafile
 ......
