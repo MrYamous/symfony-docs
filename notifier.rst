@@ -376,6 +376,14 @@ Service
             notifier:
                 message_bus: false
 
+.. tip::
+
+    When Messenger is enabled, each channel (email, SMS, chat, etc.) dispatches
+    its own message independently on the bus. If one channel fails and you have
+    configured a :ref:`failure transport <messenger-failure-transport>`, only
+    that specific channel will be retried; the other channels won't be sent
+    again. This is the recommended setup for multi-channel notifications.
+
 Chatters are configured using the ``chatter_transports`` setting:
 
 .. code-block:: bash
