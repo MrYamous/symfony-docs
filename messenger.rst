@@ -1539,6 +1539,14 @@ The transport has a number of options:
     Name of the queue (a column in the table, to use one table for multiple
     transports)
 
+    .. warning::
+
+        When using PostgreSQL with the ``use_notify`` option enabled, it is
+        highly recommended that multiple transports do **not** share the same
+        ``queue_name`` value (including the ``default`` value). Sharing a queue
+        name across transports makes LISTEN/NOTIFY significantly less effective
+        at detecting upcoming delayed messages.
+
 ``redeliver_timeout`` (default: ``3600``)
     Timeout before retrying a message that's in the queue but in the "handling"
     state (if a worker stopped for some reason, this will occur, eventually you
@@ -1566,9 +1574,45 @@ in the table.
     The interval to check for delayed messages, in milliseconds. Set to 0 to
     disable checks.
 
-``get_notify_timeout`` (default: ``0``)
-    The length of time to wait for a response when calling
-    ``PDO::pgsqlGetNotify``, in milliseconds.
+``get_notify_timeout`` (default: ``60000``)
+    The maximum time to wait for a NOTIFY, in milliseconds.
+
+When a Messenger worker consumes from multiple PostgreSQL-backed queues, the
+default LISTEN/NOTIFY blocking inside ``PostgreSqlConnection::get()`` blocks on
+one transport, preventing the other transports from being polled. This breaks
+priority-based multi-queue consumption.
+
+To fix this, the blocking is moved to a
+:class:`Symfony\\Component\\Messenger\\Bridge\\Doctrine\\EventListener\\PostgreSqlNotifyOnIdleListener`
+event subscriber that is registered automatically when using the Doctrine
+transport with PostgreSQL. The listener hooks into the worker lifecycle:
+
+* On ``WorkerStartedEvent``: validates that all PostgreSQL transports share the
+  same DBAL connection and table name, registers ``LISTEN`` on the first
+  connection only (the others mark ``get()`` as externally handled to avoid
+  accumulating unread notifications).
+* On ``WorkerRunningEvent`` (idle): blocks on ``waitForNotify()`` using the active
+  connection with a smart timeout that is capped by:
+
+  * the ``get_notify_timeout`` transport option;
+  * the earliest delayed message across all PostgreSQL queues, so the worker
+    wakes up in time to process it;
+  * the worker deadline (``--time-limit``);
+  * the worker sleep duration when non-PostgreSQL transports are also consumed,
+    so those transports are still polled regularly.
+
+This way, the worker's main loop checks all transports in priority order on
+every iteration, and only blocks *after* all queues have been found empty.
+
+.. warning::
+
+    When consuming from multiple PostgreSQL transports, all transports must
+    share the same DBAL connection and the same ``table_name``. Otherwise, a
+    ``LogicException`` is thrown at worker startup.
+
+.. versionadded:: 8.1
+
+    The ``PostgreSqlNotifyOnIdleListener`` was introduced in Symfony 8.1.
 
 The Doctrine transport supports the ``--keepalive`` option by periodically updating
 the ``delivered_at`` timestamp to prevent the message from being redelivered.
