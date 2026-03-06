@@ -997,53 +997,9 @@ The ``file()`` helper provides some arguments to configure its behavior::
 Sending Early Hints
 ~~~~~~~~~~~~~~~~~~~
 
-`Early hints`_ tell the browser to start downloading some assets even before the
-application sends the response content. This improves perceived performance
-because the browser can prefetch resources that will be needed once the full
-response is finally sent. These resources are commonly Javascript or CSS files,
-but they can be any type of resource.
-
-.. note::
-
-    In order to work, the `SAPI`_ you're using must support this feature, like
-    `FrankenPHP`_.
-
-You can send early hints from your controller action thanks to the
-:method:`Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController::sendEarlyHints`
-method::
-
-    namespace App\Controller;
-
-    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-    use Symfony\Component\HttpFoundation\Response;
-    use Symfony\Component\Routing\Attribute\Route;
-    use Symfony\Component\WebLink\Link;
-
-    class HomepageController extends AbstractController
-    {
-        #[Route("/", name: "homepage")]
-        public function index(): Response
-        {
-            $response = $this->sendEarlyHints([
-                new Link(rel: 'preconnect', href: 'https://fonts.google.com'),
-                (new Link(href: '/style.css'))->withAttribute('as', 'style'),
-                (new Link(href: '/script.js'))->withAttribute('as', 'script'),
-            ]);
-
-            // prepare the contents of the response...
-
-            return $this->render('homepage/index.html.twig', response: $response);
-        }
-    }
-
-Technically, Early Hints are an informational HTTP response with the status code
-``103``. The ``sendEarlyHints()`` method creates a ``Response`` object with that
-status code and sends its headers immediately.
-
-This way, browsers can start downloading the assets immediately; like the
-``style.css`` and ``script.js`` files in the above example. The
-``sendEarlyHints()`` method also returns the ``Response`` object, which you
-must use to create the full response sent from the controller action.
+You can improve performance by sending ``103`` Early Hints responses to ask
+the browser to start downloading assets before the full response is ready.
+See :ref:`early-hints` for details.
 
 .. _controller-server-sent-events:
 
@@ -1259,9 +1215,6 @@ Learn more about Controllers
 
 .. _`Symfony Maker`: https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html
 .. _`unvalidated redirects security vulnerability`: https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
-.. _`Early hints`: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103
-.. _`SAPI`: https://www.php.net/manual/en/function.php-sapi-name.php
-.. _`FrankenPHP`: https://frankenphp.dev
 .. _`Validate Filters`: https://www.php.net/manual/en/filter.constants.php
 .. _`phpstan/phpdoc-parser`: https://packagist.org/packages/phpstan/phpdoc-parser
 .. _`phpdocumentor/type-resolver`: https://packagist.org/packages/phpdocumentor/type-resolver

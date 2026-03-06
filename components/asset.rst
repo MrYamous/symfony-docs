@@ -427,6 +427,6 @@ Learn more
 ----------
 
 * :doc:`How to manage CSS and JavaScript assets in Symfony applications </frontend>`
-* :doc:`WebLink component </web_link>` to preload assets using HTTP/2.
+* :doc:`WebLink component </web_link>` to preload assets and send early hints.
 
 .. _`Webpack`: https://webpack.js.org/
