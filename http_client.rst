@@ -1492,6 +1492,7 @@ explicit cache-control directives. You can customize this value using the
             http_client:
                 scoped_clients:
                     example.client:
+                        base_uri: 'https://example.com'
                         caching:
                             max_ttl: 3600
 
@@ -1502,6 +1503,7 @@ explicit cache-control directives. You can customize this value using the
 
         return static function (FrameworkConfig $framework): void {
             $framework->httpClient()->scopedClient('example.client')
+                ->baseUri('https://example.com')
                 ->caching()
                     ->maxTtl(3600)
             ;
