@@ -78,7 +78,7 @@ the ``list()`` method of the ``BlogController`` class.
 
     If you define multiple PHP classes in the same file, Symfony only loads the
     routes of the first class and ignores all the other routes. The route
-    attribute always takes precedence over routes defined in YAML, XML or PHP
+    attribute always takes precedence over routes defined in YAML or PHP
     files, so Symfony will always load the route attribute.
 
 The route name (``blog_list``) is not important for now, but it will be
