@@ -97,6 +97,36 @@ of attribute-based listeners without modifying the controller source code.
     Storing controller attributes in the ``_controller_attributes`` request
     attribute was introduced in Symfony 8.1.
 
+The :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent` class provides
+the :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate` method,
+which standardizes how ``Expression`` and ``Closure`` values found in controller
+attributes are evaluated. If the given value is a ``Closure``, it is called with
+``($args, $request, $controller)`` as arguments. If it is an
+:class:`Symfony\\Component\\ExpressionLanguage\\Expression`, it is evaluated with
+the variables ``request``, ``args`` and ``this`` (the controller object). Any
+other value is returned unchanged::
+
+    use Symfony\Component\HttpKernel\Event\ControllerEvent;
+
+    public function onKernelController(ControllerEvent $event): void
+    {
+        // evaluate a Closure defined in a controller attribute
+        $result = $event->evaluate(
+            static function (array $args, Request $request, object $controller): bool {
+                return $request->attributes->get('_route') === 'admin';
+            }
+        );
+
+        // evaluate an Expression defined in a controller attribute
+        // available variables: "request", "args", and "this" (the controller)
+        $result = $event->evaluate(new Expression('request.getMethod() == "POST"'));
+    }
+
+.. versionadded:: 8.1
+
+    The :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate`
+    method was introduced in Symfony 8.1.
+
 .. seealso::
 
     Read more on the :ref:`kernel.controller event <component-http-kernel-kernel-controller>`.
@@ -132,6 +162,16 @@ found::
         // set the controller arguments to modify the original arguments or add new ones
         $event->setArguments($newArguments);
     }
+
+The :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerArgumentsEvent` also
+provides the :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate`
+method (inherited from ``ControllerEvent``) to evaluate ``Expression`` and
+``Closure`` values found in controller attributes.
+
+.. versionadded:: 8.1
+
+    The :method:`Symfony\\Component\\HttpKernel\\Event\\ControllerEvent::evaluate`
+    method was introduced in Symfony 8.1.
 
 Execute this command to find out which listeners are registered for this event and
 their priorities:
