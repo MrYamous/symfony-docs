@@ -1515,8 +1515,8 @@ explicit cache-control directives. You can customize this value using the
 
 .. deprecated:: 8.1
 
-    Before Symfony 8.1, ``max_ttl`` defaulted to ``null`` (no cap). Passing
-    ``null`` is deprecated since Symfony 8.1. Use a positive integer instead.
+    Setting ``max_ttl`` to ``null`` is deprecated since Symfony 8.1. Use a
+    positive integer instead.
 
 .. tip::
 
