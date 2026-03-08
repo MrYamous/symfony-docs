@@ -560,16 +560,15 @@ Transforming Value Using Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When callables are not enough, you can use a service implementing the
-:class:`Symfony\\Component\\JsonStreamer\\ValueTransformer\\ValueTransformerInterface`::
+:class:`Symfony\\Component\\JsonStreamer\\Transformer\\PropertyValueTransformerInterface`::
 
     // src/Transformer/DogUrlTransformer.php
     namespace App\Transformer;
 
-    use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
     use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
     use Symfony\Component\TypeInfo\Type;
 
-    class DogUrlTransformer implements ValueTransformerInterface
+    class DogUrlTransformer implements \Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface
     {
         public function __construct(
             private UrlGeneratorInterface $urlGenerator,
@@ -624,6 +623,84 @@ To use this transformer in a class, configure the ``#[ValueTransformer]`` attrib
 
     Value transformers are called frequently during encoding and decoding. Keep
     them lightweight and avoid calls to external APIs or the database.
+
+.. deprecated:: 8.1
+
+    The ``ValueTransformerInterface`` in the ``ValueTransformer`` namespace was
+    renamed to ``PropertyValueTransformerInterface`` in the ``Transformer``
+    namespace in Symfony 8.1.
+
+.. _json-streamer-value-objects:
+
+Handling Value Objects
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    Value object support was introduced in Symfony 8.1.
+
+Value objects are objects that should be serialized to/from a single scalar JSON
+value rather than being traversed property by property (e.g., ``Money``, ``Height``,
+or any custom domain type).
+
+To handle a value object, create a class implementing
+:class:`Symfony\\Component\\JsonStreamer\\Transformer\\ValueObjectTransformerInterface`::
+
+    // src/Transformer/MoneyValueObjectTransformer.php
+    namespace App\Transformer;
+
+    use App\ValueObject\Money;
+    use Symfony\Component\TypeInfo\Type;
+    use Symfony\Component\TypeInfo\Type\BuiltinType;
+
+    /**
+     * @implements \Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface<Money, string>
+     */
+    class MoneyValueObjectTransformer implements \Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface
+    {
+        public function transform(object $object, array $options = []): int|float|string|bool|null
+        {
+            return $object->amount.' '.$object->currency;
+        }
+
+        public function reverseTransform(int|float|string|bool|null $scalar, array $options = []): object
+        {
+            [$amount, $currency] = explode(' ', $scalar);
+
+            return new Money((int) $amount, $currency);
+        }
+
+        public static function getStreamValueType(): BuiltinType
+        {
+            return Type::string();
+        }
+
+        public static function getValueObjectClassName(): string
+        {
+            return Money::class;
+        }
+    }
+
+When using FrameworkBundle, value object transformers are auto-registered as
+services by tagging them with ``json_streamer.value_object_transformer``.
+The generated code then calls the transformer automatically instead of
+traversing the object's properties::
+
+    use App\ValueObject\Money;
+    use Symfony\Component\TypeInfo\Type;
+
+    // Write: "100 EUR"
+    $json = $jsonStreamWriter->write(new Money(100, 'EUR'), Type::object(Money::class));
+
+    // Read: "100 EUR" -> Money(100, 'EUR')
+    $money = $jsonStreamReader->read('"100 EUR"', Type::object(Money::class));
+
+.. note::
+
+    ``DateTimeInterface`` objects are now handled as value objects internally.
+    The previous ``DateTimeToStringValueTransformer`` and
+    ``StringToDateTimeValueTransformer`` are deprecated in favor of
+    ``DateTimeValueObjectTransformer``.
 
 Configuring Keys and Values Dynamically
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
