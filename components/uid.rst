@@ -305,6 +305,22 @@ The following constants are available:
 You can also use the ``Uuid::FORMAT_ALL`` constant to accept any UUID format.
 By default, only the RFC 4122 format is accepted.
 
+.. versionadded:: 8.1
+
+    The ``$invalidValue`` property on ``InvalidArgumentException`` was introduced in Symfony 8.1.
+
+When creating or parsing an invalid UID (UUID or ULID), the thrown
+:class:`Symfony\\Component\\Uid\\Exception\\InvalidArgumentException` includes the
+invalid value in its ``$invalidValue`` property for easier debugging::
+
+    use Symfony\Component\Uid\Uuid;
+
+    try {
+        Uuid::fromString('not-a-uuid');
+    } catch (\Symfony\Component\Uid\Exception\InvalidArgumentException $e) {
+        $e->invalidValue; // 'not-a-uuid'
+    }
+
 Storing UUIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
