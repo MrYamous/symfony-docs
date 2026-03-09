@@ -657,6 +657,26 @@ By default, the signature uses HMAC-SHA256 of the concatenated event name,
 event ID, and JSON body. Receiving endpoints should verify this signature
 using the shared secret to ensure webhook authenticity.
 
+Customizing Header Names and Signing Algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ability to configure header names and signing algorithm was introduced
+    in Symfony 8.1.
+
+You can customize the header names and the signing algorithm used for outgoing
+webhooks via the ``framework.webhook`` configuration. The following options are
+available:
+
+* ``event_header_name`` (default: ``Webhook-Event``): the HTTP header for the event name
+* ``id_header_name`` (default: ``Webhook-Id``): the HTTP header for the event ID
+* ``signature_header_name`` (default: ``Webhook-Signature``): the HTTP header for the HMAC signature
+* ``signing_algorithm`` (default: ``sha256``): the hash algorithm (e.g. ``sha512``)
+
+See the :doc:`framework configuration reference </reference/configuration/framework>`
+for details.
+
 Custom Sending Logic
 ~~~~~~~~~~~~~~~~~~~~
 

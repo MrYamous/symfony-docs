@@ -4378,6 +4378,50 @@ message_bus
 
 The service id of the Messenger bus used to dispatch incoming webhook messages.
 
+event_header_name
+.................
+
+**type**: ``string`` **default**: ``'Webhook-Event'``
+
+The name of the HTTP header used to transmit the event name.
+
+.. versionadded:: 8.1
+
+    The ``event_header_name`` option was introduced in Symfony 8.1.
+
+id_header_name
+..............
+
+**type**: ``string`` **default**: ``'Webhook-Id'``
+
+The name of the HTTP header used to transmit the event ID.
+
+.. versionadded:: 8.1
+
+    The ``id_header_name`` option was introduced in Symfony 8.1.
+
+signature_header_name
+.....................
+
+**type**: ``string`` **default**: ``'Webhook-Signature'``
+
+The name of the HTTP header used to transmit the HMAC signature.
+
+.. versionadded:: 8.1
+
+    The ``signature_header_name`` option was introduced in Symfony 8.1.
+
+signing_algorithm
+.................
+
+**type**: ``string`` **default**: ``'sha256'``
+
+The hash algorithm used to sign outgoing webhooks (e.g. ``sha256``, ``sha512``).
+
+.. versionadded:: 8.1
+
+    The ``signing_algorithm`` option was introduced in Symfony 8.1.
+
 routing
 .......
 
