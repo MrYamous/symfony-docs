@@ -500,43 +500,20 @@ Outline Methods
 
     The outline block methods were introduced in Symfony 8.1.
 
-The outline methods are alternatives to the result methods above. Instead of
-filling the entire line with a background color, they render a colored border
-around the message, keeping the text in the default foreground color. This
-improves readability on terminals with custom color schemes, dark/light
-backgrounds, or high-contrast accessibility settings.
+The outline methods are alternatives to the result methods described above.
+Instead of filling the entire line with a background color, they render a
+colored border around the message while keeping the default text color. This
+improves readability on terminals with custom color schemes, dark or light
+backgrounds, or high contrast accessibility settings.
 
-Six convenience methods mirror the existing result methods:
+Six convenience methods mirror the existing result methods::
 
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineSuccess`
-    Displays an outlined success message::
-
-        $io->outlineSuccess('Operation completed successfully.');
-
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineError`
-    Displays an outlined error message::
-
-        $io->outlineError('Something went wrong.');
-
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineWarning`
-    Displays an outlined warning message::
-
-        $io->outlineWarning('Proceed with caution.');
-
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineNote`
-    Displays an outlined note::
-
-        $io->outlineNote('This is a note.');
-
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineInfo`
-    Displays an outlined informational message::
-
-        $io->outlineInfo('Informational message.');
-
-:method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineCaution`
-    Displays an outlined caution message::
-
-        $io->outlineCaution('Dangerous operation ahead!');
+    $io->outlineSuccess('Operation completed successfully.');
+    $io->outlineError('Something went wrong.');
+    $io->outlineWarning('Proceed with caution.');
+    $io->outlineNote('This is a note.');
+    $io->outlineInfo('Informational message.');
+    $io->outlineCaution('Dangerous operation ahead!');
 
 A lower-level :method:`Symfony\\Component\\Console\\Style\\SymfonyStyle::outlineBlock`
 method is also available for custom titles and colors::
@@ -547,8 +524,8 @@ method is also available for custom titles and colors::
     // multiple messages
     $io->outlineBlock(['Step 1 done.', 'Step 2 done.', 'Step 3 done.'], 'Build', 'fg=blue');
 
-    // no title — plain bordered box
-    $io->outlineBlock('No title, just a plain bordered box.');
+    // plain bordered message without a title
+    $io->outlineBlock('Cache cleared successfully.');
 
 Configuring the Default Styles
 ------------------------------
