@@ -160,7 +160,7 @@ party provider:
 |                        | - HTTP n/a                                                                                |
 |                        | - API ``ahasend+api://KEY@default``                                                       |
 +------------------------+-------------------------------------------------------------------------------------------+
-| `Amazon SES`_          | - SMTP ``ses+smtp://USERNAME:PASSWORD@default``                                           |
+| `Amazon SES`_          | - SMTP ``ses+smtp://USERNAME:PASSWORD@default:PORT``                                      |
 |                        | - HTTP ``ses+https://ACCESS_KEY:SECRET_KEY@default``                                      |
 |                        | - API ``ses+api://ACCESS_KEY:SECRET_KEY@default``                                         |
 +------------------------+-------------------------------------------------------------------------------------------+
@@ -250,6 +250,12 @@ party provider:
     to :ref:`send messages in background <mailer-sending-messages-async>`,
     you need to add the ``ping_threshold`` parameter to your ``MAILER_DSN`` with
     a value lower than ``10``: ``ses+smtp://USERNAME:PASSWORD@default?ping_threshold=9``
+
+.. versionadded:: 8.1
+
+    The ability to configure the port in the ``ses+smtp`` DSN was introduced
+    in Symfony 8.1. The port defaults to ``465`` (implicit TLS). When using
+    port ``587`` or ``25``, STARTTLS is used instead of implicit TLS.
 
 .. note::
 
