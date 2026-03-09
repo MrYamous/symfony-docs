@@ -248,6 +248,50 @@ You can also convert some UUID versions to others::
 
     $uuid->toV7(); // returns a Symfony\Component\Uid\UuidV7 instance
 
+Converting Between UUIDv7 and UUIDv4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``Uuid47Transformer`` class was introduced in Symfony 8.1.
+
+The :class:`Symfony\\Component\\Uid\\Uuid47Transformer` allows converting
+between UUIDv7 and UUIDv4 using `SipHash-2-4`_ timestamp masking. This is
+useful when you want to store time-ordered UUIDv7 in databases while emitting
+UUIDv4-looking identifiers at API boundaries, hiding timing information from
+external consumers::
+
+    use Symfony\Component\Uid\UuidV7;
+
+    // the secret must be at least 16 bytes; longer secrets are hashed automatically
+    $transformer = new \Symfony\Component\Uid\Uuid47Transformer($secret);
+
+    // encode a UUIDv7 into a UUIDv4-looking UUID
+    $v7 = new UuidV7();
+    $v4 = $transformer->encode($v7); // returns a UuidV4 instance
+
+    // decode back to the original UUIDv7
+    $original = $transformer->decode($v4); // returns a UuidV7 instance
+    $original->equals($v7); // true
+
+The transformation is reversible only with the same secret. Decoding with a
+different secret produces a different UUIDv7 without throwing an error.
+
+When using FrameworkBundle, the ``Uuid47Transformer`` is registered as a service
+automatically, using ``kernel.secret`` as the key. You can type-hint it in any
+service or controller to get it injected.
+
+.. note::
+
+    The ``Uuid47Transformer`` requires the ``sodium`` PHP extension.
+
+.. tip::
+
+    The ``Uuid47Transformer`` implements the same algorithm as the `uuidv47`_
+    library, which provides implementations in C, Go, JavaScript, Python, Rust,
+    Ruby and other languages. UUIDs encoded by Symfony can be decoded by any
+    of these implementations and vice versa, as long as the same secret is used.
+
 Working with UUIDs
 ~~~~~~~~~~~~~~~~~~
 
@@ -751,3 +795,5 @@ commands to show all the information for a given UID:
 .. _`unique identifiers`: https://en.wikipedia.org/wiki/UID
 .. _`UUIDs`: https://en.wikipedia.org/wiki/Universally_unique_identifier
 .. _`ULIDs`: https://github.com/ulid/spec
+.. _`SipHash-2-4`: https://en.wikipedia.org/wiki/SipHash
+.. _`uuidv47`: https://github.com/stateless-me/uuidv47
