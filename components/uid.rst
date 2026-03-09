@@ -224,7 +224,7 @@ You can configure these default values::
 Converting UUIDs
 ~~~~~~~~~~~~~~~~
 
-Use these methods to transform the UUID object into different bases::
+Use these methods to transform the UUID object into **different bases**::
 
     $uuid = Uuid::fromString('d9e7a184-5d5b-11ea-a62a-3499710062d0');
 
@@ -235,7 +235,7 @@ Use these methods to transform the UUID object into different bases::
     $uuid->toHex();     // string(34) "0xd9e7a1845d5b11eaa62a3499710062d0"
     $uuid->toString();  // string(36) "d9e7a184-5d5b-11ea-a62a-3499710062d0"
 
-You can also convert some UUID versions to others::
+You can also convert some **UUID versions** to others::
 
     // convert V1 to V6 or V7
     $uuid = Uuid::v1();
@@ -248,22 +248,17 @@ You can also convert some UUID versions to others::
 
     $uuid->toV7(); // returns a Symfony\Component\Uid\UuidV7 instance
 
-Converting Between UUIDv7 and UUIDv4
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 8.1
-
-    The ``Uuid47Transformer`` class was introduced in Symfony 8.1.
-
+**Converting between UUIDv7 and UUIDv4** requires specific techniques.
 The :class:`Symfony\\Component\\Uid\\Uuid47Transformer` allows converting
-between UUIDv7 and UUIDv4 using `SipHash-2-4`_ timestamp masking. This is
-useful when you want to store time-ordered UUIDv7 in databases while emitting
-UUIDv4-looking identifiers at API boundaries, hiding timing information from
-external consumers::
+between UUIDv7 and UUIDv4 using `SipHash-2-4`_ timestamp masking.
+
+This is useful when you want to store time ordered UUIDv7 values in the database
+while exposing UUIDv4 looking identifiers at API boundaries, hiding timing
+information from external consumers::
 
     use Symfony\Component\Uid\UuidV7;
 
-    // the secret must be at least 16 bytes; longer secrets are hashed automatically
+    // the secret must be at least 16 bytes
     $transformer = new \Symfony\Component\Uid\Uuid47Transformer($secret);
 
     // encode a UUIDv7 into a UUIDv4-looking UUID
@@ -291,6 +286,10 @@ service or controller to get it injected.
     library, which provides implementations in C, Go, JavaScript, Python, Rust,
     Ruby and other languages. UUIDs encoded by Symfony can be decoded by any
     of these implementations and vice versa, as long as the same secret is used.
+
+.. versionadded:: 8.1
+
+    The ``Uuid47Transformer`` class was introduced in Symfony 8.1.
 
 Working with UUIDs
 ~~~~~~~~~~~~~~~~~~
