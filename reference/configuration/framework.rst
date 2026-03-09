@@ -2444,6 +2444,127 @@ transports
 A :ref:`list of DSN <multiple-email-transports>` that can be used by the
 mailer. A transport name is the key and the dsn is the value.
 
+dkim_signer
+...........
+
+Configures a global DKIM signer that automatically signs all outgoing messages.
+
+.. versionadded:: 7.3
+
+    The ``dkim_signer`` option was introduced in Symfony 7.3.
+
+key
+"""
+
+**type**: ``string`` **default**: ``''``
+
+The DKIM signing key. This can be the key content or a path to the key file
+in PEM format (prefixed with ``file://``).
+
+domain
+""""""
+
+**type**: ``string`` **default**: ``''``
+
+The signing domain name.
+
+select
+""""""
+
+**type**: ``string`` **default**: ``''``
+
+The DKIM selector (a string used to point to a specific DKIM public key record
+in your DNS).
+
+passphrase
+""""""""""
+
+**type**: ``string`` **default**: ``''``
+
+The passphrase for the private key.
+
+options
+"""""""
+
+**type**: ``array``
+
+Additional DKIM signing options (e.g. algorithm, headers to ignore).
+
+.. seealso::
+
+    For more information, see :ref:`Signing and Encrypting Messages <signing-and-encrypting-messages>`.
+
+smime_signer
+............
+
+Configures a global S/MIME signer that automatically signs all outgoing messages.
+
+.. versionadded:: 7.3
+
+    The ``smime_signer`` option was introduced in Symfony 7.3.
+
+key
+"""
+
+**type**: ``string`` **default**: ``''``
+
+The path to the S/MIME private key in PEM format.
+
+certificate
+"""""""""""
+
+**type**: ``string`` **default**: ``''``
+
+The path to the S/MIME certificate in PEM format.
+
+passphrase
+""""""""""
+
+**type**: ``string`` **default**: ``null``
+
+The passphrase for the private key.
+
+extra_certificates
+""""""""""""""""""
+
+**type**: ``string`` **default**: ``null``
+
+The path to a file containing extra certificates (e.g. intermediate
+certificates) to include in the signature.
+
+sign_options
+""""""""""""
+
+**type**: ``integer`` **default**: ``null``
+
+A bitwise operator options for :phpfunction:`openssl_pkcs7_sign`.
+
+smime_encrypter
+...............
+
+Configures a global S/MIME encrypter that automatically encrypts all outgoing
+messages.
+
+.. versionadded:: 7.3
+
+    The ``smime_encrypter`` option was introduced in Symfony 7.3.
+
+repository
+""""""""""
+
+**type**: ``string`` **default**: ``''``
+
+The service ID of a class implementing
+:class:`Symfony\\Component\\Mailer\\EventListener\\SmimeCertificateRepositoryInterface`.
+This service is used to find the certificate path for each email recipient.
+
+cipher
+""""""
+
+**type**: ``integer`` **default**: ``null``
+
+The `OpenSSL cipher`_ algorithm constant used for encryption.
+
 messenger
 ~~~~~~~~~
 
@@ -4654,6 +4775,7 @@ to know their differences.
 .. _`utf-8 modifier`: https://www.php.net/reference.pcre.pattern.modifiers
 .. _`Link HTTP header`: https://tools.ietf.org/html/rfc5988
 .. _`SMTP session`: https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol#SMTP_transport_example
+.. _`OpenSSL cipher`: https://www.php.net/manual/en/openssl.ciphers.php
 .. _`PHP attributes`: https://www.php.net/manual/en/language.attributes.overview.php
 .. _`shared cache`: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching#shared_cache
 .. _`private cache`: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching#private_caches
