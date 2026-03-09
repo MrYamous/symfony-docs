@@ -2449,10 +2449,6 @@ dkim_signer
 
 Configures a global DKIM signer that automatically signs all outgoing messages.
 
-.. versionadded:: 7.3
-
-    The ``dkim_signer`` option was introduced in Symfony 7.3.
-
 key
 """
 
@@ -2499,10 +2495,6 @@ smime_signer
 
 Configures a global S/MIME signer that automatically signs all outgoing messages.
 
-.. versionadded:: 7.3
-
-    The ``smime_signer`` option was introduced in Symfony 7.3.
-
 key
 """
 
@@ -2544,10 +2536,6 @@ smime_encrypter
 
 Configures a global S/MIME encrypter that automatically encrypts all outgoing
 messages.
-
-.. versionadded:: 7.3
-
-    The ``smime_encrypter`` option was introduced in Symfony 7.3.
 
 repository
 """"""""""
