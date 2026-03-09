@@ -311,11 +311,11 @@ browser-compatible files in your AssetMapper paths:
         asset_mapper:
             paths:
                 assets/: ''
-                node_modules/@hpcc-js/wasm/dist/: 'hpcc'
+                node_modules/@hpcc-js/wasm-graphviz/dist/: 'hpcc'
 
 Using a namespace (like ``hpcc``) for registered directories is highly
 recommended to avoid collisions in logical paths. For example, if both
-``assets/`` and ``node_modules/@hpcc-js/wasm/dist/`` contained an ``index.js``
+``assets/`` and ``node_modules/@hpcc-js/wasm-graphviz/dist/`` contained an ``index.js``
 file, only one of them would be mapped without namespaces.
 
 Then, require the package in the importmap using the ``--path`` option to point
@@ -323,13 +323,13 @@ to the local file using its logical path:
 
 .. code-block:: terminal
 
-    $ php bin/console importmap:require @hpcc-js/wasm --path=hpcc/index.js
+    $ php bin/console importmap:require @hpcc-js/wasm-graphviz --path=hpcc/index.js
 
 Now you can import the package as usual:
 
 .. code-block:: javascript
 
-    import { Graphviz } from '@hpcc-js/wasm';
+    import { Graphviz } from '@hpcc-js/wasm-graphviz';
 
 .. note::
 
