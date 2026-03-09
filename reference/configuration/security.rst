@@ -77,6 +77,24 @@ The possible values of this option are:
   The entire session is regenerated, so the session ID is updated but all the
   other session attributes are lost.
 
+erase_credentials
+------------------
+
+**type**: ``boolean`` **default**: ``true``
+
+.. deprecated:: 8.1
+
+    The ``erase_credentials`` option is deprecated since Symfony 8.1 and will
+    be removed in 9.0, as the feature behind it was removed in Symfony 8.0.
+
+If ``true``, the ``eraseCredentials()`` method of the user object was called
+after authentication. This was used to remove sensitive data (e.g. plain-text
+passwords) from the user object stored in the session.
+
+Since Symfony 8.0 removed the ``eraseCredentials()`` method from the user
+interface, this option no longer has any effect. You should remove it from
+your security configuration to avoid the deprecation warning.
+
 access_decision_manager
 -----------------------
 
