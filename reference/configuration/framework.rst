@@ -2494,6 +2494,11 @@ senders
 
 A list of transport names to route the message to.
 
+.. deprecated:: 8.1
+
+    The ``senders`` nesting level in the routing configuration is deprecated
+    since Symfony 8.1. Use a string or a list of strings directly instead.
+
 serializer
 ..........
 
