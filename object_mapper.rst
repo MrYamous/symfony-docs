@@ -325,6 +325,97 @@ exception. To avoid this, configure Symfony's PropertyAccess component in
 This setting ensures that the mapper skips invalid properties gracefully
 instead of throwing an exception.
 
+Conditional Property Mapping based on Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``SourceClass`` condition was introduced in Symfony 8.1.
+
+Similar to ``TargetClass``, you can use
+:class:`Symfony\\Component\\ObjectMapper\\Condition\\SourceClass` to condition
+a property mapping based on the source object's class. This is useful when a
+target class can be mapped from multiple source classes::
+
+    // src/Entity/Product.php
+    namespace App\Entity;
+
+    use App\Api\ExternalProduct;
+    use App\Dto\InternalProduct;
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(source: ExternalProduct::class)]
+    #[Map(source: InternalProduct::class)]
+    class Product
+    {
+        // map from 'externalName' only when the source is ExternalProduct
+        #[Map(source: 'externalName', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass(ExternalProduct::class))]
+        // map from 'name' only when the source is InternalProduct
+        #[Map(source: 'name', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass(InternalProduct::class))]
+        public string $name = '';
+    }
+
+Matching Multiple Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    Array support for ``TargetClass`` and ``SourceClass`` was introduced in Symfony 8.1.
+
+Both ``TargetClass`` and ``SourceClass`` accept an array of class names, matching
+when the object is an instance of any of them. This reduces the number of
+``#[Map]`` attributes needed for multi-class mappings::
+
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+
+    #[Map(source: B::class)]
+    #[Map(source: C::class)]
+    class A
+    {
+        // applies when the source is either B or C
+        #[Map(source: 'foo', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass([B::class, C::class]))]
+        public string $something = '';
+    }
+
+Combining Source and Target Conditions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    ``ClassRule`` and ``ClassRuleList`` were introduced in Symfony 8.1.
+
+For bidirectional mappings involving multiple source and target classes, use
+:class:`Symfony\\Component\\ObjectMapper\\Condition\\ClassRule` to combine both
+checks in a single condition, and
+:class:`Symfony\\Component\\ObjectMapper\\Condition\\ClassRuleList` to match
+when any of its rules matches::
+
+    use Symfony\Component\ObjectMapper\Attribute\Map;
+    use Symfony\Component\ObjectMapper\Condition\TargetClass;
+
+    #[Map(source: B::class)]
+    #[Map(source: C::class)]
+    #[Map(target: B::class)]
+    #[Map(target: C::class)]
+    class A
+    {
+        // when reading from a source: apply only when source is B
+        #[Map(source: 'foo', transform: 'strtolower', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\SourceClass(B::class)]))]
+        // when reading from a source: apply only when source is C
+        #[Map(source: 'bar', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\ClassRule(sources: [C::class])]))]
+        public string $somethingSourced = '';
+
+        // when writing to a target: apply only when target is B
+        #[Map(target: 'foo', transform: 'strtoupper', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new TargetClass(B::class)]))]
+        // when writing to a target: apply only when target is C
+        #[Map(target: 'bar', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\ClassRule(targets: [C::class])]))]
+        public string $somethingTargeted = '';
+    }
+
+``ClassRule`` requires at least one of ``sources`` or ``targets``. When both are
+provided, the condition matches only if the source **and** the target both match.
+``ClassRuleList`` matches when **any** of its rules matches.
+
 .. _object_mapper-transforming-values:
 
 Transforming Values
