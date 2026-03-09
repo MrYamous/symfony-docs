@@ -1730,7 +1730,7 @@ max_ttl
 **type**: ``integer`` **default**: ``86400``
 
 The maximum time-to-live (in seconds) for cached responses. Server-provided
-TTLs are capped to this value to prevent eternal cache items.
+TTLs are capped at this value to prevent cache items from living forever.
 
 .. deprecated:: 8.1
 

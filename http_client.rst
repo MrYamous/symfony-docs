@@ -1478,10 +1478,11 @@ so the :doc:`Cache component </components/cache>` must be installed in your appl
         $client = HttpClient::createForBaseUri('https://example.com');
         $cachingClient = new CachingHttpClient($client, $cache);
 
-By default, cached responses are limited to a maximum TTL of 86400 seconds
-(24 hours) to prevent eternal cache items when the origin server doesn't send
-explicit cache-control directives. You can customize this value using the
-``max_ttl`` option:
+By default, cached responses are limited to a maximum TTL of 86,400 seconds
+(24 hours). This prevents cache items from living forever when the origin
+server does not send explicit cache control directives.
+
+You can customize this value using the ``max_ttl`` option:
 
 .. configuration-block::
 
