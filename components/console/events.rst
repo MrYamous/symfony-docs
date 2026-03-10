@@ -255,11 +255,10 @@ The ``ConsoleEvents::ALARM`` Event
 **Typical Purposes**: To perform periodic tasks during long-running commands
 (e.g. database connection keepalive, extending lock TTLs, heartbeat checks).
 
-When a command calls
-:method:`Symfony\\Component\\Console\\Application::setAlarmInterval`, the
-application schedules a recurring ``SIGALRM`` signal at the given interval (in
-seconds). Each time the signal fires, a ``ConsoleAlarmEvent`` is dispatched,
-allowing listeners to run periodic logic without blocking the command::
+When a command calls :method:`Symfony\\Component\\Console\\Application::setAlarmInterval`,
+the application sets a recurring alarm interval, causing the OS to deliver a
+``SIGALRM`` signal at the given interval (in seconds). Each time the signal fires,
+a ``ConsoleAlarmEvent`` is dispatched, allowing listeners to run periodic logic::
 
     // src/Command/LongRunningCommand.php
     namespace App\Command;
