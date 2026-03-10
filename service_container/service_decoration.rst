@@ -421,8 +421,6 @@ The result will be the same as in the previous section::
 
     $this->services['decorated_foo_stack'] = new Baz(new Bar(new Foo()));
 
-Like aliases, a ``stack`` can only use ``public`` and ``deprecated`` attributes.
-
 Each frame of the ``stack`` can be either an inlined service, a reference or a
 child definition.
 The latter allows embedding ``stack`` definitions into each others, here's an
@@ -528,6 +526,108 @@ The result will be::
             ]);
 
     The ``Baz`` frame id will now be ``.decorated_foo_stack.second``.
+
+Using Stacks to Decorate Existing Services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The support for using ``decorates`` and ``decorates_tag`` on stacks was
+    introduced in Symfony 8.1.
+
+By default, stacks define a self-contained chain of services. But you can also
+use a stack to decorate an existing service by adding the ``decorates`` option.
+The innermost frame of the stack will automatically wrap the original service:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            my_stack:
+                decorates: api_platform.serializer.context_builder
+                stack:
+                    - class: App\Decorator\AddGroupsContextBuilder
+                      arguments: ['@.inner']
+                    - class: App\Decorator\AddFiltersContextBuilder
+                      arguments: ['@.inner']
+
+    .. code-block:: php
+
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use App\Decorator\AddFiltersContextBuilder;
+        use App\Decorator\AddGroupsContextBuilder;
+
+        return App::config([
+            'services' => [
+                'my_stack' => [
+                    'decorates' => 'api_platform.serializer.context_builder',
+                    'stack' => [
+                        ['class' => AddGroupsContextBuilder::class, 'arguments' => [service('.inner')]],
+                        ['class' => AddFiltersContextBuilder::class, 'arguments' => [service('.inner')]],
+                    ],
+                ],
+            ],
+        ]);
+
+The result will be::
+
+    $this->services['api_platform.serializer.context_builder'] = new AddGroupsContextBuilder(
+        new AddFiltersContextBuilder(
+            $originalContextBuilder
+        )
+    );
+
+You can also use the ``decorates_tag`` option to decorate all services tagged
+with a specific tag. The stack is cloned once per tagged service, each clone
+decorating one of the tagged services:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/services.yaml
+        services:
+            my_stack:
+                decorates_tag: my_tag
+                stack:
+                    - class: App\Decorator\LoggingDecorator
+                      arguments: ['@.inner']
+                    - class: App\Decorator\CachingDecorator
+                      arguments: ['@.inner']
+
+    .. code-block:: php
+
+        // config/services.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        use App\Decorator\CachingDecorator;
+        use App\Decorator\LoggingDecorator;
+
+        return App::config([
+            'services' => [
+                'my_stack' => [
+                    'decorates_tag' => 'my_tag',
+                    'stack' => [
+                        ['class' => LoggingDecorator::class, 'arguments' => [service('.inner')]],
+                        ['class' => CachingDecorator::class, 'arguments' => [service('.inner')]],
+                    ],
+                ],
+            ],
+        ]);
+
+.. note::
+
+    A stack cannot have both ``decorates`` and ``decorates_tag`` at the same
+    time. Trying to combine them will throw an
+    ``InvalidArgumentException``.
+
+The ``decoration_inner_name``, ``decoration_priority`` and
+``decoration_on_invalid`` options can also be used on stacks, just like
+on regular decorated services.
 
 Control the Behavior When the Decorated Service Does Not Exist
 --------------------------------------------------------------
