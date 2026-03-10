@@ -177,6 +177,54 @@ populated by using the special ``"\0"`` property name to define their internal v
         "\0" => [$inputArray],
     ]);
 
+Deep Cloning
+------------
+
+.. versionadded:: 8.1
+
+    The ``DeepCloner`` class was introduced in Symfony 8.1.
+
+The :class:`Symfony\\Component\\VarExporter\\DeepCloner` class deep-clones PHP
+values while preserving PHP's copy-on-write semantics for strings and arrays.
+Unlike ``unserialize(serialize())``, it does not reallocate strings and
+scalar-only arrays, resulting in lower memory usage and better performance.
+
+For one-off cloning, use the static ``deepClone()`` method::
+
+    use Symfony\Component\VarExporter\DeepCloner;
+
+    $clone = DeepCloner::deepClone($originalObject);
+
+When you need to clone the same structure multiple times, create an instance
+to amortize the cost of graph analysis::
+
+    use Symfony\Component\VarExporter\DeepCloner;
+
+    $cloner = new DeepCloner($prototype);
+
+    $clone1 = $cloner->clone();
+    $clone2 = $cloner->clone();
+
+The ``isStaticValue()`` method returns ``true`` when the value does not need
+cloning (scalars, ``null``, enums, scalar-only arrays)::
+
+    $cloner = new DeepCloner($value);
+
+    if ($cloner->isStaticValue()) {
+        // $value contains no objects or references, cloning is a no-op
+    }
+
+Use the ``cloneAs()`` method to deep-clone the root object using a different
+class (the target class must be compatible with the original, typically in the
+same hierarchy)::
+
+    $cloner = new DeepCloner($originalDog);
+    $puppy = $cloner->cloneAs(Puppy::class);
+
+``DeepCloner`` instances are serializable. The serialized form uses a compact
+representation that deduplicates class and property names, typically producing a
+smaller payload than ``serialize($value)`` itself.
+
 Creating Lazy Objects
 ---------------------
 
