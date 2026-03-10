@@ -532,12 +532,12 @@ Using Stacks to Decorate Existing Services
 
 .. versionadded:: 8.1
 
-    The support for using ``decorates`` and ``decorates_tag`` on stacks was
-    introduced in Symfony 8.1.
+    The ``decorates`` and ``decorates_tag`` options on stacks were introduced
+    in Symfony 8.1.
 
 By default, stacks define a self-contained chain of services. But you can also
 use a stack to decorate an existing service by adding the ``decorates`` option.
-The innermost frame of the stack will automatically wrap the original service:
+The innermost frame of the stack will wrap the original service:
 
 .. configuration-block::
 
@@ -621,13 +621,9 @@ decorating one of the tagged services:
 
 .. note::
 
-    A stack cannot have both ``decorates`` and ``decorates_tag`` at the same
-    time. Trying to combine them will throw an
-    ``InvalidArgumentException``.
-
-The ``decoration_inner_name``, ``decoration_priority`` and
-``decoration_on_invalid`` options can also be used on stacks, just like
-on regular decorated services.
+    The ``decoration_inner_name``, ``decoration_priority``, and
+    ``decoration_on_invalid`` options can also be used on stacks, as with
+    regular decorated services.
 
 Control the Behavior When the Decorated Service Does Not Exist
 --------------------------------------------------------------
