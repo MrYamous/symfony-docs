@@ -251,12 +251,6 @@ party provider:
     you need to add the ``ping_threshold`` parameter to your ``MAILER_DSN`` with
     a value lower than ``10``: ``ses+smtp://USERNAME:PASSWORD@default?ping_threshold=9``
 
-.. versionadded:: 8.1
-
-    The ability to configure the port in the ``ses+smtp`` DSN was introduced
-    in Symfony 8.1. The port defaults to ``465`` (implicit TLS). When using
-    port ``587`` or ``25``, STARTTLS is used instead of implicit TLS.
-
 .. note::
 
     When using SMTP, the default timeout for sending a message before throwing an
@@ -276,6 +270,16 @@ party provider:
     you need to generate a new one.
     Using other methods (like ``XOAUTH2`` or the ``Gmail API``) are not supported currently.
     You should use Gmail for testing purposes only and use a real provider in production.
+
+.. note::
+
+    In Amazon SES, the default port used by SMTP is ``465`` (implicit TLS). When
+    using port ``587`` or ``25``, STARTTLS is used instead of implicit TLS.
+
+    .. versionadded:: 8.1
+
+        Support for configuring the port in the ``ses+smtp`` DSN was introduced
+        in Symfony 8.1.
 
 .. tip::
 
