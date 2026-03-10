@@ -249,6 +249,72 @@ handle all signals e.g. to do some tasks before terminating the command.
     :method:`Symfony\\Component\\Console\\SignalRegistry\\SignalMap::getSignalName`
     method.
 
+The ``ConsoleEvents::ALARM`` Event
+----------------------------------
+
+**Typical Purposes**: To perform periodic tasks during long-running commands
+(e.g. database connection keepalive, extending lock TTLs, heartbeat checks).
+
+When a command calls
+:method:`Symfony\\Component\\Console\\Application::setAlarmInterval`, the
+application schedules a recurring ``SIGALRM`` signal at the given interval (in
+seconds). Each time the signal fires, a ``ConsoleAlarmEvent`` is dispatched,
+allowing listeners to run periodic logic without blocking the command::
+
+    // src/Command/LongRunningCommand.php
+    namespace App\Command;
+
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Input\InputInterface;
+    use Symfony\Component\Console\Output\OutputInterface;
+
+    #[AsCommand(name: 'app:long-running')]
+    class LongRunningCommand extends Command
+    {
+        protected function initialize(InputInterface $input, OutputInterface $output): void
+        {
+            // trigger an alarm every 10 seconds
+            $this->getApplication()->setAlarmInterval(10);
+        }
+
+        protected function execute(InputInterface $input, OutputInterface $output): int
+        {
+            // long-running processing...
+
+            return Command::SUCCESS;
+        }
+    }
+
+You can then listen to the
+:class:`Symfony\\Component\\Console\\Event\\ConsoleAlarmEvent` to perform
+actions on each alarm::
+
+    // src/EventListener/ConsoleAlarmListener.php
+    namespace App\EventListener;
+
+    use Symfony\Component\Console\Event\ConsoleAlarmEvent;
+    use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+    #[AsEventListener]
+    class ConsoleAlarmListener
+    {
+        public function __invoke(ConsoleAlarmEvent $event): void
+        {
+            // e.g. ping the database to keep the connection alive
+        }
+    }
+
+.. note::
+
+    The alarm feature requires the ``pcntl`` PHP extension and is not available
+    on Windows.
+
+.. versionadded:: 7.2
+
+    The ``ConsoleAlarmEvent`` and ``setAlarmInterval()`` were introduced in
+    Symfony 7.2.
+
 .. _`reserved exit codes`: https://www.tldp.org/LDP/abs/html/exitcodes.html
 .. _`Signals`: https://en.wikipedia.org/wiki/Signal_(IPC)
 .. _`constants of the PCNTL PHP extension`: https://www.php.net/manual/en/pcntl.constants.php
