@@ -239,6 +239,11 @@ representation of the object.
     parsers will likely not recognize the ``php/object`` tag and non-PHP
     implementations certainly won't - use with discretion!
 
+.. danger::
+
+    Parsing ``!php/object`` tags uses PHP deserialization internally. Never
+    enable ``PARSE_OBJECT`` for untrusted YAML contents.
+
 Parsing and Dumping Objects as Maps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -323,6 +328,11 @@ syntax to parse them as proper PHP constants::
     $yaml = '{ foo: PHP_INT_SIZE, bar: !php/const PHP_INT_SIZE }';
     $parameters = Yaml::parse($yaml, Yaml::PARSE_CONSTANT);
     // $parameters = ['foo' => 'PHP_INT_SIZE', 'bar' => 8];
+
+.. warning::
+
+    Enabling ``PARSE_CONSTANT`` allows YAML contents to resolve arbitrary PHP
+    constants and enum cases. Only enable it for trusted input.
 
 Parsing PHP Enumerations
 ~~~~~~~~~~~~~~~~~~~~~~~~
