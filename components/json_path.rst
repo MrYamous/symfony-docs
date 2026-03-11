@@ -209,6 +209,129 @@ filters, refer to the `Querying with Expressions`_ section above. All these
 features are supported and can be combined with the programmatic builder when
 appropriate (e.g., inside a ``filter()`` expression).
 
+Custom Functions
+----------------
+
+.. versionadded:: 8.1
+
+    Custom function support was introduced in Symfony 8.1.
+
+The JsonPath component supports custom function extensions as defined by
+`RFC 9535 §2.4`_. You can register your own functions to use within filter
+expressions.
+
+Using Custom Functions Standalone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the component standalone, pass a ``ContainerInterface`` of callables
+and an optional metadata array to the
+:class:`Symfony\\Component\\JsonPath\\JsonCrawler` constructor::
+
+    use Symfony\Component\JsonPath\JsonCrawler;
+
+    $upper = static fn (mixed $value): ?string => \is_string($value) ? strtoupper($value) : null;
+
+    // create a simple service locator with the custom function
+    $functionsLocator = new class(['upper' => $upper]) implements \Psr\Container\ContainerInterface {
+        public function __construct(private array $functions) {}
+        public function get(string $id): mixed { return $this->functions[$id]; }
+        public function has(string $id): bool { return isset($this->functions[$id]); }
+    };
+
+    $crawler = new JsonCrawler('{"items": [{"title": "hello"}, {"title": "world"}]}', $functionsLocator);
+
+    $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
+    // returns [{"title": "hello"}]
+
+You can also use the :class:`Symfony\\Component\\JsonPath\\JsonPathCrawler`
+factory, which creates pre-configured :class:`Symfony\\Component\\JsonPath\\JsonCrawlerInterface`
+instances::
+
+    use Symfony\Component\JsonPath\JsonPathCrawler;
+
+    $crawlerFactory = new JsonPathCrawler($functionsLocator);
+    $crawler = $crawlerFactory->crawl('{"items": [{"title": "hello"}]}');
+
+Registering Custom Functions in Symfony
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the full Symfony framework, create an invokable class and
+apply the :class:`Symfony\\Component\\JsonPath\\Attribute\\AsJsonPathFunction`
+attribute::
+
+    use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
+
+    #[AsJsonPathFunction('upper')]
+    final class UppercaseFunction
+    {
+        public function __invoke(mixed $value): ?string
+        {
+            return \is_string($value) ? strtoupper($value) : null;
+        }
+    }
+
+That's it. Symfony automatically registers the function and makes it available
+in all JsonPath queries. Inject :class:`Symfony\\Component\\JsonPath\\JsonPathCrawlerInterface`
+to get a crawler with all custom functions pre-configured::
+
+    use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
+
+    class BookController
+    {
+        public function index(JsonPathCrawlerInterface $crawlerFactory): Response
+        {
+            $crawler = $crawlerFactory->crawl($json);
+
+            $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
+
+            // ...
+        }
+    }
+
+The ``#[AsJsonPathFunction]`` attribute accepts two arguments:
+
+``name``
+    The function name used in JsonPath expressions (required).
+
+``returnType``
+    The return type of the function (default: ``FunctionReturnType::Value``).
+    This controls how the function can be used in filter expressions, following
+    the `RFC 9535 type system`_:
+
+    * ``FunctionReturnType::Value``: the function returns a JSON value that can
+      be used in comparisons (``==``, ``<``, ``>``, etc.) but not as a bare
+      filter test;
+    * ``FunctionReturnType::Logical``: the function returns a boolean result
+      that can be used as a standalone filter test (e.g.
+      ``$.items[?is_valid(@.field)]``) but not in comparisons;
+    * ``FunctionReturnType::Nodes``: the function returns a node list that can
+      be used as a filter test but not in comparisons.
+
+::
+
+    use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
+    use Symfony\Component\JsonPath\FunctionReturnType;
+
+    #[AsJsonPathFunction('is_positive', returnType: FunctionReturnType::Logical)]
+    final class IsPositiveFunction
+    {
+        public function __invoke(mixed $value): bool
+        {
+            return is_numeric($value) && $value > 0;
+        }
+    }
+
+    // usage: $.items[?is_positive(@.value)]
+
+The arity (number of required arguments) is automatically derived from the
+``__invoke()`` method signature.
+
+.. note::
+
+    Custom functions can override built-in functions (``length``, ``count``,
+    ``match``, ``search``, ``value``). When a custom function has the same name
+    as a built-in one, the custom function takes precedence.
+
 Testing with JSON Assertions
 ----------------------------
 
@@ -323,3 +446,5 @@ Example of handling errors::
     }
 
 .. _`RFC 9535 – JSONPath`: https://datatracker.ietf.org/doc/html/rfc9535
+.. _`RFC 9535 §2.4`: https://datatracker.ietf.org/doc/html/rfc9535#name-function-extensions
+.. _`RFC 9535 type system`: https://datatracker.ietf.org/doc/html/rfc9535#name-type-system-for-function-ex
