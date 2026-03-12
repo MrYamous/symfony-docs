@@ -579,11 +579,6 @@ You can also pass a fourth argument to define a distinct name for the
 This allows the service to be injected using ``#[Target('shouty')]`` on any
 argument, regardless of its name.
 
-.. versionadded:: 7.4
-
-    The ``$target`` argument of ``registerAliasForArgument()`` was introduced
-    in Symfony 7.4.
-
 .. _autowire-attribute:
 
 Fixing Non-Autowireable Arguments
