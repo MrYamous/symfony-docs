@@ -547,6 +547,88 @@ You can get a list of named autowiring aliases by running the ``debug:autowiring
 
      [...]
 
+Suppose you want to inject the ``App\Util\UppercaseTransformer`` service. You would use
+the ``#[Target]`` attribute by passing the name of the ``$shoutyTransformer`` argument::
+
+    // src/Service/MastodonClient.php
+    namespace App\Service;
+
+    use App\Util\TransformerInterface;
+    use Symfony\Component\DependencyInjection\Attribute\Target;
+
+    class MastodonClient
+    {
+        public function __construct(
+            #[Target('shoutyTransformer')]
+            private TransformerInterface $transformer,
+        ) {
+        }
+    }
+
+.. tip::
+
+    Since the ``#[Target]`` attribute normalizes the string passed to it to its
+    camelCased form, name variations (e.g. ``shouty.transformer``) also work.
+
+.. note::
+
+    Some IDEs will show an error when using ``#[Target]`` as in the previous example:
+    *"Attribute cannot be applied to a property because it does not contain the 'Attribute::TARGET_PROPERTY' flag"*.
+    The reason is that thanks to `PHP constructor promotion`_ this constructor
+    argument is both a parameter and a class property. You can safely ignore this error message.
+
+If you need to register named autowiring aliases from PHP code (e.g. in a
+:doc:`compiler pass </service_container/compiler_passes>` or a
+:ref:`bundle extension <bundle-load-services-extension>`), use the
+:method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerAliasForArgument`
+method::
+
+    use App\Util\TransformerInterface;
+
+    $container->registerAliasForArgument(
+        'app.uppercase_transformer',  // the service id
+        TransformerInterface::class,  // the type-hint
+        'shoutyTransformer'           // the argument name
+    );
+
+This registers the alias ``TransformerInterface $shoutyTransformer``, so any
+argument type-hinted with ``TransformerInterface`` and named ``$shoutyTransformer``
+will receive the ``app.uppercase_transformer`` service.
+
+You can also pass a fourth argument to define a distinct name for the
+``#[Target]`` attribute, separate from the argument name::
+
+    $container->registerAliasForArgument(
+        'app.uppercase_transformer',
+        TransformerInterface::class,
+        'shoutyTransformer',  // the argument name
+        'shouty'              // the #[Target] name
+    );
+
+This allows the service to be injected using ``#[Target('shouty')]`` on any
+argument, regardless of its name.
+
+You can get a list of named autowiring aliases by running the ``debug:autowiring`` command:
+
+.. code-block:: terminal
+
+    $ php bin/console debug:autowiring LoggerInterface
+
+    Autowirable Types
+    =================
+
+     The following classes & interfaces can be used as type-hints when autowiring:
+     (only showing classes/interfaces matching LoggerInterface)
+
+     Describes a logger instance.
+     Psr\Log\LoggerInterface - alias:monolog.logger
+     Psr\Log\LoggerInterface $assetMapperLogger - target:asset_mapperLogger - alias:monolog.logger.asset_mapper
+     Psr\Log\LoggerInterface $cacheLogger - alias:monolog.logger.cache
+     Psr\Log\LoggerInterface $httpClientLogger - target:http_clientLogger - alias:monolog.logger.http_client
+     Psr\Log\LoggerInterface $mailerLogger - alias:monolog.logger.mailer
+
+     [...]
+
 .. _autowire-attribute:
 
 Fixing Non-Autowireable Arguments
