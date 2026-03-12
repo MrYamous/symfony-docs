@@ -510,6 +510,22 @@ under the arguments key.
     The reason is that thanks to `PHP constructor promotion`_ this constructor
     argument is both a parameter and a class property. You can safely ignore this error message.
 
+If you need to register named autowiring aliases from PHP code (e.g. in a
+:doc:`compiler pass </service_container/compiler_passes>` or a
+:ref:`bundle extension <bundle-load-services-extension>`), use the
+:method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerAliasForArgument`
+method::
+
+    $container->registerAliasForArgument(
+        'app.uppercase_transformer',
+        TransformerInterface::class,
+        'shoutyTransformer',  // the argument name
+        'shouty'              // the #[Target] name
+    );
+
+This allows the service to be injected using ``#[Target('shouty')]`` on any
+argument type-hinted with ``TransformerInterface``, regardless of its name.
+
 You can get a list of named autowiring aliases by running the ``debug:autowiring`` command:
 
 .. code-block:: terminal
