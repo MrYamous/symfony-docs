@@ -343,15 +343,16 @@ target class can be mapped from multiple source classes::
     use App\Api\ExternalProduct;
     use App\Dto\InternalProduct;
     use Symfony\Component\ObjectMapper\Attribute\Map;
+    use Symfony\Component\ObjectMapper\Condition\SourceClass;
 
     #[Map(source: ExternalProduct::class)]
     #[Map(source: InternalProduct::class)]
     class Product
     {
         // map from 'externalName' only when the source is ExternalProduct
-        #[Map(source: 'externalName', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass(ExternalProduct::class))]
+        #[Map(source: 'externalName', if: new SourceClass(ExternalProduct::class))]
         // map from 'name' only when the source is InternalProduct
-        #[Map(source: 'name', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass(InternalProduct::class))]
+        #[Map(source: 'name', if: new SourceClass(InternalProduct::class))]
         public string $name = '';
     }
 
@@ -367,13 +368,14 @@ when the object is an instance of any of them. This reduces the number of
 ``#[Map]`` attributes needed for multi-class mappings::
 
     use Symfony\Component\ObjectMapper\Attribute\Map;
+    use Symfony\Component\ObjectMapper\Condition\SourceClass;
 
     #[Map(source: B::class)]
     #[Map(source: C::class)]
     class A
     {
         // applies when the source is either B or C
-        #[Map(source: 'foo', if: new \Symfony\Component\ObjectMapper\Condition\SourceClass([B::class, C::class]))]
+        #[Map(source: 'foo', if: new SourceClass([B::class, C::class]))]
         public string $something = '';
     }
 
@@ -391,6 +393,9 @@ checks in a single condition, and
 when any of its rules matches::
 
     use Symfony\Component\ObjectMapper\Attribute\Map;
+    use Symfony\Component\ObjectMapper\Condition\ClassRule;
+    use Symfony\Component\ObjectMapper\Condition\ClassRuleList;
+    use Symfony\Component\ObjectMapper\Condition\SourceClass;
     use Symfony\Component\ObjectMapper\Condition\TargetClass;
 
     #[Map(source: B::class)]
@@ -400,15 +405,15 @@ when any of its rules matches::
     class A
     {
         // when reading from a source: apply only when source is B
-        #[Map(source: 'foo', transform: 'strtolower', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\SourceClass(B::class)]))]
+        #[Map(source: 'foo', transform: 'strtolower', if: new ClassRuleList([new SourceClass(B::class)]))]
         // when reading from a source: apply only when source is C
-        #[Map(source: 'bar', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\ClassRule(sources: [C::class])]))]
+        #[Map(source: 'bar', if: new ClassRuleList([new ClassRule(sources: [C::class])]))]
         public string $somethingSourced = '';
 
         // when writing to a target: apply only when target is B
-        #[Map(target: 'foo', transform: 'strtoupper', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new TargetClass(B::class)]))]
+        #[Map(target: 'foo', transform: 'strtoupper', if: new ClassRuleList([new TargetClass(B::class)]))]
         // when writing to a target: apply only when target is C
-        #[Map(target: 'bar', if: new \Symfony\Component\ObjectMapper\Condition\ClassRuleList([new \Symfony\Component\ObjectMapper\Condition\ClassRule(targets: [C::class])]))]
+        #[Map(target: 'bar', if: new ClassRuleList([new ClassRule(targets: [C::class])]))]
         public string $somethingTargeted = '';
     }
 
