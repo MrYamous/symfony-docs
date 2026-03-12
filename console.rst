@@ -530,11 +530,11 @@ their results::
                 // e.g: '--some-option' => true,
             ]);
 
-            $this->assertIsSuccessful($result);
+            $this->assertCommandIsSuccessful($result);
 
             // you can also check for a failed or invalid command:
-            // $this->assertFailed($result);
-            // $this->assertIsInvalid($result);
+            // $this->assertCommandFailed($result);
+            // $this->assertCommandIsInvalid($result);
 
             // the output of the command in the console
             $output = $result->getOutput();
@@ -564,9 +564,9 @@ display separately::
     // the exit code
     $result->statusCode;
 
-You can also assert multiple expectations at once using ``assertResultEquals()``::
+You can also assert multiple expectations at once using ``assertCommandResultEquals()``::
 
-    $this->assertResultEquals(
+    $this->assertCommandResultEquals(
         $result,
         expectedStatusCode: 0,
         expectedOutput: 'User "Wouter" was created.',
