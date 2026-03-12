@@ -172,6 +172,8 @@ inheritance mapping, you need to execute the query in a different repository.
 Use this option to define the fully-qualified class name (FQCN) of the Doctrine
 entity associated with the repository you want to use.
 
+This option is also useful when the object being validated is not a Doctrine entity.
+
 ``errorPath``
 ~~~~~~~~~~~~~
 
@@ -281,7 +283,202 @@ If you need to require two fields to be individually unique (e.g. a unique
 ``email`` and a unique ``username``), you use two ``UniqueEntity`` entries,
 each with a single field.
 
+When the validated object is not an entity (i.e. ``entityClass`` is set and
+the object itself is not a Doctrine-managed entity), if any property names
+on the validated object differ from those on the entity, pass a key-value
+array where each key is the object property name and the value is the
+corresponding entity property name:
+
+.. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Message/CreateUser.php
+        namespace App\Message;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+        #[UniqueEntity(
+            // 'name' is the property on this class; 'username' is the property on User
+            fields: ['name' => 'username'],
+            entityClass: User::class,
+        )]
+        class CreateUser
+        {
+            public function __construct(public string $name)
+            {
+            }
+        }
+
+    .. code-block:: yaml
+
+        # config/validator/validation.yaml
+        App\Message\CreateUser:
+            constraints:
+                - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+                    fields: { name: username }
+                    entityClass: 'App\Entity\User'
+
+    .. code-block:: xml
+
+        <!-- config/validator/validation.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+            <class name="App\Message\CreateUser">
+                <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+                    <option name="fields">
+                        <value key="name">username</value>
+                    </option>
+                    <option name="entityClass">App\Entity\User</option>
+                </constraint>
+            </class>
+        </constraint-mapping>
+
+    .. code-block:: php
+
+        // src/Message/CreateUser.php
+        namespace App\Message;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Mapping\ClassMetadata;
+
+        class CreateUser
+        {
+            public string $name;
+
+            public static function loadValidatorMetadata(ClassMetadata $metadata): void
+            {
+                $metadata->addConstraint(new UniqueEntity(
+                    fields: ['name' => 'username'],
+                    entityClass: User::class,
+                ));
+            }
+        }
+
 .. include:: /reference/constraints/_groups-option.rst.inc
+
+``identifierFieldNames``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+**type**: ``array`` | ``string``
+
+.. versionadded:: 7.1
+
+    The ``identifierFieldNames`` option was introduced in Symfony 7.1.
+
+When the validated object is not a Doctrine entity and represents an update
+operation on an existing entity, use this option to specify which properties
+of the object hold the entity's primary key (or composite key). The validator
+uses these to identify the entity being updated and avoid a false uniqueness
+violation when the only conflicting record is the entity itself.
+
+If the identifier property names on the validated object differ from those on
+the entity, pass a key-value array where each key is the object property name
+and the value is the corresponding entity property name.
+
+Consider the following Doctrine entity::
+
+    // src/Entity/User.php
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+
+    #[ORM\Entity]
+    class User
+    {
+        #[ORM\Column(type: 'string')]
+        public string $id;
+
+        #[ORM\Column(type: 'string')]
+        public string $username;
+    }
+
+You can configure the ``UniqueEntity`` constraint as follows:
+
+.. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Message/UpdateEmployeeProfile.php
+        namespace App\Message;
+
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+        #[UniqueEntity(
+            entityClass: 'App\Entity\User',
+            // 'name' maps to 'username' on the User entity
+            fields: ['name' => 'username'],
+            // 'uid' holds the entity's primary key, mapped to 'id' on User
+            identifierFieldNames: ['uid' => 'id'],
+        )]
+        class UpdateEmployeeProfile
+        {
+            public function __construct(
+                public string $uid,
+                public string $name,
+            ) {
+            }
+        }
+
+    .. code-block:: yaml
+
+        # config/validator/validation.yaml
+        App\Message\UpdateEmployeeProfile:
+            constraints:
+                - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+                    fields: {name: username}
+                    entityClass: 'App\Entity\User'
+                    identifierFieldNames: {uid: id}
+
+    .. code-block:: xml
+
+        <!-- config/validator/validation.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+            <class name="App\Message\UpdateEmployeeProfile">
+                <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+                    <option name="fields">
+                        <value key="name" >username</value>
+                    </option>
+                    <option name="entityClass">App\Entity\User</option>
+                    <option name="identifierFieldNames">
+                        <value key="uid" >id</value>
+                    </option>
+                </constraint>
+            </class>
+
+        </constraint-mapping>
+
+    .. code-block:: php
+
+        // src/Message/UpdateEmployeeProfile.php
+        namespace App\Message;
+
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Mapping\ClassMetadata;
+
+        class UpdateEmployeeProfile
+        {
+            public string $uid;
+            public string $name;
+
+            public static function loadValidatorMetadata(ClassMetadata $metadata)
+            {
+                $metadata->addConstraint(new UniqueEntity([
+                    'fields' => ['name' => 'username'],
+                    'entityClass' => 'App\Entity\User',
+                    'identifierFieldNames' => ['uid' => 'id'],
+                ]));
+            }
+        }
 
 ``ignoreNull``
 ~~~~~~~~~~~~~~
