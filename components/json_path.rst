@@ -216,77 +216,73 @@ Custom Functions
 
     Custom function support was introduced in Symfony 8.1.
 
-The JsonPath component supports custom function extensions as defined by
-`RFC 9535 §2.4`_. You can register your own functions to use within filter
+The JSONPath specification allows you to `define custom functions`_. Symfony
+supports them as well, so you can register your own functions for use in filter
 expressions.
 
-Using Custom Functions Standalone
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+First, define the function and register it as a JSONPath function:
 
-When using the component standalone, pass a ``ContainerInterface`` of callables
-and an optional metadata array to the
-:class:`Symfony\\Component\\JsonPath\\JsonCrawler` constructor::
+.. configuration-block::
 
-    use Symfony\Component\JsonPath\JsonCrawler;
+    .. code-block:: php-symfony
 
-    $upper = static fn (mixed $value): ?string => \is_string($value) ? strtoupper($value) : null;
+        use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
 
-    // create a simple service locator with the custom function
-    $functionsLocator = new class(['upper' => $upper]) implements \Psr\Container\ContainerInterface {
-        public function __construct(private array $functions) {}
-        public function get(string $id): mixed { return $this->functions[$id]; }
-        public function has(string $id): bool { return isset($this->functions[$id]); }
-    };
-
-    $crawler = new JsonCrawler('{"items": [{"title": "hello"}, {"title": "world"}]}', $functionsLocator);
-
-    $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
-    // returns [{"title": "hello"}]
-
-You can also use the :class:`Symfony\\Component\\JsonPath\\JsonPathCrawler`
-factory, which creates pre-configured :class:`Symfony\\Component\\JsonPath\\JsonCrawlerInterface`
-instances::
-
-    use Symfony\Component\JsonPath\JsonPathCrawler;
-
-    $crawlerFactory = new JsonPathCrawler($functionsLocator);
-    $crawler = $crawlerFactory->crawl('{"items": [{"title": "hello"}]}');
-
-Registering Custom Functions in Symfony
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When using the full Symfony framework, create an invokable class and
-apply the :class:`Symfony\\Component\\JsonPath\\Attribute\\AsJsonPathFunction`
-attribute::
-
-    use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
-
-    #[AsJsonPathFunction('upper')]
-    final class UppercaseFunction
-    {
-        public function __invoke(mixed $value): ?string
+        #[AsJsonPathFunction('upper')]
+        final class UppercaseFunction
         {
-            return \is_string($value) ? strtoupper($value) : null;
+            public function __invoke(mixed $value): ?string
+            {
+                return \is_string($value) ? strtoupper($value) : null;
+            }
         }
-    }
 
-That's it. Symfony automatically registers the function and makes it available
-in all JsonPath queries. Inject :class:`Symfony\\Component\\JsonPath\\JsonPathCrawlerInterface`
-to get a crawler with all custom functions pre-configured::
+    .. code-block:: php-standalone
 
-    use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
+        use Symfony\Component\JsonPath\JsonCrawler;
 
-    class BookController
-    {
-        public function index(JsonPathCrawlerInterface $crawlerFactory): Response
+        $upper = static fn (mixed $value): ?string => \is_string($value) ? strtoupper($value) : null;
+
+        // create a service locator with the custom function
+        $functionsLocator = new class(['upper' => $upper]) implements \Psr\Container\ContainerInterface {
+            public function __construct(private array $functions) {}
+            public function get(string $id): mixed { return $this->functions[$id]; }
+            public function has(string $id): bool { return isset($this->functions[$id]); }
+        };
+
+        $crawler = new JsonCrawler('{"items": [{"title": "hello"}, {"title": "world"}]}', $functionsLocator);
+
+Then use it in your JsonPath expressions like any built-in function:
+
+.. configuration-block::
+
+    .. code-block:: php-symfony
+
+        use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
+
+        class BookController
         {
-            $crawler = $crawlerFactory->crawl($json);
+            public function index(JsonPathCrawlerInterface $crawlerFactory): Response
+            {
+                $crawler = $crawlerFactory->crawl($json);
 
-            $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
+                $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
 
-            // ...
+                // ...
+            }
         }
-    }
+
+    .. code-block:: php-standalone
+
+        $result = $crawler->find('$.items[?upper(@.title) == "HELLO"]');
+        // returns [{"title": "hello"}]
+
+        // you can also use the JsonPathCrawler factory, which creates
+        // pre-configured JsonCrawlerInterface instances
+        use Symfony\Component\JsonPath\JsonPathCrawler;
+
+        $crawlerFactory = new JsonPathCrawler($functionsLocator);
+        $crawler = $crawlerFactory->crawl('{"items": [{"title": "hello"}]}');
 
 The ``#[AsJsonPathFunction]`` attribute accepts two arguments:
 
@@ -299,7 +295,7 @@ The ``#[AsJsonPathFunction]`` attribute accepts two arguments:
     the `RFC 9535 type system`_:
 
     * ``FunctionReturnType::Value``: the function returns a JSON value that can
-      be used in comparisons (``==``, ``<``, ``>``, etc.) but not as a bare
+      be used in comparisons (``==``, ``<``, ``>``, etc.) but not as a standalone
       filter test;
     * ``FunctionReturnType::Logical``: the function returns a boolean result
       that can be used as a standalone filter test (e.g.
@@ -307,7 +303,7 @@ The ``#[AsJsonPathFunction]`` attribute accepts two arguments:
     * ``FunctionReturnType::Nodes``: the function returns a node list that can
       be used as a filter test but not in comparisons.
 
-::
+For example::
 
     use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
     use Symfony\Component\JsonPath\FunctionReturnType;
@@ -323,8 +319,8 @@ The ``#[AsJsonPathFunction]`` attribute accepts two arguments:
 
     // usage: $.items[?is_positive(@.value)]
 
-The arity (number of required arguments) is automatically derived from the
-``__invoke()`` method signature.
+The number of required arguments is automatically derived from the ``__invoke()``
+method signature.
 
 .. note::
 
@@ -446,5 +442,5 @@ Example of handling errors::
     }
 
 .. _`RFC 9535 – JSONPath`: https://datatracker.ietf.org/doc/html/rfc9535
-.. _`RFC 9535 §2.4`: https://datatracker.ietf.org/doc/html/rfc9535#name-function-extensions
+.. _`define custom functions`: https://datatracker.ietf.org/doc/html/rfc9535#name-function-extensions
 .. _`RFC 9535 type system`: https://datatracker.ietf.org/doc/html/rfc9535#name-type-system-for-function-ex
