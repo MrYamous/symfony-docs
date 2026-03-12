@@ -367,10 +367,6 @@ corresponding entity property name:
 
 **type**: ``array`` | ``string``
 
-.. versionadded:: 7.1
-
-    The ``identifierFieldNames`` option was introduced in Symfony 7.1.
-
 When the validated object is not a Doctrine entity and represents an update
 operation on an existing entity, use this option to specify which properties
 of the object hold the entity's primary key (or composite key). The validator
