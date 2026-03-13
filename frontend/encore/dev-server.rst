@@ -100,8 +100,6 @@ the following option:
 
         .configureDevServerOptions(options => {
             options.allowedHosts = 'all';
-            // in older Webpack Dev Server versions, use this option instead:
-            // options.firewall = false;
         })
 
 Beware that this is not a recommended security practice in general, but here

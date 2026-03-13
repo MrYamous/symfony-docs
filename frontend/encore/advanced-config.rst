@@ -268,7 +268,7 @@ normally use from the command-line interface:
     Encore.configureRuntimeEnvironment('dev-server', {
         // Same options you would use with the
         // CLI utility, with their name in camelCase.
-        https: true,
+        serverType: 'https',
         keepPublicPath: true,
     });
 
@@ -280,22 +280,19 @@ The method ``configureLoaderRule()`` provides a clean way to configure Webpack l
 This is a low-level method. All your modifications will be applied just before pushing the loaders rules to Webpack.
 It means that you can override the default configuration provided by Encore, which may break things. Be careful when using it.
 
-One use might be to configure the ``eslint-loader`` to lint Vue files too.
-The following code is equivalent:
+For example, you could use it to configure the ``vue`` loader to enable a specific option:
 
 .. code-block:: javascript
 
     // Manually
     const webpackConfig = Encore.getWebpackConfig();
 
-    const eslintLoader = webpackConfig.module.rules.find(rule => rule.loader === 'eslint-loader');
-    eslintLoader.test = /\.(jsx?|vue)$/;
-
-    return webpackConfig;
+    const vueLoader = webpackConfig.module.rules.find(rule => /vue-loader/.test(rule.loader);
+    vueLoader.options.experimentalInlineMatchResource = true;
 
     // Using Encore.configureLoaderRule()
-    Encore.configureLoaderRule('eslint', loaderRule => {
-        loaderRule.test = /\.(jsx?|vue)$/
+    Encore.configureLoaderRule('vue', loaderRule => {
+        loaderRule.options.experimentalInlineMatchResource = true;
     });
 
     return Encore.getWebpackConfig();
@@ -310,7 +307,6 @@ The following loaders are configurable with ``configureLoaderRule()``:
   - ``stylus``
   - ``svelte``
   - ``vue``
-  - ``eslint``
   - ``typescript`` (alias ``ts``)
   - ``handlebars``
 

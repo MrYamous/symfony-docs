@@ -425,7 +425,7 @@ you need a feature, Encore will tell you what you need to install. Run:
 
 .. code-block:: terminal
 
-    $ npm install sass-loader@^13.0.0 sass --save-dev
+    $ npm install sass-loader@^16.0.0 sass --save-dev
     $ npm run watch
 
 Your app now supports Sass. Encore also supports LESS and Stylus. See
