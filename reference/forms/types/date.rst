@@ -154,6 +154,10 @@ Use an array to customize the label for each field::
         ],
     ]);
 
+.. versionadded:: 8.1
+
+    The ``labels`` option was introduced in Symfony 8.1.
+
 .. _reference-forms-type-date-format:
 
 .. include:: /reference/forms/types/options/date_format.rst.inc
