@@ -135,6 +135,23 @@ values for the year, month and day fields::
         ],
     ]);
 
+``labels``
+~~~~~~~~~~
+
+**type**: ``array`` **default**: ``[]``
+
+If your widget option is set to ``choice`` or ``text``, then each sub-field
+(year, month and day) renders a label. By default, these labels are
+auto-generated from the field names (``Year``, ``Month``, ``Day``).
+
+Use an array to set individual labels for each field::
+
+    $builder->add('dueDate', DateType::class, [
+        'labels' => [
+            'year' => 'Birth year', 'month' => 'Birth month', 'day' => 'Birth day',
+        ],
+    ]);
+
 .. _reference-forms-type-date-format:
 
 .. include:: /reference/forms/types/options/date_format.rst.inc
