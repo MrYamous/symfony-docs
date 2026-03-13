@@ -1462,6 +1462,16 @@ The transport has a number of options:
 ``exchange[type]`` (default: ``fanout``)
     Type of exchange
 
+``exchange[bindings]``
+    The source exchanges to bind this exchange to, keyed by the name.
+    Binding direction: source exchange -> this exchange
+
+``exchange[bindings][binding_keys]``
+    The binding/routing keys to be used for the binding
+
+``exchange[bindings][binding_arguments]``
+    Additional binding arguments
+
 You can also configure AMQP-specific settings on your message by adding
 :class:`Symfony\\Component\\Messenger\\Bridge\\Amqp\\Transport\\AmqpStamp` to
 your Envelope::
