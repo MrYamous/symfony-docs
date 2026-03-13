@@ -747,6 +747,98 @@ there are constraint violations:
     )]
     UploadedFile $document
 
+.. versionadded:: 7.1
+
+    The ``#[MapUploadedFile]`` attribute was introduced in Symfony 7.1.
+
+Mapping Request Headers
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes, you need to retrieve one or more headers from an HTTP request to handle
+specific logic in your application.
+Thanks to the :class:`Symfony\\Component\\HttpKernel\\Attribute\\MapRequestHeader`
+attribute, arguments of your controller's action can be automatically fulfilled::
+
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+
+    // ...
+
+    public function dashboard(
+        #[MapRequestHeader] string $accept
+    ): Response
+    {
+        // ...
+    }
+
+``#[MapRequestHeader]`` can take an optional argument called ``name``.
+This argument helps you when the parameter can't be determine by the variable name
+itself::
+
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+
+    // ...
+
+    public function dashboard(
+        #[MapRequestHeader(name: 'user-agent')] ?string $agent,
+    ): Response
+    {
+        // ...
+    }
+
+If we are looking for a header of type Accept-* with an array type, we will use
+the `dedicated methods`_  to retrieve this data::
+
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+
+    // ...
+
+    public function dashboard(
+        #[MapRequestHeader] array $accept,
+    ): Response
+    {
+        // ...
+    }
+
+The last possible return type is to use the :class:`Symfony\\Component\\HttpFoundation\\AcceptHeader`.
+
+.. code-block:: php-attributes
+
+    use Symfony\Component\HttpFoundation\AcceptHeader;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+
+    // ...
+
+    public function dashboard(
+        #[MapRequestHeader(name: 'accept-encoding')] AcceptHeader $encoding,
+    ): Response
+    {
+        // ...
+    }
+
+You can customize the HTTP status to return if the validation fails::
+
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
+
+    // ...
+
+    public function dashboard(
+        #[MapRequestHeader(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)] ?string $agent,
+    ): Response
+    {
+        // ...
+    }
+
+The default status code returned if the validation fails is 400.
+
+.. versionadded:: 7.1
+
+    The ``#[MapRequestHeader]`` attribute was introduced in Symfony 8.1.
+
 Managing the Session
 --------------------
 
@@ -1220,3 +1312,4 @@ Learn more about Controllers
 .. _`phpdocumentor/type-resolver`: https://packagist.org/packages/phpdocumentor/type-resolver
 .. _`Server-Sent Events (SSE)`: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 .. _`the WHATWG SSE specification`: https://html.spec.whatwg.org/multipage/server-sent-events.html
+.. _`dedicated methods`: https://symfony.com/doc/current/components/http_foundation.html#accessing-accept-headers-data
