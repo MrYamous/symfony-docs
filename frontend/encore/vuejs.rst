@@ -106,7 +106,7 @@ Next, run or restart Encore. When you do, you will see an error message helping
 you install any missing dependencies. After running that command and restarting
 Encore, you're done!
 
-Your ``.jsx`` files will now be transformed through ``@vue/babel-preset-jsx``.
+Your ``.jsx`` files will now be transformed through ``@vue/babel-plugin-jsx``.
 
 Using styles
 ~~~~~~~~~~~~
