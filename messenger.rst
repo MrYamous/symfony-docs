@@ -1461,8 +1461,13 @@ The transport has a number of options:
     Name of the exchange to be used for the delayed/retried messages
 
 ``queues``
-    Configuration for the queues. May be set to ``false`` or ``[]`` neither
-    any own queues nor the default ``messages`` queue shall be created.
+    Configuration for the queues. May be set to ``false`` or ``[]`` if neither
+    custom queues nor the default ``messages`` queue should be created.
+
+    .. versionadded:: 8.1
+
+        The ability to set ``queues`` to ``false`` to skip binding the default
+        ``messages`` queue was introduced in Symfony 8.1.
 
 ``queues[name][arguments]``
     Extra arguments
