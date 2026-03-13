@@ -1508,15 +1508,22 @@ You can customize this value using the ``max_ttl`` option:
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()->scopedClient('example.client')
-                ->baseUri('https://example.com')
-                ->caching()
-                    ->maxTtl(3600)
-            ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        'example.client' => [
+                            'base_uri' => 'https://example.com',
+                            'caching' => [
+                                'max_ttl' => 3600
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
