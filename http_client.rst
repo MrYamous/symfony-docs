@@ -1450,22 +1450,30 @@ so the :doc:`Cache component </components/cache>` must be installed in your appl
     .. code-block:: php
 
         // config/packages/framework.php
-        use Symfony\Config\FrameworkConfig;
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-        return static function (FrameworkConfig $framework): void {
-            $framework->httpClient()->scopedClient('example.client')
-                ->baseUri('https://example.com')
-                ->caching()
-                    ->cachePool('example_cache_pool')
-                // ...
-            ;
-
-            $framework->cache()
-                ->pool('example_cache_pool')
-                    ->adapter('cache.adapter.redis_tag_aware')
-                    ->tags(true)
-                ;
-        };
+        return App::config([
+            'framework' => [
+                'http_client' => [
+                    'scoped_clients' => [
+                        'example.client' => [
+                            'base_uri' => 'https://example.com',
+                            'caching' => [
+                                'cache_pool' => 'example_cache_pool'
+                            ]
+                        ],
+                    ],
+                ],
+                'cache' => [
+                    'pools' => [
+                        'example_cache_pool' => [
+                            'adapter' => 'cache.adapter.redis_tag_aware',
+                            'tags' => true
+                        ]
+                    ]
+                ]
+            ],
+        ]);
 
     .. code-block:: php-standalone
 
