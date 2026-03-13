@@ -199,7 +199,7 @@ all the forms of the application:
         ]);
 
 The order in which themes are defined is important because each theme overrides
-all the previous one. When rendering a form field whose block is not defined in
+all the previous ones. When rendering a form field whose block is not defined in
 the form theme, Symfony falls back to the previous themes until the first one.
 
 These global themes are applied to all forms, even those which use the
