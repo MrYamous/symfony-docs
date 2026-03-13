@@ -769,6 +769,31 @@ configuration option:
                     - SIGINT
                     - SIGUSR1
 
+            # ...
+
+    .. code-block:: xml
+
+        <!-- config/packages/messenger.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony
+                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:messenger>
+                    <!-- ... -->
+
+                    <framework:stop-worker-on-signals signal="SIGTERM"/>
+                    <framework:stop-worker-on-signals signal="SIGINT"/>
+                    <framework:stop-worker-on-signals signal="SIGUSR1"/>
+                </framework:messenger>
+            </framework:config>
+        </container>
+
     .. code-block:: php
 
         // config/packages/messenger.php
