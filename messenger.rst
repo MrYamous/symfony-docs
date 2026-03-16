@@ -1582,6 +1582,13 @@ The transport has a number of options:
 ``delay[exchange_name]`` (default: ``delays``)
     Name of the exchange to be used for the delayed/retried messages
 
+``delay[arguments]`` (default: ``[]``)
+    Extra arguments for the delays queues
+
+    .. versionadded:: 7.1
+
+        The ``delay[arguments]`` option was introduced in Symfony 7.1.
+
 ``queues[name][arguments]``
     Extra arguments
 
