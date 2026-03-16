@@ -74,14 +74,41 @@ Web front-controller::
     require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
     // ...
 
+.. _override-bin-dir:
+
+Override the Binary Directory
+-----------------------------
+
+You can change the binary directory by adding the ``extra.bin-dir`` option
+in the ``composer.json`` file:
+
+.. code-block:: json
+
+    {
+        "...": "...",
+        "extra": {
+            "...": "...",
+            "bin-dir": "my_new_bin_dir"
+        }
+    }
+
 .. _override-config-dir:
 
 Override the Configuration Directory
 ------------------------------------
 
-The configuration directory is the only one which cannot be overridden in a
-Symfony application. Its location is hardcoded as the ``config/`` directory
-at your project root directory.
+You can change the configuration directory by adding the ``extra.config-dir`` option
+in the ``composer.json`` file:
+
+.. code-block:: json
+
+    {
+        "...": "...",
+        "extra": {
+            "...": "...",
+            "config-dir": "my_new_config_dir"
+        }
+    }
 
 .. _override-cache-dir:
 
@@ -159,6 +186,34 @@ Here you have changed the location of the directory to ``var/{environment}/log/`
 
 You can also change the log directory defining an environment variable named
 ``APP_LOG_DIR`` whose value is the full path of the log folder.
+
+.. _override-src-dir:
+
+Override the Source Directory
+-----------------------------
+
+You can change the source directory by adding the ``extra.src-dir`` option
+and updating the ``autoload.psr-4`` option in the ``composer.json`` file:
+
+.. code-block:: json
+
+    {
+        "...": "...",
+        "autoload": {
+            "psr-4": {
+                "App\\": "my_new_src_dir/"
+            }
+        },
+        "extra": {
+            "...": "...",
+            "src-dir": "my_new_src_dir"
+        }
+    }
+
+.. tip::
+
+    Don't forget to run the ``composer dump-autoload`` command once ``autoload.psr-4``
+    has been changed.
 
 .. _override-templates-dir:
 
