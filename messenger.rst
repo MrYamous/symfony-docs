@@ -1620,6 +1620,9 @@ The transport has a number of options:
 ``delay[exchange_name]`` (default: ``delays``)
     Name of the exchange to be used for the delayed/retried messages
 
+``delay[arguments]`` (default: ``[]``)
+    Extra arguments for the delays queues
+
 ``queues``
     Configuration for the queues. May be set to ``false`` or ``[]`` if neither
     custom queues nor the default ``messages`` queue should be created.
