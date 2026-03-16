@@ -286,6 +286,74 @@ call to support ``ReflectionMethod``::
     :method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerAttributeForAutoconfiguration`
     callable.
 
+Discovering Non-Service Classes
+...............................
+
+Sometimes you need to discover classes that should not be registered as services,
+such as entities, value objects or models. The
+:method:`Symfony\\Component\\DependencyInjection\\Definition::addResourceTag`
+method allows you to tag these classes for discovery while keeping them excluded
+from the service container::
+
+    // src/Attribute/AppModel.php
+    namespace App\Attribute;
+
+    #[\Attribute(\Attribute::TARGET_CLASS)]
+    class AppModel
+    {
+    }
+
+    // src/Kernel.php
+    use App\Attribute\AppModel;
+    use Symfony\Component\DependencyInjection\ChildDefinition;
+
+    class Kernel extends BaseKernel
+    {
+        // ...
+
+        protected function build(ContainerBuilder $container): void
+        {
+            $container->registerAttributeForAutoconfiguration(
+                AppModel::class,
+                static function (ChildDefinition $definition): void {
+                    $definition->addResourceTag('app.model');
+                }
+            );
+        }
+    }
+
+Classes annotated with ``#[AppModel]`` will be tagged with ``app.model`` and
+automatically excluded from the container (they won't be instantiated as services).
+
+You can then retrieve these classes in a
+:ref:`compiler pass <components-di-separate-compiler-passes>` using
+:method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::findTaggedResourceIds`::
+
+    // src/DependencyInjection/Compiler/ModelDiscoveryPass.php
+    namespace App\DependencyInjection\Compiler;
+
+    use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+    use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+    class ModelDiscoveryPass implements CompilerPassInterface
+    {
+        public function process(ContainerBuilder $container): void
+        {
+            $classes = [];
+
+            foreach ($container->findTaggedResourceIds('app.model') as $id => $tags) {
+                $classes[] = $container->getDefinition($id)->getClass();
+            }
+
+            $container->setParameter('app.model_classes', $classes);
+        }
+    }
+
+.. versionadded:: 7.3
+
+    The ``addResourceTag()`` and ``findTaggedResourceIds()`` methods were
+    introduced in Symfony 7.3.
+
 Creating custom Tags
 --------------------
 
