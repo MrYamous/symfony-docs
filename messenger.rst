@@ -570,6 +570,21 @@ the message from being redelivered until the worker completes processing it:
 
     This option is only available for the following transports: Beanstalkd, AmazonSQS, Doctrine and Redis.
 
+By default, the worker fetches one message at a time from the transport. Use the
+``--fetch-size`` option to fetch multiple messages per iteration, reducing the
+number of round-trips to the transport:
+
+.. code-block:: terminal
+
+    $ php bin/console messenger:consume async --fetch-size=8
+
+This is especially useful with transports that support fetching multiple messages
+in a single call, such as Amazon SQS, Redis, AMQP and Doctrine.
+
+.. versionadded:: 8.1
+
+    The ``--fetch-size`` option was introduced in Symfony 8.1.
+
 .. tip::
 
     In a development environment and if you're using the Symfony CLI tool,
