@@ -1585,10 +1585,6 @@ The transport has a number of options:
 ``delay[arguments]`` (default: ``[]``)
     Extra arguments for the delays queues
 
-    .. versionadded:: 7.1
-
-        The ``delay[arguments]`` option was introduced in Symfony 7.1.
-
 ``queues[name][arguments]``
     Extra arguments
 
