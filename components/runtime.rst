@@ -206,6 +206,32 @@ The ``SymfonyRuntime`` can handle these applications:
             return new Response('Hello world');
         };
 
+    .. versionadded:: 8.1
+
+        Support for returning a ``Response`` object when running in FrankenPHP
+        worker mode was introduced in Symfony 8.1.
+
+    When running in `FrankenPHP`_ worker mode, a ``Response`` object is
+    handled by
+    :class:`Symfony\\Component\\Runtime\\Runner\\FrankenPhpWorkerRunner`
+    instead of the ``ResponseRunner``. This is useful for scenarios like
+    maintenance pages where you want to return a static response while still
+    benefiting from the worker loop::
+
+        // public/index.php
+        use App\Kernel;
+        use Symfony\Component\HttpFoundation\Response;
+
+        require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+
+        return function (array $context) {
+            if ($context['APP_MAINTENANCE'] ?? false) {
+                return new Response('Service Unavailable', 503);
+            }
+
+            return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+        };
+
 :class:`Symfony\\Component\\Console\\Command\\Command`
     To write single command applications. This will use the
     :class:`Symfony\\Component\\Runtime\\Runner\\Symfony\\ConsoleApplicationRunner`::
