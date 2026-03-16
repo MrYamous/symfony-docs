@@ -311,18 +311,16 @@ for usage examples.
 
 .. sidebar:: ``kernel.controller`` in the Symfony Framework
 
-    An interesting listener to ``kernel.controller`` in the Symfony
-    Framework is :class:`Symfony\\Component\\HttpKernel\\EventListener\\CacheAttributeListener`.
-    This class fetches ``#[Cache]`` attribute configuration from the
-    controller and uses it to configure :doc:`HTTP caching </http_cache>`
-    on the response.
+    An interesting listener to ``kernel.controller`` in the Symfony Framework is
+    :class:`Symfony\\Component\\HttpKernel\\EventListener\\CacheAttributeListener`.
+    This class fetches ``#[Cache]`` attribute configuration from the controller
+    and uses it to configure :doc:`HTTP caching </http_cache>` on the response.
 
     .. versionadded:: 8.1
 
-        Since Symfony 8.1, listeners like ``CacheAttributeListener`` use the
-        :ref:`controller attribute events <http-kernel-controller-attribute-events>`
-        mechanism instead of manually checking for attributes on the generic
-        kernel event.
+        In Symfony 8.1, listeners like ``CacheAttributeListener`` were updated
+        to use the :ref:`controller attribute events <http-kernel-controller-attribute-events>`
+        mechanism instead of manually inspecting attributes on the generic kernel event.
 
     There are a few other minor listeners to the ``kernel.controller`` event in
     the Symfony Framework that deal with collecting profiler data when the
@@ -674,26 +672,24 @@ When a controller has PHP attributes (such as ``#[Cache]`` or ``#[IsGranted]``),
 the kernel automatically dispatches attribute-specific events for each attribute
 found on the controller, in addition to the regular kernel events. This allows
 listeners to target a specific attribute directly, instead of listening to a
-generic kernel event and manually checking for the presence of an attribute.
+generic kernel event and manually inspecting it for the presence of an attribute.
 
-Naming Convention
-~~~~~~~~~~~~~~~~~
-
-The name of each attribute event follows this pattern:
-``{kernelEvent}.{AttributeClassName}``. For example, when a controller has a
-``#[Cache]`` attribute, the following event is dispatched during the
-``kernel.controller_arguments`` phase:
+Each attribute event **name follows the pattern** ``{kernelEvent}.{AttributeClassName}``.
+For example, when a controller has a ``#[Cache]`` attribute, the following event
+is dispatched during the ``kernel.controller_arguments`` phase:
 
 .. code-block:: text
 
     kernel.controller_arguments.Symfony\Component\HttpKernel\Attribute\Cache
 
-The Event Object
-~~~~~~~~~~~~~~~~
+.. note::
+
+    Attribute events are dispatched for **all kernel events except**
+    ``kernel.request`` and ``kernel.terminate``.
 
 Each attribute event receives a
 :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerAttributeEvent` instance,
-which provides access to:
+which provides access to the following properties:
 
 ``$event->attribute``
     The attribute instance found on the controller (e.g. an instance of ``Cache``).
@@ -702,29 +698,13 @@ which provides access to:
     The underlying kernel event (e.g. ``ControllerArgumentsEvent``, ``ResponseEvent``,
     etc.), giving you access to the request, response and other contextual data.
 
-Supported Kernel Events
-~~~~~~~~~~~~~~~~~~~~~~~
+The **order in which attributes are processed** depends on the kernel event:
 
-Attribute events are dispatched for all kernel events except ``kernel.request``
-and ``kernel.terminate``:
-
-* ``kernel.controller``
-* ``kernel.controller_arguments``
-* ``kernel.view``
-* ``kernel.response``
-* ``kernel.finish_request``
-* ``kernel.exception``
-
-Dispatch Order
-~~~~~~~~~~~~~~
-
-The order in which attributes are processed depends on the kernel event:
-
-* **"Before" events** (``kernel.controller``, ``kernel.controller_arguments``):
+* **Before** events (``kernel.controller``, ``kernel.controller_arguments``):
   attributes are processed in the order they are declared on the controller.
-* **"After" events** (``kernel.view``, ``kernel.response``, ``kernel.exception``,
-  ``kernel.finish_request``): attributes are processed in **reverse** order,
-  following the decorator pattern (the last attribute applied is the first to
+* **After** events (``kernel.view``, ``kernel.response``, ``kernel.exception``,
+  ``kernel.finish_request``): attributes are processed in reverse order,
+  following the decorator pattern (the last attribute declared is the first to
   process the response).
 
 Example: Creating a Custom Attribute Listener
@@ -792,13 +772,13 @@ controller for attributes.
 Performance
 ~~~~~~~~~~~
 
-The system dispatches attribute events only when there are listeners registered
-for that specific attribute event name. The
+The system dispatches attribute events only when listeners are registered for
+that specific attribute event name. The
 :class:`Symfony\\Component\\HttpKernel\\EventListener\\ControllerAttributesListener`
 subscriber detects controller attributes and dispatches sub-events, while the
 :class:`Symfony\\Component\\HttpKernel\\DependencyInjection\\ControllerAttributesListenerPass`
 compiler pass optimizes this at container compilation time, ensuring that
-attribute instances are created lazily and only when a matching listener exists.
+attribute instances are created only when a matching listener exists.
 
 .. _http-kernel-working-example:
 

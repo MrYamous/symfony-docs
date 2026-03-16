@@ -429,17 +429,17 @@ Controller Attribute Events
 
 .. versionadded:: 8.1
 
-    The controller attribute events mechanism was introduced in Symfony 8.1.
+    Controller attribute events were introduced in Symfony 8.1.
 
-In addition to the kernel events listed above, the HttpKernel component can
-automatically dispatch events named after PHP attributes found on the resolved
+In addition to the kernel events listed above, the HttpKernel component
+automatically dispatches events named after PHP attributes found on the resolved
 controller. This allows you to write listeners that target a specific controller
-attribute instead of listening to a generic kernel event and manually checking
-for the attribute's presence.
+attribute instead of listening to a generic kernel event and manually inspecting
+it for the attribute's presence.
 
-The event name follows the convention ``{kernelEvent}.{AttributeClassName}``.
-For example, when a controller is annotated with
-``#[Cache]``, the following event is dispatched:
+Each attribute event name follows the convention ``{kernelEvent}.{AttributeClassName}``.
+For example, when a controller has a ``#[Cache]`` attribute, the following event
+is dispatched:
 
 .. code-block:: text
 
@@ -457,19 +457,10 @@ The ``ControllerAttributeEvent`` provides two properties:
     :class:`Symfony\\Component\\HttpKernel\\Event\\ControllerArgumentsEvent`),
     giving access to the request, response and other contextual data.
 
-This mechanism is supported for the following kernel events:
+This mechanism is supported by all kernel events **except** ``kernel.request``
+(the controller is not yet resolved) and ``kernel.terminate``.
 
-* ``kernel.controller``
-* ``kernel.controller_arguments``
-* ``kernel.view``
-* ``kernel.response``
-* ``kernel.finish_request``
-* ``kernel.exception``
-
-It is **not** supported for ``kernel.request`` (the controller is not yet
-resolved) and ``kernel.terminate``.
-
-Here is an example of a listener using this mechanism::
+The following example shows a listener using this mechanism::
 
     use App\Attribute\MyRateLimit;
     use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
