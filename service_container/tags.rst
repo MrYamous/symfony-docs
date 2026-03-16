@@ -286,14 +286,13 @@ call to support ``ReflectionMethod``::
     :method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::registerAttributeForAutoconfiguration`
     callable.
 
-Discovering Non-Service Classes
-...............................
+Tagging Non-Service Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes you need to discover classes that should not be registered as services,
-such as entities, value objects or models. The
-:method:`Symfony\\Component\\DependencyInjection\\Definition::addResourceTag`
-method allows you to tag these classes for discovery while keeping them excluded
-from the service container::
+Not all classes need to be registered as services. Entities, value objects, and
+DTOs, for example, should be discoverable at compile time but must not be instantiated
+by the container. Use :method:`Symfony\\Component\\DependencyInjection\\Definition::addResourceTag`
+to tag such classes while keeping them excluded from the service container::
 
     // src/Attribute/AppModel.php
     namespace App\Attribute;
@@ -313,6 +312,8 @@ from the service container::
 
         protected function build(ContainerBuilder $container): void
         {
+            // classes annotated with ``#[AppModel]`` will be tagged with ``app.model`` and
+            // automatically excluded from the container (they won't be instantiated as services)
             $container->registerAttributeForAutoconfiguration(
                 AppModel::class,
                 static function (ChildDefinition $definition): void {
@@ -322,12 +323,8 @@ from the service container::
         }
     }
 
-Classes annotated with ``#[AppModel]`` will be tagged with ``app.model`` and
-automatically excluded from the container (they won't be instantiated as services).
-
-You can then retrieve these classes in a
-:ref:`compiler pass <components-di-separate-compiler-passes>` using
-:method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::findTaggedResourceIds`::
+You can then retrieve these classes in a :ref:`compiler pass <components-di-separate-compiler-passes>`
+using :method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::findTaggedResourceIds`::
 
     // src/DependencyInjection/Compiler/ModelDiscoveryPass.php
     namespace App\DependencyInjection\Compiler;
