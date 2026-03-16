@@ -379,6 +379,69 @@ Then, in your handler, you can query for a fresh object::
 
 This guarantees the entity contains fresh data.
 
+.. _messenger-message-versioning:
+
+Versioning Message Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A message class defines the **contract** between the code that dispatches the
+message and the worker that handles it. Because Messenger processes messages
+asynchronously, some messages may still be pending in the queue when you deploy
+a new version of your application. If you change a message class, those older
+messages may no longer deserialize correctly, which can cause failures when
+workers try to process them.
+
+For **minor changes**, keep backward compatibility by making new constructor
+arguments optional and providing a sensible default value::
+
+    final class SendInvoice
+    {
+        public function __construct(
+            public readonly int $orderId,
+            public readonly ?string $locale = null, // added later
+        ) {
+        }
+    }
+
+With this approach, older messages that do not include the new ``$locale``
+argument can still be deserialized correctly.
+
+Another breaking change is **removing properties** from a message class. Messages
+already stored in the queue may still contain those properties when they are
+deserialized by newer workers. Since PHP 8.2, this can trigger deprecation
+warnings because dynamic properties are deprecated.
+
+If you must remove a property, consider one of the following approaches:
+
+* Keep the property temporarily (for example as ``public ?type $property =
+  null``) until all old messages have been processed.
+* Add the ``#[\AllowDynamicProperties]`` attribute to the class to allow older
+  serialized messages to set properties that no longer exist.
+* Implement custom serialization logic to control how the message is
+  serialized and deserialized.
+
+If the change alters the meaning of the message instead of simply extending it,
+create a **new version of the message class** instead of modifying the existing one::
+
+    // Keep SendInvoice until all queued messages using it are processed
+    final class SendInvoiceV2
+    {
+        public function __construct(
+            public readonly int $orderId,
+            public readonly string $locale,
+            public readonly string $templateId,
+        ) {
+        }
+    }
+
+During deployment, both versions may need to coexist temporarily. First
+deploy the new ``SendInvoiceV2`` message class and its handler while keeping
+the old ones. After the queue has been fully drained, remove the old class and
+handler in a later deployment.
+
+Removing the old class too early can cause workers to fail when they attempt
+to deserialize messages that were dispatched before the deployment.
+
 .. _messenger-handling-messages-synchronously:
 
 Handling Messages Synchronously
@@ -525,45 +588,75 @@ Deploying to Production
 On production, there are a few important things to think about:
 
 **Use a Process Manager like Supervisor or systemd to keep your worker(s) running**
-    You'll want one or more "workers" running at all times. To do that, use a
-    process control system like :ref:`Supervisor <messenger-supervisor>`
-    or :ref:`systemd <messenger-systemd>`.
+
+You'll want one or more "workers" running at all times. To do that, use a
+process control system like :ref:`Supervisor <messenger-supervisor>`
+or :ref:`systemd <messenger-systemd>`.
 
 **Don't Let Workers Run Forever**
-    Some services (like Doctrine's ``EntityManager``) will consume more memory
-    over time. So, instead of allowing your worker to run forever, use a flag
-    like ``messenger:consume --limit=10`` to tell your worker to only handle 10
-    messages before exiting (then the process manager will create a new process). There
-    are also other options like ``--memory-limit=128M`` and ``--time-limit=3600``.
+
+Some services (like Doctrine's ``EntityManager``) will consume more memory over
+time. So, instead of allowing your worker to run forever, use a flag like
+``messenger:consume --limit=10`` to tell your worker to only handle 10 messages
+before exiting (then the process manager will create a new process). There are
+also other options like ``--memory-limit=128M`` and ``--time-limit=3600``.
 
 **Stopping Workers That Encounter Errors**
-    If a worker dependency like your database server is down, or timeout is reached,
-    you can try to add :ref:`reconnect logic <middleware-doctrine>`, or just quit
-    the worker if it receives too many errors with the ``--failure-limit`` option of
-    the ``messenger:consume`` command.
+
+If a worker dependency like your database server is down, or timeout is reached,
+you can try to add :ref:`reconnect logic <middleware-doctrine>`, or just quit
+the worker if it receives too many errors with the ``--failure-limit`` option
+of the ``messenger:consume`` command.
 
 **Restart Workers on Deploy**
-    Each time you deploy, you'll need to restart all your worker processes so
-    that they see the newly deployed code. To do this, run ``messenger:stop-workers``
-    on deployment. This will signal to each worker that it should finish the message
-    it's currently handling and should shut down gracefully. Then, the process manager
-    will create new worker processes. The command uses the :ref:`app <cache-configuration-with-frameworkbundle>`
-    cache internally - so make sure this is configured to use an adapter you like.
+
+Each time you deploy, restart all worker processes so they pick up the new code.
+To do this, run ``messenger:stop-workers`` after the new code is on disk and
+the cache is warmed up, but before traffic shifts. This sets a cache flag that
+tells each worker to finish its current message and exit cleanly. The process
+manager then restarts them against the new codebase:
+
+.. code-block:: terminal
+
+    # in your deployment script, after code deploy and cache warmup: $ php
+    php bin/console messenger:stop-workers
+
+The command uses the :ref:`app cache <cache-configuration-with-frameworkbundle>`
+internally. If your application runs on multiple hosts, configure the app cache
+to use a shared adapter (for example Redis) so that all web and worker processes
+use the same cache.
+
+.. note::
+
+    In a Kubernetes environment, a rolling restart of the worker ``Deployment``
+    achieves the same result, but only if ``terminationGracePeriodSeconds`` is
+    long enough for the longest-running handler to complete before the pod is
+    replaced. ``SIGKILL`` does not give workers a chance to finish the current
+    message, which can leave a handler mid-execution.
 
 **Use the Same Cache Between Deploys**
-    If your deploy strategy involves the creation of new target directories, you
-    should set a value for the :ref:`cache.prefix_seed <reference-cache-prefix-seed>`
-    configuration option in order to use the same cache namespace between deployments.
-    Otherwise, the ``cache.app`` pool will use the value of the ``kernel.project_dir``
-    parameter as base for the namespace, which will lead to different namespaces
-    each time a new deployment is made.
+
+If your deploy strategy involves the creation of new target directories, you
+should set a value for the :ref:`cache.prefix_seed <reference-cache-prefix-seed>`
+configuration option in order to use the same cache namespace between deployments.
+Otherwise, the ``cache.app`` pool will use the value of the ``kernel.project_dir``
+parameter as base for the namespace, which will lead to different namespaces
+each time a new deployment is made.
 
 Prioritized Transports
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes certain types of messages should have a higher priority and be handled
-before others. To make this possible, you can create multiple transports and route
-different messages to them. For example:
+Use separate transports for message types with different latency requirements,
+failure modes, or retry windows. When multiple message types share the same
+transport, a slow or failing handler for one type can delay all others in the
+same queue.
+
+For example, if catalog sync messages and payment confirmations are routed to
+the same transport, a slow product feed handler could delay payment confirmations
+for customers going through checkout.
+
+Consider assigning each transport its own worker so that failures or slowdowns
+in one message flow do not affect others:
 
 .. configuration-block::
 
@@ -1072,6 +1165,13 @@ this is configurable for each transport:
 
 .. tip::
 
+    If failures in your application involve external services, including
+    rate-limiting issues, the default retry window may be too short. Consider
+    increasing ``max_retries``, ``delay``, ``multiplier``, and ``max_delay`` to
+    better match your use case.
+
+.. tip::
+
     Symfony triggers a :class:`Symfony\\Component\\Messenger\\Event\\WorkerMessageRetriedEvent`
     when a message is retried so you can run your own logic.
 
@@ -1193,6 +1293,66 @@ to retry them:
 If the message fails again, it will be re-sent back to the failure transport
 due to the normal :ref:`retry rules <messenger-retries-failures>`. Once the max
 retry has been hit, the message will be discarded permanently.
+
+.. _messenger-handler-idempotency:
+
+Writing Idempotent Handlers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A message can be **delivered more than once** under normal operating conditions.
+For example, a worker may process a message successfully but crash before
+acknowledging it to the transport. In that case, the transport will redeliver
+the message.
+
+If running a handler twice produces different outcomes (for example charging
+a customer twice, sending duplicate emails, or reducing inventory twice),
+retry mechanisms cannot prevent those errors.
+
+Whenever possible, design handlers to be naturally **idempotent**. This means
+that running them multiple times should produce the same result as running them
+once. For example, setting an absolute value (such as the current stock level
+from an external feed) is safe to repeat, whereas decrementing a counter is not.
+
+For operations that are inherently non-idempotent, such as payment processing,
+include a **stable idempotency key** in the message. The key should be derived
+from the business event, not generated at dispatch time, so that any redelivery
+of the same logical event uses the same key::
+
+    final class ProcessPayment
+    {
+        public function __construct(
+            public readonly int $orderId,
+            // the idempotencyKey is derived from the order and not generated at dispatch time
+            // for example: "payment-{orderId}-{orderVersion}"
+            public readonly string $idempotencyKey,
+        ) {
+        }
+    }
+
+In the handler, check the key before performing the operation and enforce a
+database-level uniqueness constraint. The check helps avoid unnecessary work,
+while the constraint protects against concurrent redeliveries::
+
+    #[AsMessageHandler]
+    final class ProcessPaymentHandler
+    {
+        public function __invoke(ProcessPayment $message): void
+        {
+            if ($this->paymentRepository->existsByIdempotencyKey($message->idempotencyKey)) {
+                return;
+            }
+
+            // ... process payment, persist record with the idempotency key
+        }
+    }
+
+.. note::
+
+    A UUID generated at dispatch time is not suitable as an idempotency key.
+    If the same business event is dispatched twice (for example because of a
+    double form submission), each dispatch generates a different UUID and
+    both executions will proceed. The key must remain stable across all
+    dispatches of the same logical event.
 
 Multiple Failed Transports
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1571,8 +1731,11 @@ DSN by using the ``table_name`` option:
     # .env
     MESSENGER_TRANSPORT_DSN=doctrine://default?table_name=your_custom_table_name
 
-Or, to create the table yourself, set the ``auto_setup`` option to ``false`` and
-:ref:`generate a migration <doctrine-creating-the-database-tables-schema>`.
+By default, the Doctrine table is created automatically when the first message
+is dispatched. This is convenient in development, but in production you may
+prefer to set ``auto_setup`` to ``false`` in ``MESSENGER_TRANSPORT_DSN``. Then
+:ref:`generate a migration <doctrine-creating-the-database-tables-schema>` and
+create the table explicitly as part of your deployment process.
 
 The transport has a number of options:
 
@@ -1895,9 +2058,12 @@ under the transport in ``messenger.yaml``:
     handled more than once. If you run multiple queue workers, ``consumer`` can be set to an
     environment variable, like ``%env(MESSENGER_CONSUMER_NAME)%``, set by Supervisor
     (example below) or any other service used to manage the worker processes.
-    In a container environment, the ``HOSTNAME`` can be used as the consumer name, since
-    there is only one worker per container/host. If using Kubernetes to orchestrate the
-    containers, consider using a ``StatefulSet`` to have stable names.
+
+    .. tip::
+
+        In a container environment, the ``HOSTNAME`` can be used as the consumer name,
+        since there is only one worker per container/host. If using Kubernetes to
+        orchestrate the containers, consider using a ``StatefulSet`` to have stable names.
 
 .. tip::
 
@@ -1982,6 +2148,40 @@ The transport has a number of options:
     test classes extending
     :class:`Symfony\\Bundle\\FrameworkBundle\\Test\\KernelTestCase`
     or :class:`Symfony\\Bundle\\FrameworkBundle\\Test\\WebTestCase`.
+
+You can optionally use two complementary testing strategies for message
+handling. First, test handlers as plain PHP classes by injecting mocks and
+calling ``__invoke()`` directly, without any Messenger infrastructure. This
+allows you to verify business logic, exception classification, and edge cases::
+
+    // tests/MessageHandler/SendInvoiceHandlerTest.php
+    final class SendInvoiceHandlerTest extends TestCase
+    {
+        public function testThrowsUnrecoverableForUnknownOrder(): void
+        {
+            $repository = $this->createMock(OrderRepository::class);
+            $repository->method('find')->willReturn(null);
+
+            $handler = new SendInvoiceHandler($repository);
+
+            $this->expectException(UnrecoverableMessageHandlingException::class);
+            $handler(new SendInvoice(orderId: 99));
+        }
+    }
+
+Then, use the ``in-memory://`` transport in functional tests to verify that the
+correct message is dispatched to the expected transport. Map each named transport
+to ``in-memory://`` in your test configuration and assert on the specific transport::
+
+    // tests/Controller/CheckoutControllerTest.php
+    /** @var InMemoryTransport $transport */
+    $transport = self::getContainer()->get('messenger.transport.orders_high');
+
+    self::assertCount(1, $transport->getSent());
+    self::assertInstanceOf(
+        SendOrderConfirmation::class,
+        $transport->getSent()[0]->getMessage()
+    );
 
 Amazon SQS
 ~~~~~~~~~~
@@ -2982,6 +3182,24 @@ are a variety of different stamps for different purposes and they're used intern
 to track information about a message - like the message bus that's handling it
 or if it's being retried after failure.
 
+.. tip::
+
+    Symfony doesn't inject the :class:`Symfony\\Component\\Messenger\\Envelope`
+    automatically when you add it as an argument of the ``__invoke()`` method
+    in your handler. To do so, you can create the following custom :ref:`middleware <messenger_middleware>`
+    to stamp the envelope before ``HandleMessageMiddleware`` runs::
+
+        final class InjectEnvelopeMiddleware implements MiddlewareInterface
+        {
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                return $stack->next()->handle(
+                    $envelope->with(new HandlerArgumentsStamp([$envelope])),
+                    $stack
+                );
+            }
+        }
+
 Default Stamps on Messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3453,6 +3671,17 @@ You can configure these buses and their rules by using middleware.
 
 It might also be a good idea to separate actions from reactions by introducing
 an **event bus**. The event bus could have zero or more subscribers.
+
+.. tip::
+
+    A single bus is a **good default**. Add another bus only when you need a
+    different middleware stack, not because an architecture pattern suggests it.
+    For example, you might add ``doctrine_transaction`` middleware to a command
+    bus but not to a query bus, since read operations do not need the overhead
+    of a transaction.
+
+    If you cannot identify a concrete behavioral difference between the buses,
+    you likely do not need more than one yet.
 
 .. configuration-block::
 
