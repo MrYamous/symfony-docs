@@ -1049,6 +1049,20 @@ properties in the ``reset()`` method.
 If you don't want to reset the container, add the ``--no-reset`` option when
 running the ``messenger:consume`` command.
 
+Instead of disabling the reset entirely, you can also configure the reset to
+happen every N messages by passing a number to the ``--no-reset`` option. This
+is useful when resetting after every message is too expensive, but never
+resetting leads to memory leaks or stale state:
+
+.. code-block:: terminal
+
+    # reset services every 100 messages instead of after each one
+    $ php bin/console messenger:consume async --no-reset=100
+
+.. versionadded:: 8.1
+
+    The ability to pass a number to the ``--no-reset`` option was introduced in Symfony 8.1.
+
 .. _messenger-retries-failures:
 
 Rate Limited Transport
