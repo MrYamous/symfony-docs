@@ -2108,14 +2108,9 @@ method::
     $request = Request::createFromGlobals();
     // ...
 
-.. versionadded:: 7.4
+.. note::
 
-    The ``allowed_http_method_override`` option was introduced in Symfony 7.4.
-
-.. deprecated:: 7.4
-
-    Overriding methods ``GET``, ``HEAD``, ``CONNECT`` and ``TRACE`` is deprecated
-    since Symfony 7.4 and will stop working in Symfony 8.0.
+    You cannot override the methods ``GET``, ``HEAD``, ``CONNECT``, and ``TRACE``.
 
 .. _reference-framework-ide:
 
