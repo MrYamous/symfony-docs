@@ -143,10 +143,9 @@ Blocking Locks
 --------------
 
 By default, when a lock cannot be acquired, the ``acquire`` method returns
-``false`` immediately. To wait (indefinitely) until the lock can be created,
-pass ``true`` as the argument of the ``acquire()`` method. This is called a
-**blocking lock** because the execution of your application stops until the
-lock is acquired::
+``false`` immediately. To wait until the lock can be created, pass ``true`` as
+the argument of the ``acquire()`` method. This is called a **blocking lock**
+because the execution of your application stops until the lock is acquired::
 
     use Symfony\Component\Lock\LockFactory;
     use Symfony\Component\Lock\Store\FlockStore;
@@ -162,6 +161,10 @@ When the store does not support blocking locks by implementing the
 :ref:`lock stores <lock-stores>` for supported stores), the ``Lock`` class
 will retry to acquire the lock in a non-blocking way until the lock is
 acquired.
+
+If the lock cannot be acquired despite blocking (e.g. because the store's
+blocking mechanism failed while the lock is still held by another process), a
+:class:`Symfony\\Component\\Lock\\Exception\\LockConflictedException` is thrown.
 
 Expiring Locks
 --------------
