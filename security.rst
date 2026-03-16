@@ -2740,7 +2740,7 @@ permission in :ref:`your custom security voters <creating-the-custom-voter>`:
 .. code-block:: html+twig
 
     {% set voter_decision = access_decision('post_edit', post) %}
-    {% if voter_decision.isGranted() %}
+    {% if voter_decision.isGranted %}
         {# ... #}
     {% else %}
         {# before showing voter messages to end users, make sure it's safe to do so #}
@@ -2748,7 +2748,7 @@ permission in :ref:`your custom security voters <creating-the-custom-voter>`:
     {% endif %}
 
     {% set voter_decision = access_decision('post_edit', post, anotherUser) %}
-    {% if voter_decision.isGranted() %}
+    {% if voter_decision.isGranted %}
         {# ... #}
     {% else %}
         <p>The {{ anotherUser.name }} user doesn't have sufficient permission:</p>
