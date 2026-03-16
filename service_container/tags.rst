@@ -307,11 +307,6 @@ using :method:`Symfony\\Component\\DependencyInjection\\ContainerBuilder::findTa
         }
     }
 
-.. versionadded:: 7.3
-
-    The ``addResourceTag()`` and ``findTaggedResourceIds()`` methods were
-    introduced in Symfony 7.3.
-
 Creating custom Tags
 --------------------
 
