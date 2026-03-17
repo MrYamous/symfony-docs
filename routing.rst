@@ -1769,7 +1769,7 @@ when importing the routes.
 
         # config/routes.yaml
         controllers:
-            resource: routing.controllerss
+            resource: routing.controllers
             # this is added to the beginning of all imported route URLs
             prefix: '/blog'
             # this is added to the beginning of all imported route names
