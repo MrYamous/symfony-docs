@@ -747,10 +747,6 @@ there are constraint violations:
     )]
     UploadedFile $document
 
-.. versionadded:: 7.1
-
-    The ``#[MapUploadedFile]`` attribute was introduced in Symfony 7.1.
-
 .. _controller_map-request-header:
 
 Mapping Request Headers
