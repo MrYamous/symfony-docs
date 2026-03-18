@@ -211,11 +211,10 @@ The ``SymfonyRuntime`` can handle these applications:
         Support for returning a ``Response`` object when running in FrankenPHP
         worker mode was introduced in Symfony 8.1.
 
-    When running in `FrankenPHP`_ worker mode, a ``Response`` object is
-    handled by
-    :class:`Symfony\\Component\\Runtime\\Runner\\FrankenPhpWorkerRunner`
-    instead of the ``ResponseRunner``. This is useful for scenarios like
-    maintenance pages where you want to return a static response while still
+    When running in `FrankenPHP`_ worker mode, a ``Response`` object is handled
+    by :class:`Symfony\\Component\\Runtime\\Runner\\FrankenPhpWorkerRunner`
+    instead of ``ResponseRunner``. This is useful for scenarios such as
+    maintenance pages, where you want to return a static response while still
     benefiting from the worker loop::
 
         // public/index.php
