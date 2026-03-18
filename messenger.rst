@@ -570,9 +570,9 @@ the message from being redelivered until the worker completes processing it:
 
     This option is only available for the following transports: Beanstalkd, AmazonSQS, Doctrine and Redis.
 
-By default, the worker fetches one message at a time from the transport. Use the
-``--fetch-size`` option to fetch multiple messages per iteration, reducing the
-number of round-trips to the transport:
+By default, the worker fetches a single message per iteration from the
+transport. Use the ``--fetch-size`` option to fetch multiple messages per
+iteration, reducing the number of round trips to the transport:
 
 .. code-block:: terminal
 
