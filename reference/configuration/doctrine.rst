@@ -116,11 +116,6 @@ The following block shows all possible configuration keys:
     to find your PostgreSQL version and ``mysql -V`` to get your MySQL
     version).
 
-    If you are running a MariaDB database, you must prefix the ``server_version``
-    value with ``mariadb-`` (e.g. ``server_version: mariadb-10.4.14``). This will
-    change in Doctrine DBAL 4.x, where you must define the version as output by
-    the server (e.g. ``10.4.14-MariaDB``).
-
     Always wrap the server version number with quotes to parse it as a string
     instead of a float number. Otherwise, the floating-point representation
     issues can make your version be considered a different number (e.g. ``5.7``
