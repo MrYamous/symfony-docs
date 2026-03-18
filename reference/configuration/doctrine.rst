@@ -37,7 +37,7 @@ The following block shows all possible configuration keys:
                 user:                 user
                 password:             secret
                 driver:               pdo_mysql
-                # if the url option is specified, it will override the above config
+                # the url option can be used to replace the above config
                 url:                  mysql://db_user:db_password@127.0.0.1:3306/db_name
                 # the DBAL driverClass option
                 driver_class:         App\DBAL\MyDatabaseDriver
@@ -51,7 +51,6 @@ The following block shows all possible configuration keys:
                 wrapper_class:        App\DBAL\MyConnectionWrapper
                 charset:              utf8mb4
                 logging:              '%kernel.debug%'
-                platform_service:     App\DBAL\MyDatabasePlatformService
                 server_version:       '8.0.37'
                 mapping_types:
                     enum: string
@@ -79,7 +78,7 @@ The following block shows all possible configuration keys:
                             'user' => 'user',
                             'password' => 'secret',
                             'driver' => 'pdo_mysql',
-                            // if the url option is specified, it will override the above config
+                            # the url option can be used to replace the above config
                             'url' => 'mysql://db_user:db_password@127.0.0.1:3306/db_name',
                             // the DBAL driverClass option
                             'driver_class' => MyDatabaseDriver::class,
@@ -94,7 +93,6 @@ The following block shows all possible configuration keys:
                             'wrapper_class' => MyConnectionWrapper::class,
                             'charset' => 'utf8mb4',
                             'logging' => '%kernel.debug%',
-                            'platform_service' => MyDatabasePlatformService::class,
                             'server_version' => '8.0.37',
                             'mapping_types' => [
                                 'enum' => 'string',
@@ -302,10 +300,6 @@ that the ORM resolves to:
         doctrine:
             orm:
                 auto_mapping: false
-                # the standard distribution overrides this to be true in debug, false otherwise
-                auto_generate_proxy_classes: false
-                proxy_namespace: Proxies
-                proxy_dir: '%kernel.cache_dir%/doctrine/orm/Proxies'
                 default_entity_manager: default
                 metadata_cache_driver: array
                 query_cache_driver: array
