@@ -744,6 +744,91 @@ execution, which helps spot slow resolvers.
     profile. Moreover, consider using the ``--limit`` option to only process a few
     messages to make the profile more readable in the profiler.
 
+Legacy Syntax to Define Commands
+--------------------------------
+
+Instead of using invokable commands, you can also define commands by extending
+the :class:`Symfony\\Component\\Console\\Command\\Command` class. Both syntaxes
+are supported, but invokable commands are recommended::
+
+    // src/Command/CreateUserCommand.php
+    namespace App\Command;
+
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Input\InputInterface;
+    use Symfony\Component\Console\Output\OutputInterface;
+
+    // the name of the command is what users type after "php bin/console"
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand extends Command
+    {
+        protected function execute(InputInterface $input, OutputInterface $output): int
+        {
+            // ... put here the code to create the user
+        }
+    }
+
+You can optionally define a description, help message and the input options and
+arguments by overriding the ``configure()`` method::
+
+    // src/Command/CreateUserCommand.php
+
+    // ...
+    class CreateUserCommand extends Command
+    {
+        // ...
+        protected function configure(): void
+        {
+            $this
+                // the command description shown when running "php bin/console list"
+                ->setDescription('Creates a new user.')
+                // the command help shown when running the command with the "--help" option
+                ->setHelp('This command allows you to create a user...')
+                // add an argument required to your command
+                ->addArgument('username', InputArgument::REQUIRED, 'How the user should be named?')
+            ;
+        }
+    }
+
+.. tip::
+
+    Using the ``#[AsCommand]`` attribute to define a description instead of
+    the ``setDescription()`` method retrieves the command description without
+    instantiating its class, which makes the ``php bin/console list`` command
+    run much faster.
+
+The ``configure()`` method is called automatically at the end of the command
+constructor. If your command defines its own constructor, set the properties
+first and then call to the parent constructor, to make those properties
+available in the ``configure()`` method::
+
+    // src/Command/CreateUserCommand.php
+
+    // ...
+    class CreateUserCommand extends Command
+    {
+        // ...
+
+        public function __construct(bool $requirePassword = false)
+        {
+            // best practices recommend to call the parent constructor first and
+            // then set your own properties. That wouldn't work in this case
+            // because configure() needs the properties set in this constructor
+            $this->requirePassword = $requirePassword;
+
+            parent::__construct();
+        }
+
+        protected function configure(): void
+        {
+            $this
+                // ...
+                ->addArgument('password', $this->requirePassword ? InputArgument::REQUIRED : InputArgument::OPTIONAL, 'User password')
+            ;
+        }
+    }
+
 Learn More
 ----------
 
