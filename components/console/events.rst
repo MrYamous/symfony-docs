@@ -249,6 +249,8 @@ handle all signals e.g. to do some tasks before terminating the command.
     :method:`Symfony\\Component\\Console\\SignalRegistry\\SignalMap::getSignalName`
     method.
 
+.. _the-consoleevents-alarm-event:
+
 The ``ConsoleAlarmEvent``
 -------------------------
 
