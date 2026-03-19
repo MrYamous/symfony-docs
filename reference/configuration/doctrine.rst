@@ -132,11 +132,9 @@ The following block shows all possible configuration keys:
 
 .. note::
 
-    The ``server_version`` option was added in Doctrine DBAL 2.5, which
-    is used by DoctrineBundle 1.3. The value of this option should match
-    your database server version (use ``postgres -V`` or ``psql -V`` command
-    to find your PostgreSQL version and ``mysql -V`` to get your MySQL
-    version).
+    The ``server_version`` value should match your database server version (use
+    ``postgres -V`` or ``psql -V`` command to find your PostgreSQL version and
+    ``mysql -V`` to get your MySQL version).
 
     If you are running a MariaDB database, you must prefix the ``server_version``
     value with ``mariadb-`` (e.g. ``server_version: mariadb-10.4.14``). This will
