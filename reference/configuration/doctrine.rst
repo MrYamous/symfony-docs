@@ -110,11 +110,9 @@ The following block shows all possible configuration keys:
 
 .. note::
 
-    The ``server_version`` option was added in Doctrine DBAL 2.5, which
-    is used by DoctrineBundle 1.3. The value of this option should match
-    your database server version (use ``postgres -V`` or ``psql -V`` command
-    to find your PostgreSQL version and ``mysql -V`` to get your MySQL
-    version).
+    The ``server_version`` value should match your database server version (use
+    ``postgres -V`` or ``psql -V`` command to find your PostgreSQL version and
+    ``mysql -V`` to get your MySQL version).
 
     Always wrap the server version number with quotes to parse it as a string
     instead of a float number. Otherwise, the floating-point representation
