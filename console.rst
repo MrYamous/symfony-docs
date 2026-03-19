@@ -620,12 +620,12 @@ profile is accessible through the web page of the profiler.
     profile. Moreover, consider using the ``--limit`` option to only process a few
     messages to make the profile more readable in the profiler.
 
-Legacy syntax to define Commands
+Legacy Syntax to Define Commands
 --------------------------------
 
-Prior to Symfony 7.3 and invokable commands support, Commands were defined in
-classes extending :class:`Symfony\\Component\\Console\\Command\\Command`. This
-syntax is still valid and can continue to be used::
+Instead of using invokable commands, you can also define commands by extending
+the :class:`Symfony\\Component\\Console\\Command\\Command` class. Both syntaxes
+are supported, but invokable commands are recommended::
 
     // src/Command/CreateUserCommand.php
     namespace App\Command;
@@ -644,9 +644,6 @@ syntax is still valid and can continue to be used::
             // ... put here the code to create the user
         }
     }
-
-Configuring the Command
-~~~~~~~~~~~~~~~~~~~~~~~
 
 You can optionally define a description, help message and the input options and
 arguments by overriding the ``configure()`` method::
@@ -673,18 +670,9 @@ arguments by overriding the ``configure()`` method::
 .. tip::
 
     Using the ``#[AsCommand]`` attribute to define a description instead of
-    using the ``setDescription()`` method allows to get the command description without
-    instantiating its class. This makes the ``php bin/console list`` command run
-    much faster.
-
-    If you want to always run the ``list`` command fast, add the ``--short`` option
-    to it (``php bin/console list --short``). This will avoid instantiating command
-    classes, but it won't show any description for commands that use the
-    ``setDescription()`` method instead of the attribute to define the command
-    description.
-
-Using a constructor
-~~~~~~~~~~~~~~~~~~~
+    the ``setDescription()`` method retrieves the command description without
+    instantiating its class, which makes the ``php bin/console list`` command
+    run much faster.
 
 The ``configure()`` method is called automatically at the end of the command
 constructor. If your command defines its own constructor, set the properties
@@ -716,7 +704,6 @@ available in the ``configure()`` method::
             ;
         }
     }
-
 
 Learn More
 ----------
