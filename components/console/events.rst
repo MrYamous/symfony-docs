@@ -249,8 +249,8 @@ handle all signals e.g. to do some tasks before terminating the command.
     :method:`Symfony\\Component\\Console\\SignalRegistry\\SignalMap::getSignalName`
     method.
 
-The ``ConsoleEvents::ALARM`` Event
-----------------------------------
+The ``ConsoleAlarmEvent``
+-------------------------
 
 **Typical Purposes**: To perform periodic tasks during long-running commands
 (e.g. database connection keepalive, extending lock TTLs, heartbeat checks).
