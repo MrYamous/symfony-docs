@@ -681,9 +681,9 @@ Asking Choice Questions
 
     The ``#[AskChoice]`` attribute was introduced in Symfony 8.1.
 
-The :class:`Symfony\\Component\\Console\\Attribute\\AskChoice` attribute allows
-you to prompt the user with a choice question. It works on both ``__invoke()``
-parameters and DTO properties (via ``#[MapInput]``)::
+The :class:`Symfony\\Component\\Console\\Attribute\\AskChoice` attribute prompts
+the user to select a value from a predefined list of choices. You can use it on
+both ``__invoke()`` arguments and DTO properties (via ``#[MapInput]``)::
 
     use Symfony\Component\Console\Attribute\Argument;
     use Symfony\Component\Console\Attribute\AsCommand;
@@ -703,7 +703,7 @@ parameters and DTO properties (via ``#[MapInput]``)::
         }
     }
 
-When the argument is not provided, this renders the following interactive prompt:
+If the user doesn't provide a value for this, it renders the following interactive prompt:
 
 .. code-block:: terminal
 
@@ -712,9 +712,6 @@ When the argument is not provided, this renders the following interactive prompt
      [1] editor
      [2] viewer
     >
-
-Using BackedEnum for Choices
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the parameter type is a ``BackedEnum``, choices are automatically derived
 from the enum cases, so you don't need to pass them explicitly::
@@ -738,9 +735,6 @@ from the enum cases, so you don't need to pass them explicitly::
         }
     }
 
-Multi-Select Choices
-~~~~~~~~~~~~~~~~~~~~
-
 When the parameter type is ``array``, multi-select is automatically enabled,
 allowing the user to select multiple values::
 
@@ -756,23 +750,11 @@ allowing the user to select multiple values::
         }
     }
 
-The ``#[AskChoice]`` attribute accepts the following options:
-
-================ ========================= =============================== =============================================
-Option           Type                      Default                         Description
-================ ========================= =============================== =============================================
-``question``     ``string``                *(required)*                    The question to display
-``choices``      ``array|callable``        ``[]``                          Available choices (auto-derived for enums)
-``default``      ``string|int|float|null`` ``null``                        Default value if user presses Enter
-``errorMessage`` ``string``                ``'Value "%s" is invalid'``     Error message for invalid input
-``prompt``       ``string``                ``' > '``                       Input prompt
-``validator``    ``callable|null``         ``null``                        Custom validator
-``maxAttempts``  ``int|null``              ``null``                        Max retry attempts (``null`` = unlimited)
-================ ========================= =============================== =============================================
-
 .. note::
 
-    The ``default`` option does not support ``array`` values for multi-select
+    You can use the ``default`` option of ``#[AskChoice]`` to set the value when
+    the user presses ``Enter`` without selecting any value. However, you can not
+    set an array of values and therefore cannot set a default value for multi-select
     choices. This is a limitation of the underlying ``ChoiceQuestion`` class.
 
 .. _console-input-file:
