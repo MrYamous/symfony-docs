@@ -672,6 +672,109 @@ given.
     :ref:`Validating the Answer <console-validate-question-answer>` in
     the QuestionHelper documentation.
 
+.. _console-input-ask-choice:
+
+Asking Choice Questions
+-----------------------
+
+.. versionadded:: 8.1
+
+    The ``#[AskChoice]`` attribute was introduced in Symfony 8.1.
+
+The :class:`Symfony\\Component\\Console\\Attribute\\AskChoice` attribute allows
+you to prompt the user with a choice question. It works on both ``__invoke()``
+parameters and DTO properties (via ``#[MapInput]``)::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\AskChoice;
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        public function __invoke(
+            #[Argument]
+            #[AskChoice('Select a role', ['admin', 'editor', 'viewer'])]
+            string $role,
+        ): int {
+            // $role will be one of: 'admin', 'editor', 'viewer'
+
+            return Command::SUCCESS;
+        }
+    }
+
+When the argument is not provided, this renders the following interactive prompt:
+
+.. code-block:: terminal
+
+    Select a role:
+     [0] admin
+     [1] editor
+     [2] viewer
+    >
+
+Using BackedEnum for Choices
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the parameter type is a ``BackedEnum``, choices are automatically derived
+from the enum cases, so you don't need to pass them explicitly::
+
+    enum Role: string
+    {
+        case Admin = 'admin';
+        case Editor = 'editor';
+        case Viewer = 'viewer';
+    }
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        public function __invoke(
+            #[Argument]
+            #[AskChoice('Select a role')]
+            Role $role,
+        ): int {
+            // ...
+        }
+    }
+
+Multi-Select Choices
+~~~~~~~~~~~~~~~~~~~~
+
+When the parameter type is ``array``, multi-select is automatically enabled,
+allowing the user to select multiple values::
+
+    #[AsCommand(name: 'app:setup')]
+    class SetupCommand
+    {
+        public function __invoke(
+            #[Argument]
+            #[AskChoice('Select features', ['auth', 'api', 'cache'])]
+            array $features,
+        ): int {
+            // $features will contain the selected values
+        }
+    }
+
+The ``#[AskChoice]`` attribute accepts the following options:
+
+================ ========================= =============================== =============================================
+Option           Type                      Default                         Description
+================ ========================= =============================== =============================================
+``question``     ``string``                *(required)*                    The question to display
+``choices``      ``array|callable``        ``[]``                          Available choices (auto-derived for enums)
+``default``      ``string|int|float|null`` ``null``                        Default value if user presses Enter
+``errorMessage`` ``string``                ``'Value "%s" is invalid'``     Error message for invalid input
+``prompt``       ``string``                ``' > '``                       Input prompt
+``validator``    ``callable|null``         ``null``                        Custom validator
+``maxAttempts``  ``int|null``              ``null``                        Max retry attempts (``null`` = unlimited)
+================ ========================= =============================== =============================================
+
+.. note::
+
+    The ``default`` option does not support ``array`` values for multi-select
+    choices. This is a limitation of the underlying ``ChoiceQuestion`` class.
+
 .. _console-input-file:
 
 File Input
