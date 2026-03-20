@@ -651,6 +651,53 @@ instance automatically::
             // ...
         }
 
+Mapping Empty Data
+..................
+
+By default, when the query string or request body is empty and the parameter
+is nullable or has a default value, the resolver returns ``null`` without
+calling the serializer. This means custom denormalizers never run.
+
+If you need denormalization to happen even when no data is present (e.g. to
+let a custom denormalizer populate some fields from the security context or
+session), set the ``mapWhenEmpty`` option to ``true``::
+
+    use App\Model\SearchFilters;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+
+    // ...
+
+    public function search(
+        #[MapQueryString(mapWhenEmpty: true)] SearchFilters $filters
+    ): Response
+    {
+        // ...
+    }
+
+This also works with ``#[MapRequestPayload]``::
+
+    use App\Model\SearchFilters;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+
+    // ...
+
+    public function search(
+        #[MapRequestPayload(mapWhenEmpty: true)] SearchFilters $filters
+    ): Response
+    {
+        // ...
+    }
+
+When ``mapWhenEmpty`` is ``true``, the resolver passes an empty array to the
+serializer's ``denormalize()`` method, giving custom denormalizers a chance to
+construct the object.
+
+.. versionadded:: 8.1
+
+    The ``mapWhenEmpty`` option was introduced in Symfony 8.1.
+
 .. _controller_map-uploaded-file:
 
 Mapping Uploaded Files
