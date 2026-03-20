@@ -142,6 +142,7 @@ Apply ``#[Map]`` to the source class to define its default mapping target::
 
 Defining the Default Source Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Apply ``#[Map]`` to the target class toe defined its default mapping source::
 
     // src/Dto/ProductOutput.php
@@ -157,25 +158,25 @@ Apply ``#[Map]`` to the target class toe defined its default mapping source::
         public string $sku = '';
     }
 
-    // You should provide a reverse class map array
+    // provide a reverse class map array
     $classMap = [
         Product::class => ProductOutput::class,
     ];
 
-    // now you can call map() without the second argument if ProductOutput is the target:
+    // now you can call map() without the second argument if ProductOutput is the target
     $mapper = new ObjectMapper(
         new ReverseClassObjectMapperMetadataFactory(
             new ReflectionObjectMapperMetadataFactory(),
             $classMap,
         )
     );
-    $productOutput = $mapper->map($product); // Maps to ProductOutput automatically
+    $productOutput = $mapper->map($product); // maps to ProductOutput automatically
 
 .. tip::
 
-    When using ObjectMapper with Symfony Framework, you juste have to use the
+    When using ObjectMapper with Symfony Framework, you only need to use the
     :class:`Symfony\\Component\\ObjectMapper\\ObjectMapperInterface`.
-    Symfony will handle everything for you
+    Symfony will handle everything for you.
 
 Configuring Property Mapping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
