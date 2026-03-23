@@ -248,16 +248,10 @@ which they are defined:
     When adding handlers in other configuration files, it's recommended to set
     an explicit priority to ensure they are ordered as expected.
 
-.. _logging-handler-fingers_crossed:
+.. tip::
 
-
-.. versionadded:: 3.11.0
-  
-    The ``enabled`` option was introduced in Monolog 3.11.0. 
-
-    You can use the ``enabled`` option to enable or disable a handler depending
-    on the environment. For example, you can keep logging in ``dev`` and ``prod``
-    but disable it in ``staging``:
+    Use the ``enabled`` option to enable or disable a handler without removing
+    its configuration:
 
     .. code-block:: yaml
 
@@ -267,9 +261,16 @@ which they are defined:
                     type: stream
                     path: "%kernel.logs_dir%/%kernel.environment%.log"
                     level: debug
-                    enabled: false  # disables the handler
+                    enabled: false
+                # ...
 
     When ``enabled`` is set to ``false``, the handler is completely ignored.
+
+    .. versionadded:: 3.11.0
+
+        The ``enabled`` option was introduced in Monolog 3.11.0.
+
+.. _logging-handler-fingers_crossed:
 
 Handlers that Modify Log Entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
