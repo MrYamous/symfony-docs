@@ -1586,8 +1586,48 @@ adapted to the format required by GitHub, but you can force that format too:
 
         $ php vendor/bin/yaml-lint translations/
 
+Testing Translations
+--------------------
+
+Symfony provides tools to simplify testing translation-related code and features.
+
+Identity Translator
+~~~~~~~~~~~~~~~~~~~
+
+When testing features that use the translation service, you often don't need
+to verify the actual translated content. Instead of mocking the
+:class:`Symfony\\Contracts\\Translation\\TranslatorInterface`, you can use the
+:class:`Symfony\\Component\\Translation\\IdentityTranslator`, which implements
+the interface without loading any translation catalogs.
+
+Instead of looking up translations, ``IdentityTranslator`` always returns the
+original message after applying parameter substitution and message selection
+(e.g. pluralization)::
+
+    use Symfony\Component\Translation\IdentityTranslator;
+
+    $translator = new IdentityTranslator();
+
+    // with keyword keys, the key itself is returned
+    $translator->trans('app.greeting');
+    // => "app.greeting"
+    $translator->trans('app.greeting', ['%name%' => 'Fabien']);
+    // => "app.greeting"
+
+    // when using real messages as keys, parameters are replaced in the key
+    $translator->trans('Hello %name%!', ['%name%' => 'Fabien']);
+    // => "Hello Fabien!"
+
+    // message selection (including pluralization) still applies
+    $translator->trans('{0} No results|one result|%count% results', ['%count%' => 3]);
+    // => "3 results"
+
+The locale defaults to ``\Locale::getDefault()`` (or ``en`` when the ``intl``
+extension is not available) and can be changed using ``setLocale()``. The
+locale only affects message selection; no translation catalog is ever used.
+
 Pseudo-localization translator
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
 
