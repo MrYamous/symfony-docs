@@ -250,6 +250,27 @@ which they are defined:
 
 .. _logging-handler-fingers_crossed:
 
+
+.. versionadded:: 3.11.0
+  
+    The ``enabled`` option was introduced in Monolog 3.11.0. 
+
+    You can use the ``enabled`` option to enable or disable a handler depending
+    on the environment. For example, you can keep logging in ``dev`` and ``prod``
+    but disable it in ``staging``:
+
+    .. code-block:: yaml
+
+        monolog:
+            handlers:
+                file_log:
+                    type: stream
+                    path: "%kernel.logs_dir%/%kernel.environment%.log"
+                    level: debug
+                    enabled: false  # disables the handler
+
+    When ``enabled`` is set to ``false``, the handler is completely ignored.
+
 Handlers that Modify Log Entries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
