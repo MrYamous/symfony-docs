@@ -2454,9 +2454,12 @@ The transport has a number of options:
     :class:`Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\MessageDeduplicationAwareInterface`,
     the middleware will automatically add the
     :class:`Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\Transport\\AmazonSqsFifoStamp`
-    and set the ``Message deduplication ID``. Additionally, if your message implements the
+    and set the ``Message deduplication ID``.
+
+    Additionally, if your message implements the
     :class:`Symfony\\Component\\Messenger\\Bridge\\AmazonSqs\\MessageGroupAwareInterface`,
     the middleware will automatically set the ``Message group ID`` of the stamp.
+    The default value of this group ID is a hash of the SQS message's headers and body.
 
     You can learn more about middlewares in
     :ref:`the dedicated section <messenger_middleware>`.
