@@ -399,6 +399,39 @@ Pass the ``include_null_properties`` option to include them explicitly::
     // Without the option: {"name": "Garfield"}
     // With the option:    {"name": "Garfield", "color": null}
 
+Configuring DateTime Timezone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoding or decoding ``DateTimeInterface`` objects, you can convert the
+timezone by passing the ``date_time_timezone`` option as a string or a
+``\DateTimeZone`` instance::
+
+    use App\Dto\Event;
+    use Symfony\Component\TypeInfo\Type;
+
+    // ...
+
+    // Encoding: converts the timezone before formatting
+    $json = $jsonStreamWriter->write($event, Type::object(Event::class), [
+        'date_time_timezone' => 'Asia/Tokyo',
+    ]);
+
+    // Decoding: applies the timezone when parsing datetime strings
+    $event = $jsonStreamReader->read($json, Type::object(Event::class), [
+        'date_time_timezone' => new \DateTimeZone('Asia/Tokyo'),
+    ]);
+
+You can also customize the datetime format using the ``date_time_format`` option::
+
+    $json = $jsonStreamWriter->write($event, Type::object(Event::class), [
+        'date_time_format' => 'Y/m/d H:i:s',
+        'date_time_timezone' => 'Europe/Paris',
+    ]);
+
+.. versionadded:: 8.1
+
+    The ``date_time_timezone`` option was introduced in Symfony 8.1.
+
 .. _json-streamer-configure-encoded-name:
 
 Configuring the Encoded Name
