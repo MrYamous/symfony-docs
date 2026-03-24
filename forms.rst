@@ -1737,6 +1737,7 @@ Misc.:
 
     /form/embedded
     /form/form_collections
+    /form/form_flow
     /form/inherit_data_option
     /form/unit_testing
     /form/use_empty_data
