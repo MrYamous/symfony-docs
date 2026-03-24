@@ -411,12 +411,12 @@ timezone by passing the ``date_time_timezone`` option as a string or a
 
     // ...
 
-    // Encoding: converts the timezone before formatting
+    // encoding: converts the timezone before formatting
     $json = $jsonStreamWriter->write($event, Type::object(Event::class), [
         'date_time_timezone' => 'Asia/Tokyo',
     ]);
 
-    // Decoding: applies the timezone when parsing datetime strings
+    // decoding: applies the timezone when parsing datetime strings
     $event = $jsonStreamReader->read($json, Type::object(Event::class), [
         'date_time_timezone' => new \DateTimeZone('Asia/Tokyo'),
     ]);
