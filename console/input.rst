@@ -646,6 +646,68 @@ they are assigned to the DTO::
 With this setup, when the command input is resolved, the email is lowercased
 and trimmed, and roles are uppercased.
 
+Validating Input DTOs with Constraints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the :doc:`Validator component </validation>` is available, you can add
+validation constraints directly to DTO properties. They are automatically
+enforced after the input is resolved::
+
+    // src/Console/Input/CreateUserInput.php
+    namespace App\Console\Input;
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\Option;
+    use Symfony\Component\Validator\Constraints\Email;
+    use Symfony\Component\Validator\Constraints\NotBlank;
+
+    class CreateUserInput
+    {
+        #[Argument]
+        #[NotBlank]
+        public string $name;
+
+        #[Option]
+        #[Email]
+        public ?string $email = null;
+    }
+
+If any constraint is violated, an
+:class:`Symfony\\Component\\Console\\Exception\\InputValidationFailedException`
+is thrown with a message listing all violations::
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        public function __invoke(#[MapInput] CreateUserInput $input): int
+        {
+            // $input is already validated at this point
+            // ...
+
+            return 0;
+        }
+    }
+
+You can also specify validation groups via the ``validationGroups`` option of
+the ``#[MapInput]`` attribute::
+
+    public function __invoke(
+        #[MapInput(validationGroups: ['registration'])]
+        CreateUserInput $input,
+    ): int {
+        // ...
+    }
+
+.. note::
+
+    When the Validator component is not installed, constraints on DTO
+    properties are silently ignored.
+
+.. versionadded:: 8.1
+
+    Validation constraints support for ``#[MapInput]`` was introduced in
+    Symfony 8.1.
+
 Validating Input with Constraints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
