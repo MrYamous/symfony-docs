@@ -830,10 +830,105 @@ by using the property name as method name::
         }
     }
 
-.. versionadded:: 7.1
+When to Use AutowireMethodOf
+............................
 
-    The :class:`Symfony\\Component\\DependencyInjection\\Attribute\\AutowireMethodOf`
-    attribute was introduced in Symfony 7.1.
+The ``#[AutowireMethodOf]`` attribute is particularly useful in the following scenarios:
+
+**Decoupling from heavy dependencies**: Instead of injecting an entire repository
+or service, you can inject only the specific method you need. This makes your
+code more modular and explicit about its dependencies::
+
+    // src/Controller/ConferenceController.php
+    namespace App\Controller;
+
+    use App\Repository\CommentRepository;
+    use Symfony\Component\DependencyInjection\Attribute\AutowireMethodOf;
+
+    class ConferenceController
+    {
+        public function __construct(
+            // Instead of injecting the entire repository...
+            // private CommentRepository $commentRepository,
+
+            // ...inject only the method you need
+            #[AutowireMethodOf(CommentRepository::class)]
+            private \Closure $getCommentPaginator,
+        ) {
+        }
+
+        public function show(Conference $conference, int $page): Response
+        {
+            $paginator = ($this->getCommentPaginator)($conference, $page);
+
+            // ...
+        }
+    }
+
+**Simplified testing**: When you inject closures instead of full services, testing
+becomes straightforward because you can easily replace the closure with a mock
+without complex mocking frameworks::
+
+    // tests/Controller/ConferenceControllerTest.php
+    namespace App\Tests\Controller;
+
+    use App\Controller\ConferenceController;
+
+    class ConferenceControllerTest extends TestCase
+    {
+        public function testShow(): void
+        {
+            // Create a simple mock closure instead of mocking the entire repository
+            $getCommentPaginator = function (Conference $conference, int $page) {
+                return new MockPaginator([/* test comments */]);
+            };
+
+            $controller = new ConferenceController($getCommentPaginator);
+
+            // Test your controller...
+        }
+    }
+
+**Using interfaces for type safety**: For better IDE support and static analysis,
+you can define a functional interface and use it as the parameter type instead
+of ``\Closure``::
+
+    // src/Repository/Function/GetCommentPaginatorInterface.php
+    namespace App\Repository\Function;
+
+    use App\Entity\Conference;
+    use Doctrine\ORM\Tools\Pagination\Paginator;
+
+    interface GetCommentPaginatorInterface
+    {
+        public function __invoke(Conference $conference, int $page): Paginator;
+    }
+
+Then use this interface in your service::
+
+    // src/Controller/ConferenceController.php
+    namespace App\Controller;
+
+    use App\Repository\CommentRepository;
+    use App\Repository\Function\GetCommentPaginatorInterface;
+    use Symfony\Component\DependencyInjection\Attribute\AutowireMethodOf;
+
+    class ConferenceController
+    {
+        public function __construct(
+            #[AutowireMethodOf(CommentRepository::class)]
+            private GetCommentPaginatorInterface $getCommentPaginator,
+        ) {
+        }
+
+        public function show(Conference $conference, int $page): Response
+        {
+            // Call directly without parentheses around the property
+            $paginator = $this->getCommentPaginator->__invoke($conference, $page);
+
+            // ...
+        }
+    }
 
 .. _autowiring-calls:
 
