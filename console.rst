@@ -147,6 +147,12 @@ If you can't use PHP attributes, register the command as a service and
 :ref:`default services.yaml configuration <service-container-services-load-example>`,
 this is already done for you, thanks to :ref:`autoconfiguration <services-autoconfigure>`.
 
+.. deprecated:: 8.1
+
+    Registering console commands by overriding the ``Bundle::registerCommands()``
+    method is deprecated. Use the ``#[AsCommand]`` attribute or the
+    ``console.command`` service tag instead.
+
 You can also use ``#[AsCommand]`` to add a description, usage examples, and
 longer help text for the command::
 
