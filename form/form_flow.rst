@@ -1,24 +1,25 @@
-FormFlow aka. Multi-Step Forms
-==============================
+Multi-Step Forms
+================
 
-Symfony provides support for building multi-step forms via the
-``FormFlow`` system. A form flow lets you split a form into multiple
-steps while keeping a single form instance, shared data, validation
-groups, and navigation controls.
+.. versionadded:: 7.4
+
+    Multi-Step forms were introduced in Symfony 7.4.
+
+Symfony provides support for building multi-step forms via the ``FormFlow``
+system. A form flow splits a form into multiple steps while keeping a single
+form instance, shared data, validation groups, and navigation controls.
 
 A form flow is implemented as a custom form type that defines:
 
 * the ordered list of steps
-* how the current step is stored
-* how navigation between steps works
-* how data is persisted between requests
+* the storage strategy for the current step
+* the navigation behavior between steps
+* the persistence strategy for data between requests
 
-Creating a Form Flow
---------------------
+Creating a Multi-Step Form
+--------------------------
 
 A form flow is created by extending ``AbstractFlowType`` and implementing
-``buildFormFlow()``.
-
 ``buildFormFlow()``::
 
     use Symfony\Component\Form\Flow\AbstractFlowType;
@@ -40,15 +41,18 @@ A form flow is created by extending ``AbstractFlowType`` and implementing
 Each step corresponds to a form type. Only the form of the current step
 is rendered and processed.
 
+.. note::
+
+    :doc:`Validation groups </form/validation_groups>` are automatically scoped
+    to the current step. By default, the active groups are ``['Default', '<current_step_name>']``,
+    which allows you to define step-specific constraints on your data object.
+
 Storing the Current Step
 ------------------------
 
 A form flow needs to know which step is currently active. By default,
-this is done via a property path on the form data.
-
-You must configure the ``step_property_path`` option:
-
-.. code-block:: php-attributes
+this is done via a property path on the form data. Configure the ``step_property_path``
+option in ``configureOptions()``::
 
     use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -68,56 +72,63 @@ Processing a Multi-Step Form
 To use a form flow in a controller, create the form, handle the request,
 and check the flow state to determine what to do next::
 
+    // src/Controller/SignUpController.php
+    namespace App\Controller;
+
     use App\Entity\User;
     use App\Form\UserSignUpType;
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
 
-    #[Route('/signup', name: 'signup')]
-    public function signup(Request $request): Response
+    class SignUpController extends AbstractController
     {
-        $flow = $this->createForm(UserSignUpType::class, new User());
-        $flow->handleRequest($request);
+        #[Route('/signup', name: 'signup')]
+        public function signup(Request $request): Response
+        {
+            $flow = $this->createForm(UserSignUpType::class, new User());
+            $flow->handleRequest($request);
 
-        if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
-            // all steps are completed, process the final data
-            // $flow->getData();
+            if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
+                // all steps are completed; process the final data
+                $data = $flow->getData();
 
-            return $this->redirectToRoute('signup_success');
+                return $this->redirectToRoute('signup_success');
+            }
+
+            return $this->render('signup.html.twig', [
+                'form' => $flow->getStepForm(),
+            ]);
         }
-
-        return $this->render('signup.html.twig', [
-            'form' => $flow->getStepForm(),
-        ]);
     }
 
 After calling ``handleRequest()``, the flow knows which button was clicked
-(next, previous, finish, or reset) and acts accordingly. When the form is
-valid and not yet finished, ``getStepForm()`` transitions to the next step
-and returns a fresh form instance ready for rendering.
+(next, previous, finish, or reset) and acts accordingly.
 
-When ``isFinished()`` returns ``true``, the data object (here ``$flow->getData()``)
-contains all the accumulated data from every step.
+.. warning::
+
+    ``getStepForm()`` both transitions the flow to the next step *and*
+    returns the form for that step. Call it only once per request, and
+    only after all state checks (``isSubmitted()``, ``isValid()``,
+    ``isFinished()``) are complete. Calling it multiple times will advance
+    the step counter more than once.
+
+When ``isFinished()`` returns ``true``, the data object returned by
+``getData()`` contains all accumulated data from every step.
 
 Step Ordering and Priority
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Steps are ordered by priority (higher first). If no priority is defined,
-steps are ordered by insertion order.
-
-Example:
-
-.. code-block:: php-attributes
+steps are ordered by insertion order::
 
     $builder->addStep('first', FirstType::class, priority: 10);
     $builder->addStep('second', SecondType::class);
 
 Skipping Steps
---------------
+~~~~~~~~~~~~~~
 
-Steps can be conditionally skipped using a callable:
-
-.. code-block:: php-attributes
+Steps can be conditionally skipped using a callable::
 
     $builder->addStep(
         'professional',
@@ -125,18 +136,21 @@ Steps can be conditionally skipped using a callable:
         skip: fn (User $data) => !$data->isWorker()
     );
 
-Skipped steps are not rendered and are ignored by navigation.
+Skipped steps are not rendered and are ignored during navigation.
 
 Persisting Data Between Requests
 --------------------------------
 
-Form data can be persisted between requests using a data storage.
+Form data is persisted between requests using a data storage. Symfony
+provides several implementations:
 
-Symfony provides several implementations:
+* ``SessionDataStorage``: stores data in the session (used by default)
+* ``InMemoryDataStorage``: stores data in memory (mainly for tests)
+* ``NullDataStorage``: does not persist data
 
-* ``SessionDataStorage`` — the default if no explicit data storage is configured
-* ``InMemoryDataStorage`` (mainly for tests)
-* ``NullDataStorage``
+.. note::
+
+    ``SessionDataStorage`` requires an active HTTP session.
 
 To configure a data storage explicitly::
 
@@ -146,42 +160,34 @@ To configure a data storage explicitly::
         'data_storage' => new SessionDataStorage('signup_flow', $requestStack),
     ]);
 
-.. note::
+Multi-Step Form Navigation
+--------------------------
 
-    Session-based storage requires an active HTTP session.
+Navigation is handled via special submit button types:
 
-Navigation Buttons
-------------------
+* ``PreviousFlowType``: goes back to the previous step
+* ``NextFlowType``: advances to the next step, validating the current one
+* ``FinishFlowType``: submits the final step and marks the flow as finished
+* ``ResetFlowType``: clears all stored data and returns to the first step
 
-Navigation is handled via special submit buttons:
-
-* ``PreviousFlowType``
-* ``NextFlowType``
-* ``FinishFlowType``
-* ``ResetFlowType``
-
-Symfony provides a default navigator::
+Symfony provides a default navigator that includes previous, next, and
+finish buttons:
 
     use Symfony\Component\Form\Flow\Type\NavigatorFlowType;
 
     $builder->add('navigator', NavigatorFlowType::class);
 
 Buttons are automatically shown or hidden depending on the current step.
-
-By default, the navigator includes previous, next and finish buttons. To also
-include a reset button, use the ``with_reset`` option::
+To also include a reset button, use the ``with_reset`` option:
 
     $builder->add('navigator', NavigatorFlowType::class, [
         'with_reset' => true,
     ]);
 
-This adds a reset button to the navigator without needing to separately add
-a ``ResetFlowType`` button.
+Custom Navigation Buttons
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Custom Navigation
------------------
-
-You can define custom navigation buttons::
+You can define custom navigation buttons independently of the default navigator::
 
     use Symfony\Component\Form\Flow\Type\NextFlowType;
 
@@ -192,111 +198,106 @@ You can define custom navigation buttons::
         'include_if' => ['professional'],
     ]);
 
-Each button defines a handler that controls the flow behavior.
-
-Validation Groups
------------------
-
-Validation groups are automatically scoped to the current step.
-
-By default, the active validation groups are
-``['Default', '<current_step_name>']``.
-
-This behavior is configured by ``FormFlowType`` and allows you to define
-step-specific constraints on your data object.
+Each button type accepts options that control validation behavior, which
+steps it appears on (``include_if``), and whether the current submission
+data is cleared (``clear_submission``).
 
 Finishing and Resetting the Flow
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When the ``finish`` button is clicked:
+When the ``finish`` button is clicked, the flow is marked as finished, the data
+storage is cleared (if ``auto_reset`` is enabled), and the cursor is reset to
+the first step. Use ``$form->isFinished()`` to check whether the flow has completed.
 
-* the flow is marked as finished
-* the data storage is cleared (if ``auto_reset`` is enabled)
-* the cursor is reset to the first step
+Rendering Navigation Information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can check completion with the ``$form->isFinished()`` method.
-
-Rendering Step Information
---------------------------
-
-The form view exposes step metadata:
+The form view exposes step metadata that can be used to build progress
+indicators or navigation menus:
 
 .. code-block:: twig
 
-    {{ form.vars.steps }}
-    {{ form.vars.visible_steps }}
+    <ol>
+        {% for step in form.vars.visible_steps %}
+            <li class="{{ step.is_current_step ? 'active' : '' }}">
+                {{ step.name }}
+            </li>
+        {% endfor %}
+    </ol>
+
+    {# current step index, zero-based #}
     {{ form.vars.cursor }}
 
-Each step contains:
+Each step object exposes the following properties:
 
-* name
-* index
-* position
-* is_current_step
-* is_skipped
-* can_be_skipped
+* ``name``
+* ``index``
+* ``position``
+* ``is_current_step``
+* ``is_skipped``
+* ``can_be_skipped``
 
-This can be used to build progress indicators or navigation menus.
+Using Multi-Step Forms with Turbo
+---------------------------------
 
-Using FormFlow with Turbo
--------------------------
+When `Symfony UX Turbo`_ is enabled, Turbo Drive intercepts form submissions via
+AJAX and relies on HTTP status codes to decide how to handle the response.
+Without returning the correct codes, Turbo will receive the response but will
+not render the new step.
 
-When `Symfony UX Turbo`_ is enabled (which is the default in applications
-created with ``symfony new --webapp``), Turbo Drive intercepts form submissions
-and expects the server to return specific HTTP status codes. Without proper
-handling, clicking the navigation buttons (next, previous, finish) will send
-an AJAX request but the form will not move to the next step.
+The expected status codes are:
 
-To make FormFlow work with Turbo, the controller must return the appropriate
-HTTP status codes:
+* ``200``: initial rendering (form not yet submitted)
+* ``422``: form submitted but invalid (Turbo re-renders the form in place)
+* ``303``: form submitted and valid, advancing to the next step (Turbo follows the redirect)
 
-* ``200`` when the form is not yet submitted (initial rendering)
-* ``422`` when the form is submitted but invalid (Turbo re-renders the form)
-* ``303`` when the form is submitted, valid, and moving to the next step
+The following example shows a controller that handles all three cases::
 
-Here is an example of a controller that handles this::
+    // src/Controller/SignUpController.php
+    namespace App\Controller;
 
+    use App\Entity\User;
+    use App\Form\UserSignUpType;
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
 
-    #[Route('/signup', name: 'signup')]
-    public function signup(Request $request): Response
+    class SignUpController extends AbstractController
     {
-        $flow = $this->createForm(UserSignUpType::class, new User());
-        $flow->handleRequest($request);
+        #[Route('/signup', name: 'signup')]
+        public function signup(Request $request): Response
+        {
+            $flow = $this->createForm(UserSignUpType::class, new User());
+            $flow->handleRequest($request);
 
-        if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
-            // process the completed data
-            // $flow->getData();
+            if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
+                // all steps are completed; process the final data
+                $data = $flow->getData();
 
-            return $this->redirectToRoute('signup_success');
+                return $this->redirectToRoute('signup_success');
+            }
+
+            // At this point, the flow is either not yet submitted,
+            // submitted but invalid, or submitted, valid, and not yet finished.
+            $statusCode = match (true) {
+                !$flow->isSubmitted() => Response::HTTP_OK,
+                !$flow->isValid() => Response::HTTP_UNPROCESSABLE_ENTITY,
+                default => Response::HTTP_SEE_OTHER,
+            };
+
+            return $this->render('signup.html.twig', [
+                'form' => $flow->getStepForm(),
+            ], new Response(status: $statusCode));
         }
-
-        $response = (new Response())->setStatusCode(match (true) {
-            !$flow->isSubmitted() => Response::HTTP_OK,
-            !$flow->isValid() => Response::HTTP_UNPROCESSABLE_ENTITY,
-            !$flow->isFinished() => Response::HTTP_SEE_OTHER,
-        });
-
-        return $this->render('signup.html.twig', [
-            'form' => $flow->getStepForm(),
-        ], $response);
     }
 
-Limitations
------------
+Known Limitations
+-----------------
 
-* Nested form flows are not supported
-* Only one step form is processed per request
-* Steps must be explicitly defined
-
-Summary
--------
-
-FormFlow provides a structured, extensible, and native solution for
-multi-step forms in Symfony, without relying on external bundles.
-
-It integrates seamlessly with the Form component, validation,
-HttpFoundation, and the session system while remaining fully customizable.
+* **Nested form flows** are not supported; a flow step cannot itself be a flow.
+* **One step per request**: only the active step's form is processed on each
+  request. Submitting multiple steps in a single request is not possible.
+* **Steps must be declared explicitly** in ``buildFormFlow()``. Dynamic or
+  runtime-generated steps are not supported.
 
 .. _`Symfony UX Turbo`: https://symfony.com/bundles/ux-turbo/current/index.html
