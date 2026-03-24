@@ -1,10 +1,6 @@
 Multi-Step Forms
 ================
 
-.. versionadded:: 7.4
-
-    Multi-Step forms were introduced in Symfony 7.4.
-
 Symfony provides support for building multi-step forms via the ``FormFlow``
 system. A form flow splits a form into multiple steps while keeping a single
 form instance, shared data, validation groups, and navigation controls.
