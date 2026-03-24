@@ -264,6 +264,15 @@ class. You've also assigned each a :ref:`form type <form-types>` (e.g. ``TextTyp
 and ``DateType``), represented by its fully qualified class name. Finally, you
 added a submit button with a custom label for submitting the form to the server.
 
+.. tip::
+
+    Symfony also provides a ``createFormFlowBuilder()`` helper so you can create
+    :doc:`form flows </form/form_flow>` (multi-step forms).
+
+    .. versionadded:: 8.1
+
+        The ``createFormFlowBuilder`` helper was introduced in Symfony 8.1.
+
 .. _creating-forms-in-classes:
 
 Creating Form Classes

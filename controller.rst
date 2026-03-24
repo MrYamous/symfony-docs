@@ -168,34 +168,6 @@ Templating and Twig are explained more in the
 .. _controller-accessing-services:
 .. _accessing-other-services:
 
-Creating Form Flow Builders
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Symfony 8.1 adds a shortcut method to create form flow builders directly
-from controllers extending
-:class:``Symfony\Bundle\FrameworkBundle\Controller\AbstractController``.
-
-Use the :method:``Symfony\Bundle\FrameworkBundle\Controller\AbstractController::createFormFlowBuilder``
-method to create a form flow builder using the ``FormFlowType`` and the
-form factory::
-
-    public function index(): Response
-    {
-        $flowBuilder = $this->createFormFlowBuilder($data, [
-            // options
-        ]);
-
-        // ...
-    }
-
-The method accepts optional initial data and an array of options, and
-returns a
-:class:``Symfony\Component\Form\FormFlowBuilderInterface``.
-
-.. versionadded:: 8.1
-
-    The ``createFormFlowBuilder`` shortcut method was introduced in Symfony 8.1.
-
 Fetching Services
 ~~~~~~~~~~~~~~~~~
 
