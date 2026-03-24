@@ -805,6 +805,9 @@ attribute. By doing so, the callable will automatically be lazy, which means
 that the encapsulated service will be instantiated **only** at the
 closure's first call.
 
+``AutowireMethodOf``
+~~~~~~~~~~~~~~~~~~~~
+
 The :class:`Symfony\\Component\\DependencyInjection\\Attribute\\AutowireMethodOf`
 attribute provides a simpler way of specifying the name of the service method
 by using the property name as method name::
@@ -830,9 +833,6 @@ by using the property name as method name::
         }
     }
 
-When to Use AutowireMethodOf
-............................
-
 The ``#[AutowireMethodOf]`` attribute is particularly useful in the following scenarios:
 
 **Decoupling from heavy dependencies**: Instead of injecting an entire repository
@@ -848,7 +848,7 @@ code more modular and explicit about its dependencies::
     class ConferenceController
     {
         public function __construct(
-            // Instead of injecting the entire repository...
+            // instead of injecting the entire repository...
             // private CommentRepository $commentRepository,
 
             // ...inject only the method you need
@@ -866,8 +866,8 @@ code more modular and explicit about its dependencies::
     }
 
 **Simplified testing**: When you inject closures instead of full services, testing
-becomes straightforward because you can easily replace the closure with a mock
-without complex mocking frameworks::
+becomes simpler because you can replace the closure with a test double without
+complex mocking frameworks::
 
     // tests/Controller/ConferenceControllerTest.php
     namespace App\Tests\Controller;
@@ -878,7 +878,7 @@ without complex mocking frameworks::
     {
         public function testShow(): void
         {
-            // Create a simple mock closure instead of mocking the entire repository
+            // create a mock closure instead of mocking the entire repository
             $getCommentPaginator = function (Conference $conference, int $page) {
                 return new MockPaginator([/* test comments */]);
             };
@@ -924,7 +924,7 @@ Then use this interface in your service::
         public function show(Conference $conference, int $page): Response
         {
             // Call directly without parentheses around the property
-            $paginator = $this->getCommentPaginator->__invoke($conference, $page);
+            $paginator = ($this->getCommentPaginator)($conference, $page);
 
             // ...
         }
