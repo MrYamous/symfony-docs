@@ -96,12 +96,6 @@ If you prefer to store production logs in a file, set the ``path`` option of you
 log handler(s) to the desired file path (e.g. ``var/log/prod.log``). Monolog
 creates the log directory automatically if it doesn't exist.
 
-.. versionadded:: 7.3
-
-    Deferring the log directory creation to Monolog was introduced in Symfony 7.3.
-    Previously, the Kernel always created the log directory at build time, even
-    when not using file-based logging (which caused issues on read-only filesystems).
-
 Handlers: Writing Logs to different Locations
 ---------------------------------------------
 
