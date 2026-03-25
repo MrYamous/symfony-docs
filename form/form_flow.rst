@@ -215,7 +215,7 @@ Rendering Navigation Information
 The form view exposes step metadata that can be used to build progress
 indicators or navigation menus:
 
-.. code-block:: twig
+.. code-block:: html+twig
 
     <ol>
         {% for step in form.vars.visible_steps %}
