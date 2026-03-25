@@ -1572,11 +1572,6 @@ Unless your application needs to process events on cache hits, it's recommended
 to set this to ``false`` to improve performance, because it avoids having to
 bootstrap the Symfony framework on a cache hit.
 
-.. deprecated:: 7.0
-
-    The underlying ``HttpCache`` option was removed in Symfony 7.0. This
-    configuration option has no effect and will be removed in a future version.
-
 trace_header
 ............
 
