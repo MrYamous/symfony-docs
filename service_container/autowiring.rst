@@ -711,7 +711,6 @@ The ``#[Autowire]`` attribute can also be used for :ref:`parameters <service-par
             private bool $allowAttachments,
         ) {
         }
-        // ...
     }
 
 .. _autowiring_closures:
