@@ -529,6 +529,7 @@ event subscribers, you can learn more about :ref:`how to use them <events-subscr
     namespace App\EventSubscriber;
 
     use App\Controller\TokenAuthenticatedController;
+    use Symfony\Component\DependencyInjection\Attribute\Autowire;
     use Symfony\Component\EventDispatcher\EventSubscriberInterface;
     use Symfony\Component\HttpKernel\Event\ControllerEvent;
     use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -537,6 +538,7 @@ event subscribers, you can learn more about :ref:`how to use them <events-subscr
     class TokenSubscriber implements EventSubscriberInterface
     {
         public function __construct(
+            #[Autowire(param: 'tokens')]
             private array $tokens
         ) {
         }
