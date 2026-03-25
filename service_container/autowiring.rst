@@ -692,23 +692,23 @@ The ``#[Autowire]`` attribute can also be used for :ref:`parameters <service-par
         public function __construct(
             // use the %...% syntax for parameters
             #[Autowire('%kernel.project_dir%/data')]
-            string $dataDir,
+            private string $dataDir,
 
             // or use argument "param"
             #[Autowire(param: 'kernel.debug')]
-            bool $debugMode,
+            private bool $debugMode,
 
             // expressions
             #[Autowire(expression: 'service("App\\\Mail\\\MailerConfiguration").getMailerMethod()')]
-            string $mailerMethod,
+            private string $mailerMethod,
 
             // environment variables
             #[Autowire(env: 'SOME_ENV_VAR')]
-            string $senderName,
+            private string $senderName,
 
             // environment variables with processors
             #[Autowire(env: 'bool:SOME_BOOL_ENV_VAR')]
-            bool $allowAttachments,
+            private bool $allowAttachments,
         ) {
         }
         // ...
