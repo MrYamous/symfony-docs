@@ -1566,22 +1566,22 @@ Usage in Twig
 Symfony defines several Twig functions to manage workflows and reduce the need
 of domain logic in your templates:
 
-``workflow_can()``
+``workflow_can(object $subject, string $transitionName, ?string $name = null)``
     Returns ``true`` if the given object can make the given transition.
 
-``workflow_transitions()``
+``workflow_transitions(object $subject, ?string $name = null)``
     Returns an array with all the transitions enabled for the given object.
 
-``workflow_transition()``
+``workflow_transition(object $subject, string $transition, ?string $name = null)``
     Returns a specific transition enabled for the given object and transition name.
 
-``workflow_marked_places()``
+``workflow_marked_places(object $subject, bool $placesNameOnly = true, ?string $name = null)``
     Returns an array with the place names of the given marking.
 
-``workflow_has_marked_place()``
+``workflow_has_marked_place(object $subject, string $placeName, ?string $name = null)``
     Returns ``true`` if the marking of the given object has the given state.
 
-``workflow_transition_blockers()``
+``workflow_transition_blockers(object $subject, string $transitionName, ?string $name = null)``
     Returns :class:`Symfony\\Component\\Workflow\\TransitionBlockerList` for the given transition.
 
 All workflow functions accept an optional ``name`` argument (the workflow name)
