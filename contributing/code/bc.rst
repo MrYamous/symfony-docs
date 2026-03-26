@@ -211,7 +211,8 @@ Add argument without a default value            No
 Add argument with a default value               No
 Remove argument                                 No              :ref:`[3] <note-3>`
 Add default value to an argument                No
-Remove default value of an argument             No
+Change default value of an argument             No              :ref:`[12] <note-12>`
+Remove default value of an argument             No              :ref:`[13] <note-13>`
 Add type hint to an argument                    No
 Remove type hint of an argument                 No
 Change argument type                            No
@@ -264,7 +265,8 @@ Add constructor without mandatory arguments                               Yes   
 Add argument with a default value                                         Yes             :ref:`[11] <note-11>`
 Remove argument                                                           No              :ref:`[3] <note-3>`
 Add default value to an argument                                          Yes
-Remove default value of an argument                                       No
+Change default value of an argument                                       No              :ref:`[12] <note-12>`
+Remove default value of an argument                                       No              :ref:`[13] <note-13>`
 Add type hint to an argument                                              No
 Remove type hint of an argument                                           Yes
 Change argument type                                                      No
@@ -288,7 +290,7 @@ Move to parent class                                                      Yes
 Rename argument                                                           Yes             :ref:`[10] <note-10>`
 Remove argument                                                           No              :ref:`[3] <note-3>`
 Add default value to an argument                                          No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
-Remove default value of an argument                                       No
+Remove default value of an argument                                       No              :ref:`[13] <note-13>`
 Add type hint to an argument                                              No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Remove type hint of an argument                                           No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Change argument type                                                      No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
@@ -308,7 +310,8 @@ Move to parent class                                                      Yes
 Rename argument                                                           Yes             :ref:`[10] <note-10>`
 Remove argument                                                           No              :ref:`[3] <note-3>`
 Add default value to an argument                                          No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
-Remove default value of an argument                                       No              :ref:`[7] <note-7>`
+Change default value of an argument                                       No              :ref:`[12] <note-12>`
+Remove default value of an argument                                       No              :ref:`[13] <note-13>` :ref:`[7] <note-7>`
 Add type hint to an argument                                              No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Remove type hint of an argument                                           No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Change argument type                                                      No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
@@ -382,7 +385,7 @@ Move to used trait                                                              
 :ref:`Add argument with a default value <add-argument-public-method>`            No
 Remove argument                                                                  No
 Add default value to an argument                                                 No
-Remove default value of an argument                                              No
+Remove default value of an argument                                              No              :ref:`[13] <note-13>`
 Add type hint to an argument                                                     No
 Remove type hint of an argument                                                  No
 Change argument type                                                             No
@@ -399,7 +402,7 @@ Move to used trait                                                              
 :ref:`Add argument with a default value <add-argument-public-method>`            No
 Remove argument                                                                  No
 Add default value to an argument                                                 No
-Remove default value of an argument                                              No
+Remove default value of an argument                                              No              :ref:`[13] <note-13>`
 Add type hint to an argument                                                     No
 Remove type hint of an argument                                                  No
 Change argument type                                                             No
@@ -414,7 +417,7 @@ Add argument without a default value                                            
 Add argument with a default value                                                No
 Remove argument                                                                  No
 Add default value to an argument                                                 No
-Remove default value of an argument                                              No
+Remove default value of an argument                                              No              :ref:`[13] <note-13>`
 Add type hint to an argument                                                     No
 Remove type hint of an argument                                                  No
 Change argument type                                                             No
@@ -489,6 +492,16 @@ code when upgrading to newer Symfony versions.
 .. _note-11:
 
 **[11]** Only optional argument(s) of a constructor at last position may be added.
+
+.. _note-12:
+
+**[12]** Changing a default value is a BC break because it changes the behavior
+of existing code that relies on the current default value.
+
+.. _note-13:
+
+**[13]** Removing a default value is a BC break because it makes previously
+optional arguments required, breaking existing code that doesn't pass all arguments.
 
 Making Code Changes in a Backward Compatible Way
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
