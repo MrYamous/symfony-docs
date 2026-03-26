@@ -651,14 +651,13 @@ instance automatically::
             // ...
         }
 
-.. _controller-map-request-payload-uploaded-files:
-
-Mapping Uploaded Files in Request Payload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Symfony provides a ``#[MapUploadedFile]`` attribute to :ref:`map uploaded files <controller_map-uploaded-file>`,
+but you can also use ``#[MapRequestPayload]`` to map files included in the request
+payload.
 
 .. versionadded:: 8.1
 
-    The ``#[MapRequestPayload]`` attribute supports mapping uploaded files.
+    Support for mapping files with ``#[MapRequestPayload]`` was introduced in Symfony 8.1.
 
 When handling ``multipart/form-data`` requests, Symfony automatically merges
 request parameters and uploaded files before deserializing the payload.
