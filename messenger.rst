@@ -760,6 +760,10 @@ there are none, *then* it will consume messages from ``async_priority_low``.
 Prioritized Messages
 ~~~~~~~~~~~~~~~~~~~~
 
+.. versionadded:: 8.1
+
+    Support for prioritizing messages was introduced in Symfony 8.1.
+
 By default, Messenger uses first-in, first-out ordering, so messages are
 received in the same order they were sent, except for delayed messages.
 
