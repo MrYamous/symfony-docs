@@ -44,42 +44,6 @@ When configuring the cache component there are a few concepts you should know:
     Redis and Memcached are examples of such adapters. If a DSN is used as the
     provider then a service is automatically created.
 
-.. _cache-app-system:
-
-There are two pools that are always enabled by default. They are ``cache.app`` and
-``cache.system``. The system cache is used for things like the serializer,
-and validation. The ``cache.app`` can be used in your code. You can configure which
-adapter (template) they use by using the ``app`` and ``system`` key like:
-
-.. configuration-block::
-
-    .. code-block:: yaml
-
-        # config/packages/cache.yaml
-        framework:
-            cache:
-                app: cache.adapter.filesystem
-                system: cache.adapter.system
-
-    .. code-block:: php
-
-        // config/packages/cache.php
-        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
-
-        return App::config([
-            'framework' => [
-                'cache' => [
-                    'app' => 'cache.adapter.filesystem',
-                    'system' => 'cache.adapter.system',
-                ],
-            ],
-        ]);
-
-.. tip::
-
-    While it is possible to reconfigure the ``system`` cache, it's recommended
-    to keep the default configuration applied to it by Symfony.
-
 The Cache component comes with a series of adapters pre-configured:
 
 * :doc:`cache.adapter.apcu </components/cache/adapters/apcu_adapter>`
@@ -130,6 +94,69 @@ Some of these adapters could be configured via shortcuts.
                     'default_redis_provider' => 'redis://localhost',
                     'default_memcached_provider' => 'memcached://localhost',
                     'default_pdo_provider' => 'pgsql:host=localhost',
+                ],
+            ],
+        ]);
+
+.. _cache-app-system:
+
+System Cache and Application Cache
+----------------------------------
+
+Two cache pools are always enabled by default: ``cache.system`` and ``cache.app``.
+
+``cache.system`` is used **internally** by Symfony components such as annotations,
+the serializer, and validation. It is also **available for application** code,
+but only under specific constraints:
+
+#. Entries must be derivable from source code and regeneratable during cache
+   warmup via a ``CacheWarmer``.
+#. Cached content must only change when the source code changes (i.e. on deployment,
+  not at runtime); treat it as read-only after deployment.
+
+By default, ``cache.system`` uses ``cache.adapter.system``, which writes to the
+filesystem and chains APCu when available. In most cases, the default is the
+right choice.
+
+.. tip::
+
+    While it is possible to reconfigure the ``system`` cache, it's recommended
+    to keep the default configuration applied to it by Symfony.
+
+``cache.app`` is a **general-purpose data cache** for application and bundle code.
+Data in this pool does not need to be flushed on deployment. It defaults to
+``cache.adapter.filesystem``, but configuring a faster adapter like Redis is
+recommended when available (this ensures cached data survives deployments and
+is shared across multiple instances in a multi-server setup).
+
+:ref:`Custom pools <cache-create-pools>` default to ``cache.app`` as their adapter
+unless configured otherwise. When using **autowiring**, ``cache.app`` is injected
+automatically into any service argument typed as ``CacheItemPoolInterface``,
+``AdapterInterface``, or ``CacheInterface``.
+
+You can configure the adapter used by each predefined pool via the ``app`` and
+``system`` keys:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/cache.yaml
+        framework:
+            cache:
+                app: cache.adapter.filesystem
+                system: cache.adapter.system
+
+    .. code-block:: php
+
+        // config/packages/cache.php
+        namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+        return App::config([
+            'framework' => [
+                'cache' => [
+                    'app' => 'cache.adapter.filesystem',
+                    'system' => 'cache.adapter.system',
                 ],
             ],
         ]);
