@@ -327,7 +327,7 @@ to multiple transports:
     :class:`Symfony\\Component\\Messenger\\Stamp\\TransportNamesStamp` on
     the envelope of the message. This stamp takes an array of transport
     name as its only argument. For more information about stamps, see
-    `Envelopes & Stamps`_.
+    :ref:`Envelopes & Stamps <messenger-envelopes-stamps>`.
 
 Doctrine Entities in Messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -658,6 +658,8 @@ Otherwise, the ``cache.app`` pool will use the value of the ``kernel.project_dir
 parameter as base for the namespace, which will lead to different namespaces
 each time a new deployment is made.
 
+.. _messenger-prioritized-transports:
+
 Prioritized Transports
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -754,6 +756,96 @@ to handle messages in a priority order:
 
 The worker will always first look for messages waiting on ``async_priority_high``. If
 there are none, *then* it will consume messages from ``async_priority_low``.
+
+Prioritized Messages
+~~~~~~~~~~~~~~~~~~~~
+
+By default, Messenger uses first-in, first-out ordering, so messages are
+received in the same order they were sent, except for delayed messages.
+
+:ref:`Prioritized transports <messenger-prioritized-transports>` provide basic
+priority support, but only across different message types. When using
+:ref:`AMQP <messenger-amqp-transport>` or :ref:`Beanstalkd <messenger-beanstalkd-transport>`
+transports, you can prioritize messages of the same type using the :ref:`stamp <messenger-envelopes-stamps>`
+called ``PriorityStamp``::
+
+    use Symfony\Component\Messenger\Envelope;
+    use Symfony\Component\Messenger\Stamp\PriorityStamp;
+
+    $bus->dispatch(
+        (new Envelope($message))->with(new PriorityStamp(255))
+    );
+
+.. tip::
+
+    Supported priorities range from ``0`` (lowest) to ``255`` (highest).
+
+``PriorityStamp`` can be combined with ``DelayStamp``. When the delay expires,
+the message is delivered before any lower-priority messages already in the queue::
+
+    use Symfony\Component\Messenger\Envelope;
+    use Symfony\Component\Messenger\Stamp\DelayStamp;
+    use Symfony\Component\Messenger\Stamp\PriorityStamp;
+
+    $bus->dispatch(
+        (new Envelope($message))->with(
+            new PriorityStamp(255),
+            new DelayStamp(5000)
+        )
+    );
+
+When using the **Beanstalkd** transport, no additional configuration is
+required. Beanstalkd uses a reversed priority scale internally (``0`` = highest,
+``2^32 - 1`` = lowest), but Messenger handles the conversion automatically.
+
+When using the **AMQP** transport, priority queues must be explicitly enabled in
+the configuration:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/messenger.yaml
+        framework:
+            messenger:
+                transports:
+                    async:
+                        dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
+                        options:
+                            queues:
+                                messenger:
+                                    arguments:
+                                        x-max-priority: 255
+
+    .. code-block:: php
+
+        // config/packages/messenger.php
+        use Symfony\Config\FrameworkConfig;
+
+        return static function (FrameworkConfig $framework): void {
+            $framework->messenger()
+                ->transport('async')
+                ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+                ->options([
+                    'queues' => [
+                        'messenger' => [
+                            'arguments' => ['x-max-priority' => 255],
+                        ],
+                    ],
+                ]);
+        };
+
+.. caution::
+
+    ``x-max-priority`` cannot be changed on an existing RabbitMQ queue.
+    Messenger will fail to auto-setup, and priorities won't work. Create a new
+    queue instead.
+
+.. note::
+
+    RabbitMQ recommends using `no more than 10 priority levels`_. For example:
+    ``255`` for high, ``127`` for medium, and ``0`` for low. More levels may
+    impact performance.
 
 .. _messenger-limit-queues:
 
@@ -1520,6 +1612,8 @@ options. Options can be passed to the transport via a DSN string or configuratio
 
 Options defined under ``options`` take precedence over ones defined in the DSN.
 
+.. _messenger-amqp-transport:
+
 AMQP Transport
 ~~~~~~~~~~~~~~
 
@@ -1855,6 +1949,8 @@ every iteration and only blocks *after* all queues have been found empty.
 
 The Doctrine transport supports the ``--keepalive`` option by periodically updating
 the ``delivered_at`` timestamp to prevent the message from being redelivered.
+
+.. _messenger-beanstalkd-transport:
 
 Beanstalkd Transport
 ~~~~~~~~~~~~~~~~~~~~
@@ -2439,7 +2535,7 @@ The ``messenger.transport.symfony_serializer`` is a built-in service that uses
 the :doc:`Serializer component </serializer>` and can be configured in a few ways.
 If you *do* choose to use the Symfony serializer, you can control the context
 on a case-by-case basis via the :class:`Symfony\\Component\\Messenger\\Stamp\\SerializerStamp`
-(see `Envelopes & Stamps`_).
+(see :ref:`Envelopes & Stamps <messenger-envelopes-stamps>`).
 
 .. tip::
 
@@ -3230,6 +3326,8 @@ disable the idle timeout entirely::
 
 Extending Messenger
 -------------------
+
+.. _messenger-envelopes-stamps:
 
 Envelopes & Stamps
 ~~~~~~~~~~~~~~~~~~
@@ -4036,3 +4134,4 @@ Learn more
 .. _`article about CQRS`: https://martinfowler.com/bliki/CQRS.html
 .. _`SSL context options`: https://php.net/context.ssl
 .. _`SQS CreateQueue API`: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html
+.. _`no more than 10 priority levels`: https://www.rabbitmq.com/docs/priority
