@@ -139,43 +139,44 @@ Some of these adapters could be configured via shortcuts.
             ;
         };
 
-.. _cache-create-pools:
+.. _cache-app-system:
 
 System Cache and Application Cache
 ----------------------------------
 
-There are two pools that are always enabled by default. They are
-``cache.system`` and ``cache.app``.
+Two cache pools are always enabled by default: ``cache.system`` and ``cache.app``.
 
-The system cache ``cache.system`` is mainly used by Symfony components for
-things like annotations, serializer, and validation. For advanced use-cases it
-is also available for application code under the following constraints:
+``cache.system`` is used **internally** by Symfony components such as annotations,
+the serializer, and validation. It is also **available for application** code,
+but only under specific constraints:
 
-- Entries are derived from source code and can be generated during cache warmup
-  by a CacheWarmer
-- Cached content only needs to change if the source code also changes (i.e.
-  only on deployment on non-development machines); it should be regarded as
-  read-only after deployment
+#. Entries must be derivable from source code and regeneratable during cache
+   warmup via a ``CacheWarmer``.
+#. Cached content must only change when the source code changes (i.e. on deployment,
+  not at runtime); treat it as read-only after deployment.
 
-By default the system cache uses the special ``cache.adapter.system`` adapter
-which writes to the file system and chains the APCu adapter if APCu is
-available. In most cases the default adapter should be the right choice for
-your application.
+By default, ``cache.system`` uses ``cache.adapter.system``, which writes to the
+filesystem and chains APCu when available. In most cases, the default is the
+right choice.
 
-The application cache ``cache.app`` can be used as a multi-purpose data cache
-in your application and bundle code. In general, data in this pool does not
-need to be flushed on deployment. It defaults to ``cache.adapter.filesystem``
-but it is recommended to configure another adapter like Redis if available, so
-that data both "survives" deployments and is available on multiple instances in
-a multi-server setup.
-Custom pools (see section below) will default to ``cache.app`` as adapter if
-not specified explicitly.
-When using autowiring in your service definitions, ``cache.app`` will by
-default be injected if a service argument declares ``CacheItemPoolInterface``,
-``AdapterInterface``, or ``CacheInterface`` as its type.
+.. tip::
 
-You can configure which adapter (template) these predefined pools use by using
-the ``app`` and ``system`` key like:
+    While it is possible to reconfigure the ``system`` cache, it's recommended
+    to keep the default configuration applied to it by Symfony.
+
+``cache.app`` is a **general-purpose data cache** for application and bundle code.
+Data in this pool does not need to be flushed on deployment. It defaults to
+``cache.adapter.filesystem``, but configuring a faster adapter like Redis is
+recommended when available (this ensures cached data survives deployments and
+is shared across multiple instances in a multi-server setup).
+
+:ref:`Custom pools <cache-create-pools>` default to ``cache.app`` as their adapter
+unless configured otherwise. When using **autowiring**, ``cache.app`` is injected
+automatically into any service argument typed as ``CacheItemPoolInterface``,
+``AdapterInterface``, or ``CacheInterface``.
+
+You can configure the adapter used by each predefined pool via the ``app`` and
+``system`` keys:
 
 .. configuration-block::
 
@@ -215,6 +216,8 @@ the ``app`` and ``system`` key like:
                 'system' => 'cache.adapter.system',
             ],
         ]);
+
+.. _cache-create-pools:
 
 Creating Custom (Namespaced) Pools
 ----------------------------------
