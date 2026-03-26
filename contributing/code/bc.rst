@@ -136,10 +136,6 @@ covered by our backward compatibility promise:
 +-----------------------------------------------+-----------------------------+
 | Add a default value to an argument            | Yes                         |
 +-----------------------------------------------+-----------------------------+
-| Change default value of an argument           | No :ref:`[12] <note-12>`    |
-+-----------------------------------------------+-----------------------------+
-| Remove default value of an argument           | No :ref:`[13] <note-13>`    |
-+-----------------------------------------------+-----------------------------+
 | Call a private method (via Reflection)        | No                          |
 +-----------------------------------------------+-----------------------------+
 | Access a private property (via Reflection)    | No                          |
@@ -314,7 +310,8 @@ Move to parent class                                                      Yes
 Rename argument                                                           Yes             :ref:`[10] <note-10>`
 Remove argument                                                           No              :ref:`[3] <note-3>`
 Add default value to an argument                                          No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
-Remove default value of an argument                                       No              :ref:`[13] <note-13>`              :ref:`[7] <note-7>`
+Change default value of an argument                                       No              :ref:`[12] <note-12>`
+Remove default value of an argument                                       No              :ref:`[13] <note-13>` :ref:`[7] <note-7>`
 Add type hint to an argument                                              No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Remove type hint of an argument                                           No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
 Change argument type                                                      No              :ref:`[7] <note-7>` :ref:`[8] <note-8>`
