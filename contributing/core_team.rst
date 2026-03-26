@@ -87,13 +87,13 @@ Active Core Members
   * **Kévin Dunglas** (`dunglas`_);
   * **Javier Eguiluz** (`javiereguiluz`_);
   * **Grégoire Pineau** (`lyrixx`_);
-  * **Ryan Weaver** (`weaverryan`_);
   * **Robin Chalas** (`chalasr`_);
   * **Yonel Ceruto** (`yceruto`_);
   * **Tobias Nyholm** (`Nyholm`_);
   * **Wouter De Jong** (`wouterj`_);
   * **Alexander M. Turek** (`derrabus`_);
   * **Jérémy Derussé** (`jderusse`_);
+  * **Tugdual Saunier** (`tucksaun`_);
   * **Oskar Stark** (`OskarStark`_);
   * **Mathieu Santostefano** (`welcomattic`_);
   * **Kevin Bond** (`kbond`_);
@@ -111,7 +111,6 @@ Active Core Members
 
 * **Symfony UX Team** (``@symfony/ux`` on GitHub):
 
-  * **Ryan Weaver** (`weaverryan`_);
   * **Kevin Bond** (`kbond`_);
   * **Simon André** (`smnandre`_);
   * **Hugo Alliaume** (`kocal`_);
@@ -125,7 +124,6 @@ Active Core Members
 * **Documentation Team** (``@symfony/team-symfony-docs`` on GitHub):
 
   * **Fabien Potencier** (`fabpot`_);
-  * **Ryan Weaver** (`weaverryan`_);
   * **Christian Flothmann** (`xabbuh`_);
   * **Wouter De Jong** (`wouterj`_);
   * **Javier Eguiluz** (`javiereguiluz`_);
@@ -149,7 +147,8 @@ Symfony contributions:
 * **Maxime Steinhausser** (`ogizanagi`_);
 * **Titouan Galopin** (`tgalopin`_);
 * **Michael Cullum** (`michaelcullum`_);
-* **Thomas Calvet** (`fancyweb`_).
+* **Thomas Calvet** (`fancyweb`_);
+* **Ryan Weaver** (`weaverryan`_).
 
 Core Membership Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
