@@ -651,6 +651,52 @@ instance automatically::
             // ...
         }
 
+.. _controller-map-request-payload-uploaded-files:
+
+Mapping Uploaded Files in Request Payload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 8.1
+
+    The ``#[MapRequestPayload]`` attribute supports mapping uploaded files.
+
+When handling ``multipart/form-data`` requests, Symfony automatically merges
+request parameters and uploaded files before deserializing the payload.
+This allows mapping both scalar values and ``UploadedFile`` instances into
+a single data transfer object.
+
+For example, you can define a request object containing both scalar values and
+uploaded files::
+
+    use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+    class ProductRequest
+    {
+       public ?string $name = null;
+       public ?UploadedFile $image = null;
+    }
+
+And map it directly in a controller action::
+
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+
+    public function upload(
+         #[MapRequestPayload] ProductRequest $data,
+    ): Response
+    {
+        // $data->name contains request parameters
+        // $data->image contains the uploaded file as an UploadedFile instance
+
+        return new Response('OK');
+    }
+
+.. note::
+
+    Uploaded files are resolved from ``$request->files`` and merged with request
+    parameters before deserialization. This works with standard form submissions
+    and multipart requests.
+
 Mapping Empty Data
 ~~~~~~~~~~~~~~~~~~
 
