@@ -1584,12 +1584,14 @@ of domain logic in your templates:
 ``workflow_transition_blockers()``
     Returns :class:`Symfony\\Component\\Workflow\\TransitionBlockerList` for the given transition.
 
-The following example shows these functions in action:
+All workflow functions accept an optional ``name`` argument (the workflow name)
+as the last parameter. This is only required when the object is associated with
+multiple workflows:
 
 .. code-block:: html+twig
 
     <h3>Actions on Blog Post</h3>
-    {% if workflow_can(post, 'publish') %}
+    {% if workflow_can(post, 'publish', 'blog_publishing') %}
         <a href="...">Publish</a>
     {% endif %}
     {% if workflow_can(post, 'to_review') %}

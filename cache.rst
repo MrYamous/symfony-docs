@@ -44,60 +44,6 @@ When configuring the cache component there are a few concepts you should know:
     Redis and Memcached are examples of such adapters. If a DSN is used as the
     provider then a service is automatically created.
 
-.. _cache-app-system:
-
-There are two pools that are always enabled by default. They are ``cache.app`` and
-``cache.system``. The system cache is used for things like the serializer,
-and validation. The ``cache.app`` can be used in your code. You can configure which
-adapter (template) they use by using the ``app`` and ``system`` key like:
-
-.. configuration-block::
-
-    .. code-block:: yaml
-
-        # config/packages/cache.yaml
-        framework:
-            cache:
-                app: cache.adapter.filesystem
-                system: cache.adapter.system
-
-    .. code-block:: xml
-
-        <!-- config/packages/cache.xml -->
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <container xmlns="http://symfony.com/schema/dic/services"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services
-                https://symfony.com/schema/dic/services/services-1.0.xsd
-                http://symfony.com/schema/dic/symfony
-                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd"
-        >
-            <framework:config>
-                <framework:cache
-                    app="cache.adapter.filesystem"
-                    system="cache.adapter.system"
-                />
-            </framework:config>
-        </container>
-
-    .. code-block:: php
-
-        // config/packages/cache.php
-        use Symfony\Config\FrameworkConfig;
-
-        return static function (FrameworkConfig $framework): void {
-            $framework->cache()
-                ->app('cache.adapter.filesystem')
-                ->system('cache.adapter.system')
-            ;
-        };
-
-.. tip::
-
-    While it is possible to reconfigure the ``system`` cache, it's recommended
-    to keep the default configuration applied to it by Symfony.
-
 The Cache component comes with a series of adapters pre-configured:
 
 * :doc:`cache.adapter.apcu </components/cache/adapters/apcu_adapter>`
@@ -179,6 +125,84 @@ Some of these adapters could be configured via shortcuts.
 .. versionadded:: 7.1
 
     Using a DSN as the provider for the PDO adapter was introduced in Symfony 7.1.
+
+.. _cache-app-system:
+
+System Cache and Application Cache
+----------------------------------
+
+Two cache pools are always enabled by default: ``cache.system`` and ``cache.app``.
+
+``cache.system`` is used **internally** by Symfony components such as annotations,
+the serializer, and validation. It is also **available for application** code,
+but only under specific constraints:
+
+#. Entries must be derivable from source code and regeneratable during cache
+   warmup via a ``CacheWarmer``.
+#. Cached content must only change when the source code changes (i.e. on deployment,
+  not at runtime); treat it as read-only after deployment.
+
+By default, ``cache.system`` uses ``cache.adapter.system``, which writes to the
+filesystem and chains APCu when available. In most cases, the default is the
+right choice.
+
+.. tip::
+
+    While it is possible to reconfigure the ``system`` cache, it's recommended
+    to keep the default configuration applied to it by Symfony.
+
+``cache.app`` is a **general-purpose data cache** for application and bundle code.
+Data in this pool does not need to be flushed on deployment. It defaults to
+``cache.adapter.filesystem``, but configuring a faster adapter like Redis is
+recommended when available (this ensures cached data survives deployments and
+is shared across multiple instances in a multi-server setup).
+
+:ref:`Custom pools <cache-create-pools>` default to ``cache.app`` as their adapter
+unless configured otherwise. When using **autowiring**, ``cache.app`` is injected
+automatically into any service argument typed as ``CacheItemPoolInterface``,
+``AdapterInterface``, or ``CacheInterface``.
+
+You can configure the adapter used by each predefined pool via the ``app`` and
+``system`` keys:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/cache.yaml
+        framework:
+            cache:
+                app: cache.adapter.filesystem
+                system: cache.adapter.system
+
+    .. code-block:: xml
+
+        <!-- config/packages/cache.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                https://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony
+                https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:cache app="cache.adapter.filesystem"
+                    system="cache.adapter.system"
+                />
+            </framework:config>
+        </container>
+
+    .. code-block:: php
+
+        // config/packages/cache.php
+        $container->loadFromExtension('framework', [
+            'cache' => [
+                'app' => 'cache.adapter.filesystem',
+                'system' => 'cache.adapter.system',
+            ],
+        ]);
 
 .. _cache-create-pools:
 
