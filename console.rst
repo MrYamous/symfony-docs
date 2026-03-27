@@ -608,6 +608,47 @@ If your command requires interactive inputs, pass them as the third argument::
     :class:`Symfony\\Component\\Console\\Application` instead of the
     FrameworkBundle one.
 
+Testing Console Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to testing single commands, you can test full console applications
+with the :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester` class::
+
+    use Symfony\Bundle\FrameworkBundle\Console\Application;
+    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Symfony\Component\Console\Tester\ApplicationTester;
+
+    class WelcomeCommandTest extends KernelTestCase
+    {
+        public function testPerson(): void
+        {
+            self::bootKernel();
+            $application = new Application(self::$kernel);
+            // this is key: don't terminate the PHP process after running the command
+            $application->setAutoExit(false);
+
+            $applicationTester = new ApplicationTester($application);
+            $applicationTester->run([
+                'command' => 'app:welcome-person',
+                'firstName' => 'Jane',
+                'lastName' => 'Smith',
+                'hobbies' => ['reading', 'dancing']
+            ]);
+
+            $applicationTester->assertCommandIsSuccessful();
+
+            $output = $applicationTester->getDisplay();
+            $this->assertStringContainsString('Jane Smith', $output);
+            $this->assertStringContainsString('reading and dancing', $output);
+        }
+    }
+
+.. note::
+
+    Don't forget to call ``setAutoExit(false)`` on the application before passing
+    it to ``ApplicationTester``. Without it, the application calls ``exit()``
+    after running the command, which would terminate the PHPUnit process.
+
 Legacy Command Tester
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -655,6 +696,11 @@ you need lower-level control over the testing setup::
         }
     }
 
+.. note::
+
+    If you are using a :doc:`single-command application </components/console/single_command_tool>`,
+    call ``setAutoExit(false)`` on the application to get the command result in ``CommandTester``.
+
 .. tip::
 
     Use PHP's first-class callable syntax to test
@@ -664,6 +710,14 @@ you need lower-level control over the testing setup::
 
         $tester = new CommandTester($commands->create(...));
         $tester->execute([]);
+
+.. warning::
+
+    When testing ``InputOption::VALUE_NONE`` command options, you must pass ``true``
+    to them::
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(['--some-option' => true]);
 
 .. note::
 
