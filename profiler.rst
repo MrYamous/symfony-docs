@@ -370,10 +370,6 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
 Supporting a Disabled Profiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 7.3
-
-    The ``profiler.is_disabled_state_checker`` service was introduced in Symfony 7.3.
-
 Some data collectors rely on a decorated traceable service to gather data.
 Because the profiler can be disabled at runtime, you should check its state
 inside the traceable service to avoid collecting data unnecessarily. Inject the
