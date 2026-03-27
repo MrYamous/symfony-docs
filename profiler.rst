@@ -368,12 +368,17 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
     with ``autoconfigure``, then Symfony will start using your data collector after the
     next page refresh. Otherwise, :ref:`enable the data collector by hand <data_collector_tag>`.
 
-.. warning::
+Supporting a Disabled Profiler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    It arrives that some data collector leverage some decorated underlying service (traceable service).
-    And as the profiler mechanism can be disabled, you may adapt your collector to handle such case
-    to avoid unwanted useless memory leak.
-    You can do so by injecting the ``profiler.is_disabled_state_checker`` service::
+.. versionadded:: 7.3
+
+    The ``profiler.is_disabled_state_checker`` service was introduced in Symfony 7.3.
+
+Some data collectors rely on a decorated traceable service to gather data.
+Because the profiler can be disabled at runtime, you should check its state
+inside the traceable service to avoid collecting data unnecessarily. Inject the
+``profiler.is_disabled_state_checker`` service to do this::
 
     // src/Debug/TraceableService.php
     namespace App\Debug;
@@ -381,7 +386,7 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\HttpFoundation\Response;
 
-    class TraceableService
+    class TraceableService implements ServiceInterface
     {
         public function __construct(
             private ServiceInterface $decoratedService,
@@ -394,8 +399,8 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
                 return $this->decoratedService->action();
             }
 
-            // do the tracing job to gather/load/compute some data to be collected by your data collector...
-            return [/* heavy data */];
+            // gather data to be collected by your data collector
+            return [/* ... data ... */];
         }
     }
 
@@ -409,22 +414,16 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
     class ServiceCollector extends AbstractDataCollector
     {
         public function __construct(
-            private ServiceInterface $service, // here we have TraceableService
+            private ServiceInterface $service, // TraceableService
         ) {}
 
         public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
         {
-            $data = $this->service->action();
-
             $this->data = [
-                'data' => $data,
+                'data' => $this->service->action(),
             ];
         }
     }
-
-.. versionadded:: 7.3
-
-    The ``profiler.is_disabled_state_checker`` service was introduced in Symfony 7.3.
 
 Adding Web Profiler Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
