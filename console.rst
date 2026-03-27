@@ -544,69 +544,16 @@ console::
         }
     }
 
-If you are using a :doc:`single-command application </components/console/single_command_tool>`,
-call ``setAutoExit(false)`` on it to get the command result in ``CommandTester``.
+.. note::
+
+    If you are using a :doc:`single-command application </components/console/single_command_tool>`,
+    call ``setAutoExit(false)`` on the application to get the command result in ``CommandTester``.
 
 .. warning::
 
     When testing commands using the ``CommandTester`` class, console events are
     not dispatched. If you need to test those events, use the
     :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester` instead.
-
-.. warning::
-
-    When testing commands using the :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`
-    class, don't forget to disable the auto exit flag::
-
-        $application = new Application();
-        $application->setAutoExit(false);
-
-        $tester = new ApplicationTester($application);
-
-.. tip::
-
-    You can also test a whole console application by using
-    :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester`.
-
-    Here an example of a test using this class::
-
-        use Symfony\Bundle\FrameworkBundle\Console\Application;
-        use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-        use Symfony\Component\Console\Tester\ApplicationTester;
-        use Symfony\Component\Console\Tester\CommandTester;
-
-        class WelcomeCommandTest extends KernelTestCase
-        {
-            public function testPerson(): void
-            {
-                self::bootKernel();
-                $application = new Application(self::$kernel);
-                $application->setAutoExit(false);
-
-                $applicationTester = new ApplicationTester($application);
-
-                $input = [
-                    // Pass the command name
-                    'command' => 'app:welcome-person',
-
-                    // Pass the different arguments
-                    'firstName' => 'Michael',
-                    'lastName' => 'Jackson',
-                    'hobbies' => ['singing', 'dancing']
-                ];
-
-                // Call run to launch the application
-                $applicationTester->run($input);
-
-                $applicationTester->assertCommandIsSuccessful();
-
-                $output = $applicationTester->getDisplay();
-
-                // Here $output value is "The person is Michael Jackson and his hobbies are the following singing and dancing."
-                $this->assertStringContainsString('Michael Jackson', $output);
-                $this->assertStringContainsString('singing and dancing', $output);
-            }
-        }
 
 .. warning::
 
@@ -655,6 +602,47 @@ even the color mode being used. You have access to such information thanks to th
 
     The support for setting and getting the current color mode was introduced
     in Symfony 6.2.
+
+Testing Console Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to testing single commands, you can test full console applications
+with the :class:`Symfony\\Component\\Console\\Tester\\ApplicationTester` class::
+
+    use Symfony\Bundle\FrameworkBundle\Console\Application;
+    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Symfony\Component\Console\Tester\ApplicationTester;
+
+    class WelcomeCommandTest extends KernelTestCase
+    {
+        public function testPerson(): void
+        {
+            self::bootKernel();
+            $application = new Application(self::$kernel);
+            // this is key: don't terminate the PHP process after running the command
+            $application->setAutoExit(false);
+
+            $applicationTester = new ApplicationTester($application);
+            $applicationTester->run([
+                'command' => 'app:welcome-person',
+                'firstName' => 'Jane',
+                'lastName' => 'Smith',
+                'hobbies' => ['reading', 'dancing']
+            ]);
+
+            $applicationTester->assertCommandIsSuccessful();
+
+            $output = $applicationTester->getDisplay();
+            $this->assertStringContainsString('Jane Smith', $output);
+            $this->assertStringContainsString('reading and dancing', $output);
+        }
+    }
+
+.. note::
+
+    Don't forget to call ``setAutoExit(false)`` on the application before passing
+    it to ``ApplicationTester``. Without it, the application calls ``exit()``
+    after running the command, which would terminate the PHPUnit process.
 
 Logging Command Errors
 ----------------------
