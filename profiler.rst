@@ -367,6 +367,63 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
     with ``autoconfigure``, then Symfony will start using your data collector after the
     next page refresh. Otherwise, :ref:`enable the data collector by hand <data_collector_tag>`.
 
+Supporting a Disabled Profiler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 7.3
+
+    The ``profiler.is_disabled_state_checker`` service was introduced in Symfony 7.3.
+
+Some data collectors rely on a decorated traceable service to gather data.
+Because the profiler can be disabled at runtime, you should check its state
+inside the traceable service to avoid collecting data unnecessarily. Inject the
+``profiler.is_disabled_state_checker`` service to do this::
+
+    // src/Debug/TraceableService.php
+    namespace App\Debug;
+
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class TraceableService implements ServiceInterface
+    {
+        public function __construct(
+            private ServiceInterface $decoratedService,
+            protected readonly ?\Closure $disabled = null, // profiler.is_disabled_state_checker
+        ) {}
+
+        public function action(): array
+        {
+            if ($this->disabled?->__invoke()) {
+                return $this->decoratedService->action();
+            }
+
+            // gather data to be collected by your data collector
+            return [/* ... data ... */];
+        }
+    }
+
+    // src/DataCollector/ServiceCollector.php
+    namespace App\DataCollector;
+
+    use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class ServiceCollector extends AbstractDataCollector
+    {
+        public function __construct(
+            private ServiceInterface $service, // TraceableService
+        ) {}
+
+        public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
+        {
+            $this->data = [
+                'data' => $this->service->action(),
+            ];
+        }
+    }
+
 Adding Web Profiler Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
