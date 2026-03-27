@@ -730,10 +730,28 @@ traversing the object's properties::
 
 .. note::
 
-    ``DateTimeInterface`` objects are now handled as value objects internally.
-    The previous ``DateTimeToStringValueTransformer`` and
+    ``DateTimeInterface`` and ``DateInterval`` objects are handled as value objects
+    internally. The previous ``DateTimeToStringValueTransformer`` and
     ``StringToDateTimeValueTransformer`` are deprecated in favor of
     ``DateTimeValueObjectTransformer``.
+
+    ``DateInterval`` objects are serialized to ISO 8601 duration strings
+    (e.g. ``P2Y6M1DT12H30M5S``) and deserialized back using the
+    ``DateIntervalValueObjectTransformer``. You can customize the format
+    using the ``date_interval_format`` option::
+
+        use App\Dto\Task;
+        use Symfony\Component\TypeInfo\Type;
+
+        // ...
+
+        $json = $jsonStreamWriter->write($task, Type::object(Task::class), [
+            'date_interval_format' => 'P%yY%mM%dDT%hH%iM%sS',
+        ]);
+
+    .. versionadded:: 8.1
+
+        ``DateInterval`` value object support was introduced in Symfony 8.1.
 
 Configuring Keys and Values Dynamically
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
