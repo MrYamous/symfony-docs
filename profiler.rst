@@ -368,6 +368,64 @@ data serialization (during :ref:`kernel.terminate <component-http-kernel-kernel-
     with ``autoconfigure``, then Symfony will start using your data collector after the
     next page refresh. Otherwise, :ref:`enable the data collector by hand <data_collector_tag>`.
 
+.. warning::
+
+    It arrives that some data collector leverage some decorated underlying service (traceable service).
+    And as the profiler mechanism can be disabled, you may adapt your collector to handle such case
+    to avoid unwanted useless memory leak.
+    You can do so by injecting the ``profiler.is_disabled_state_checker`` service::
+
+    // src/Debug/TraceableService.php
+    namespace App\Debug;
+
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class TraceableService
+    {
+        public function __construct(
+            private ServiceInterface $decoratedService,
+            protected readonly ?\Closure $disabled = null, // profiler.is_disabled_state_checker
+        ) {}
+
+        public function action(): array
+        {
+            if ($this->disabled?->__invoke()) {
+                return $this->decoratedService->action();
+            }
+
+            // do the tracing job to gather/load/compute some data to be collected by your data collector...
+            return [/* heavy data */];
+        }
+    }
+
+    // src/DataCollector/ServiceCollector.php
+    namespace App\DataCollector;
+
+    use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+
+    class ServiceCollector extends AbstractDataCollector
+    {
+        public function __construct(
+            private ServiceInterface $service, // here we have TraceableService
+        ) {}
+
+        public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
+        {
+            $data = $this->service->action();
+
+            $this->data = [
+                'data' => $data,
+            ];
+        }
+    }
+
+.. versionadded:: 7.3
+
+    The ``profiler.is_disabled_state_checker`` service was introduced in Symfony 7.3.
+
 Adding Web Profiler Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
