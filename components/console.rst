@@ -72,22 +72,23 @@ Using a PSR Container
     The ``$container`` parameter of the ``Application`` class was introduced
     in Symfony 8.1.
 
-The ``Application`` class accepts an optional third argument: a PSR-11
-``ContainerInterface``. When provided, the application
-automatically wires several services from the container:
+The ``Application`` class accepts an optional third argument, a PSR-11
+``ContainerInterface``. When provided, the application automatically wires
+several services from the container:
 
-* ``event_dispatcher`` — sets the event dispatcher via ``setDispatcher()``
-* ``console.argument_resolver`` — sets the argument resolver via ``setArgumentResolver()``
-* ``console.command_loader`` — sets the command loader via ``setCommandLoader()``
-* ``console.command.ids`` — eagerly loads commands registered in the container
-* ``services_resetter`` — resets services after ``run()`` completes
+* ``event_dispatcher``: sets the event dispatcher via ``setDispatcher()``
+* ``console.argument_resolver``: sets the argument resolver via ``setArgumentResolver()``
+* ``console.command_loader``: sets the command loader via ``setCommandLoader()``
+* ``console.command.ids``: eagerly loads commands registered in the container
+* ``services_resetter``: resets services after ``run()`` completes
 
 When using Symfony's :class:`Symfony\\Component\\DependencyInjection\\ContainerInterface`,
 the ``kernel.environment`` and ``kernel.debug`` parameters are also displayed
 in the application's long version output.
 
-This allows you to build console applications with dependency injection without
-requiring HttpKernel or FrameworkBundle::
+This makes it possible to build console applications with dependency injection
+without requiring HttpKernel or FrameworkBundle. Passing no container preserves
+all existing behavior::
 
     #!/usr/bin/env php
     <?php
@@ -103,8 +104,6 @@ requiring HttpKernel or FrameworkBundle::
 
     $application = new Application('my-cli', '1.0', $container);
     $application->run();
-
-All existing behavior is preserved when no container is passed.
 
 Learn more
 ----------
