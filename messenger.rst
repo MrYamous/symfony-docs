@@ -839,7 +839,7 @@ the configuration:
                 ]);
         };
 
-.. caution::
+.. warning::
 
     ``x-max-priority`` cannot be changed on an existing RabbitMQ queue.
     Messenger will fail to auto-setup, and priorities won't work. Create a new
