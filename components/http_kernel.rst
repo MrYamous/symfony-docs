@@ -51,13 +51,14 @@ that system::
     namespace Symfony\Component\HttpKernel;
 
     use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
 
     interface HttpKernelInterface
     {
         // ...
 
         /**
-         * @return Response A Response instance
+         * @return a Response instance
          */
         public function handle(
             Request $request,
