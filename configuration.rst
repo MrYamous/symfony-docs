@@ -396,6 +396,22 @@ files directly in the ``config/packages/`` directory.
                 ],
             ],
 
+.. tip::
+
+    The optional :ref:`PHP configuration wrappers <service-container-configuration-wrappers>`
+    also work with environment-specific configuration::
+
+        // config/services.php
+        use Symfony\Config\ServicesConfig;
+
+        return [
+            'when@dev' => new ServicesConfig(
+                services: [
+                    'App\\' => ['resource' => '../src/', 'exclude' => '../src/{Entity,Kernel.php}'],
+                ],
+            ),
+        ];
+
 .. seealso::
 
     See the ``configureContainer()`` method of

@@ -77,9 +77,9 @@ the ``list()`` method of the ``BlogController`` class.
 .. warning::
 
     If you define multiple PHP classes in the same file, Symfony only loads the
-    routes of the first class and ignores all the other routes. The route
-    attribute always takes precedence over routes defined in YAML or PHP
-    files, so Symfony will always load the route attribute.
+    routes of the first class, ignoring all the other routes. The route attribute
+    always wins over routes defined in YAML or PHP files and Symfony will always
+    load the route attribute.
 
 The route name (``blog_list``) is not important for now, but it will be
 essential later when :ref:`generating URLs <routing-generating-urls>`. You only
@@ -129,6 +129,21 @@ the ``BlogController``:
                 // 'controller' => BlogController::class,
             ],
         ]);
+
+When using the PHP format, you can wrap your configuration arrays with
+:class:`Symfony\\Config\\RoutesConfig`. This wrapper, which is entirely optional,
+provides `psalm array-shape`_ type definitions that enable autocompletion and
+static analysis in IDEs::
+
+    // config/routes.php
+    use Symfony\Config\RoutesConfig;
+
+    return new RoutesConfig([
+        'controllers' => [
+            'resource' => '../src/Controller/',
+            'type' => 'attribute',
+        ],
+    ]);
 
 .. _routing-matching-http-methods:
 
@@ -2781,3 +2796,4 @@ Learn more about Routing
 .. _`PCRE Unicode properties`: https://www.php.net/manual/en/regexp.reference.unicode.php
 .. _`FOSJsRoutingBundle`: https://github.com/FriendsOfSymfony/FOSJsRoutingBundle
 .. _`backed enumerations`: https://www.php.net/manual/en/language.enumerations.backed.php
+.. _`psalm array-shape`: https://psalm.dev/docs/annotating_code/type_syntax/array_types/#array-shapes
