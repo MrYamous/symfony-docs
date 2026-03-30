@@ -133,7 +133,7 @@ Alternatively, the :class:`Symfony\\Component\\HttpClient\\HttpOptions` class
 brings most of the available options with type-hinted getters and setters::
 
     $this->client = $client->withOptions(
-        (new HttpOptions())
+        new HttpOptions()
             ->setBaseUri('https://...')
             // replaces *all* headers at once, and deletes the headers you do not provide
             ->setHeaders(['header-name' => 'header-value'])
@@ -1684,7 +1684,7 @@ You can also pass a set of default options to your client thanks to the
 
     use Symfony\Component\HttpClient\Psr18Client;
 
-    $client = (new Psr18Client())
+    $client = new Psr18Client()
         ->withOptions([
             'base_uri' => 'https://symfony.com',
             'headers' => [
@@ -1701,7 +1701,7 @@ You can also pass a set of default options to your client thanks to the
 You can use the ``auto_upgrade_http_version`` option to control whether the HTTP
 protocol version is automatically upgraded::
 
-    $client = (new Psr18Client())
+    $client = new Psr18Client()
         ->withOptions([
             // set to false to always use the HTTP version defined in your request;
             // set to true to allow the server to upgrade the HTTP version in its response
@@ -1807,7 +1807,7 @@ You can also pass a set of default options to your client thanks to the
     use Psr\Http\Message\ResponseInterface;
     use Symfony\Component\HttpClient\HttplugClient;
 
-    $httpClient = (new HttplugClient())
+    $httpClient = new HttplugClient()
         ->withOptions([
             'base_uri' => 'https://my.api.com',
         ]);

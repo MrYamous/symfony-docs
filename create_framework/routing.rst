@@ -223,6 +223,6 @@ generate absolute URLs::
 
         // $compiledRoutes is a plain PHP array that describes all routes in a performant data format
         // you can (and should) cache it, typically by exporting it to a PHP file
-        $compiledRoutes = (new CompiledUrlMatcherDumper($routes))->getCompiledRoutes();
+        $compiledRoutes = new CompiledUrlMatcherDumper($routes)->getCompiledRoutes();
 
         $matcher = new CompiledUrlMatcher($compiledRoutes, $context);

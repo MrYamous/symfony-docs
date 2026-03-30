@@ -138,7 +138,7 @@ escaping of keys and values, preventing syntax errors::
 
     use Symfony\Component\JsonPath\JsonPath;
 
-    $path = (new JsonPath())
+    $path = new JsonPath()
         ->key('store') // selects the 'store' key
         ->key('book')  // then the 'book' key
         ->index(1);    // then the second item (indexes start at 0)
@@ -155,20 +155,20 @@ methods to build your query:
   Adds a key selector. The key name is properly escaped::
 
       // creates the path '$["key\"with\"quotes"]'
-      $path = (new JsonPath())->key('key"with"quotes');
+      $path = new JsonPath()->key('key"with"quotes');
 
 * :method:`Symfony\\Component\\JsonPath\\JsonPath::deepScan`
   Adds the descendant operator ``..`` to perform a recursive search from the
   current point in the path::
 
       // get all prices in the store: '$["store"]..["price"]'
-      $path = (new JsonPath())->key('store')->deepScan()->key('price');
+      $path = new JsonPath()->key('store')->deepScan()->key('price');
 
 * :method:`Symfony\\Component\\JsonPath\\JsonPath::all`
   Adds the wildcard operator ``[*]`` to select all items in an array or object::
 
         // creates the path '$["store"]["book"][*]'
-        $path = (new JsonPath())->key('store')->key('book')->all();
+        $path = new JsonPath()->key('store')->key('book')->all();
 
 * :method:`Symfony\\Component\\JsonPath\\JsonPath::index`
   Adds an array index selector. Index numbers start at ``0``.
@@ -178,25 +178,25 @@ methods to build your query:
   Shortcuts for ``index(0)`` and ``index(-1)`` respectively::
 
       // get the last book: '$["store"]["book"][-1]'
-      $path = (new JsonPath())->key('store')->key('book')->last();
+      $path = new JsonPath()->key('store')->key('book')->last();
 
 * :method:`Symfony\\Component\\JsonPath\\JsonPath::slice`
   Adds an array slice selector ``[start:end:step]``::
 
       // get books from index 1 up to (but not including) index 3
       // creates the path '$["store"]["book"][1:3]'
-      $path = (new JsonPath())->key('store')->key('book')->slice(1, 3);
+      $path = new JsonPath()->key('store')->key('book')->slice(1, 3);
 
       // get every second book from the first four books
       // creates the path '$["store"]["book"][0:4:2]'
-      $path = (new JsonPath())->key('store')->key('book')->slice(0, 4, 2);
+      $path = new JsonPath()->key('store')->key('book')->slice(0, 4, 2);
 
 * :method:`Symfony\\Component\\JsonPath\\JsonPath::filter`
   Adds a filter expression. The expression string is the part that goes inside
   the ``?()`` syntax::
 
       // get expensive books: '$["store"]["book"][?(@.price > 20)]'
-      $path = (new JsonPath())
+      $path = new JsonPath()
           ->key('store')
           ->key('book')
           ->filter('@.price > 20');

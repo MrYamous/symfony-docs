@@ -803,7 +803,7 @@ As an alternate option, you can directly invoke the ``Dotenv`` class in your
 
     use Symfony\Component\Dotenv\Dotenv;
 
-    (new Dotenv())->bootEnv(dirname(__DIR__).'my/custom/path/to/.env');
+    new Dotenv()->bootEnv(dirname(__DIR__).'my/custom/path/to/.env');
 
 Symfony will then look for the environment variables in that file, but also in
 the local and environment-specific files (e.g. ``.*.local`` and

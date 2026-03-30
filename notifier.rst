@@ -271,7 +271,7 @@ send SMS messages::
         #[Route('/login/success')]
         public function loginSuccess(TexterInterface $texter): Response
         {
-            $options = (new ProviderOptions())
+            $options = new ProviderOptions()
                 ->setPriority('high')
             ;
 
@@ -435,7 +435,7 @@ you to send messages to chat services::
         #[Route('/checkout/thankyou')]
         public function thankyou(ChatterInterface $chatter): Response
         {
-            $message = (new ChatMessage('You got a new invoice for 15 EUR.'))
+            $message = new ChatMessage('You got a new invoice for 15 EUR.')
                 // if not set explicitly, the message is sent to the
                 // default transport (the first one configured)
                 ->transport('slack');
@@ -650,7 +650,7 @@ they may support features like custom sounds, icons, and more::
     use Symfony\Component\Notifier\Bridge\JoliNotif\JoliNotifOptions;
     // ...
 
-    $options = (new JoliNotifOptions())
+    $options = new JoliNotifOptions()
         ->setIconPath('/path/to/icons/error.png')
         ->setExtraOption('sound', 'sosumi')
         ->setExtraOption('url', 'https://example.com');
@@ -731,7 +731,7 @@ To send a notification, autowire the
 
             // Create a Notification that has to be sent
             // using the "email" channel
-            $notification = (new Notification('New Invoice', ['email']))
+            $notification = new Notification('New Invoice', ['email'])
                 ->content('You got a new invoice for 15 EUR.');
 
             // The receiver of the Notification
@@ -829,7 +829,7 @@ sent using the Slack transport::
         {
             // ...
 
-            $notification = (new Notification('New Invoice'))
+            $notification = new Notification('New Invoice')
                 ->content('You got a new invoice for 15 EUR.')
                 ->importance(Notification::IMPORTANCE_HIGH);
 
