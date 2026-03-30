@@ -546,7 +546,7 @@ and create an :class:`Symfony\\Component\\Mime\\Email` object::
         #[Route('/email')]
         public function sendEmail(MailerInterface $mailer): Response
         {
-            $email = (new Email())
+            $email = new Email()
                 ->from('hello@example.com')
                 ->to('you@example.com')
                 //->cc('cc@example.com')
@@ -579,7 +579,7 @@ both strings or address objects::
     // ...
     use Symfony\Component\Mime\Address;
 
-    $email = (new Email())
+    $email = new Email()
         // email address as a simple string
         ->from('fabien@example.com')
 
@@ -615,7 +615,7 @@ both strings or address objects::
 
 Use ``addTo()``, ``addCc()``, or ``addBcc()`` methods to add more addresses::
 
-    $email = (new Email())
+    $email = new Email()
         ->to('foo@example.com')
         ->addTo('bar@example.com')
         ->cc('cc@example.com')
@@ -628,7 +628,7 @@ Alternatively, you can pass multiple addresses to each method::
 
     $toAddresses = ['foo@example.com', new Address('bar@example.com')];
 
-    $email = (new Email())
+    $email = new Email()
         ->to(...$toAddresses)
         ->cc('cc1@example.com', 'cc2@example.com')
 
@@ -643,7 +643,7 @@ sets all the required headers automatically, but you can set your own headers
 too. There are different types of headers (Id header, Mailbox header, Date
 header, etc.) but most of the times you'll set text headers::
 
-    $email = (new Email())
+    $email = new Email()
         ->getHeaders()
             // this non-standard header tells compliant autoresponders ("email holiday mode")
             // to not reply to this message because it's an automated email
@@ -668,7 +668,7 @@ Message Contents
 The text and HTML contents of the email messages can be strings (usually the
 result of rendering some template) or PHP resources::
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         // simple contents defined as a string
         ->text('Lorem ipsum...')
@@ -695,7 +695,7 @@ file system::
     use Symfony\Component\Mime\Part\File;
     // ...
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         ->addPart(new DataPart(new File('/path/to/documents/terms-of-use.pdf')))
         // optionally you can tell email clients to display a custom name for the file
@@ -707,7 +707,7 @@ file system::
 Alternatively you can attach contents from a stream by passing it directly to
 the ``DataPart``::
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         ->addPart(new DataPart(fopen('/path/to/documents/contract.doc', 'r')))
     ;
@@ -723,7 +723,7 @@ the images are embedded automatically. Otherwise, you need to embed them manuall
 First, use the ``addPart()`` method to add an image from a
 file or stream::
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         // get the image contents from a PHP resource
         ->addPart((new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png'))->asInline())
@@ -737,7 +737,7 @@ The second optional argument of both methods is the image name ("Content-ID" in
 the MIME standard). Its value is an arbitrary string that must be unique in each
 email message and is used later to reference the images inside the HTML contents::
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         ->addPart((new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png'))->asInline())
         ->addPart((new DataPart(new File('/path/to/images/signature.gif'), 'footer-signature', 'image/gif'))->asInline())
@@ -757,7 +757,7 @@ method to define a custom Content-ID for the image and use it as its ``cid`` ref
     // according to the spec, the Content-ID value must include at least one '@' character
     $part->setContentId('footer-signature@my-app');
 
-    $email = (new Email())
+    $email = new Email()
         // ...
         ->addPart($part->asInline())
         ->html('... <img src="cid:footer-signature@my-app"> ...')
@@ -863,7 +863,7 @@ To access information about the sent email, update your code to replace the
     -    public function sendEmail(MailerInterface $mailer): Response
     +    public function sendEmail(TransportInterface $mailer): Response
          {
-             $email = (new Email())
+             $email = new Email()
                  // ...
 
              $sentEmail = $mailer->send($email);
@@ -921,7 +921,7 @@ for Twig templates::
 
     use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-    $email = (new TemplatedEmail())
+    $email = new TemplatedEmail()
         ->from('fabien@example.com')
         ->to(new Address('ryan@example.com'))
         ->subject('Thanks for signing up!')
@@ -989,7 +989,7 @@ the ``TemplatedEmail`` class:
 
     +use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-     $email = (new TemplatedEmail())
+     $email = new TemplatedEmail()
          // ...
 
          ->htmlTemplate('emails/signup.html.twig')
@@ -1286,7 +1286,7 @@ requires using both a certificate and a private key::
     use Symfony\Component\Mime\Crypto\SMimeSigner;
     use Symfony\Component\Mime\Email;
 
-    $email = (new Email())
+    $email = new Email()
         ->from('hello@example.com')
         // ...
         ->html('...');
@@ -1314,7 +1314,7 @@ key but not a certificate::
     use Symfony\Component\Mime\Crypto\DkimSigner;
     use Symfony\Component\Mime\Email;
 
-    $email = (new Email())
+    $email = new Email()
         ->from('hello@example.com')
         // ...
         ->html('...');
@@ -1395,7 +1395,7 @@ corresponding private key can read the original message contents::
     use Symfony\Component\Mime\Crypto\SMimeEncrypter;
     use Symfony\Component\Mime\Email;
 
-    $email = (new Email())
+    $email = new Email()
         ->from('hello@example.com')
         // ...
         ->html('...');
@@ -1407,11 +1407,11 @@ corresponding private key can read the original message contents::
 You can pass more than one certificate to the ``SMimeEncrypter`` constructor
 and it will select the appropriate certificate depending on the ``To`` option::
 
-    $firstEmail = (new Email())
+    $firstEmail = new Email()
         // ...
         ->to('jane@example.com');
 
-    $secondEmail = (new Email())
+    $secondEmail = new Email()
         // ...
         ->to('john@example.com');
 
@@ -1599,7 +1599,7 @@ render the email before calling ``$mailer->send($email)``::
 
     public function action(MailerInterface $mailer, BodyRendererInterface $bodyRenderer): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->htmlTemplate($template)
             ->context($context)
         ;
@@ -1717,7 +1717,7 @@ Here's an example of making one available to download::
         #[Route('/download-email')]
         public function __invoke(): Response
         {
-            $message = (new DraftEmail())
+            $message = new DraftEmail()
                 ->html($this->renderView(/* ... */))
                 ->addPart(/* ... */)
             ;
