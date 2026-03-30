@@ -515,7 +515,7 @@ domain names. As Panther saves the client in memory between tests to improve
 performance, you will have to run your tests in separate
 processes if you write several tests using Panther for different domain names.
 
-To do so, you can use the native ``@runInSeparateProcess`` PHPUnit annotation.
+To do so, you can use the native ``runInSeparateProcess`` PHPUnit attribute.
 Here is an example using the ``external_base_uri`` option to determine the
 domain name used by the client when using separate processes::
 
@@ -526,9 +526,7 @@ domain name used by the client when using separate processes::
 
     class FirstDomainTest extends PantherTestCase
     {
-        /**
-         * @runInSeparateProcess
-         */
+        #[RunInSeparateProcess]
         public function testMyApp(): void
         {
             $pantherClient = static::createPantherClient([
@@ -546,9 +544,7 @@ domain name used by the client when using separate processes::
 
     class SecondDomainTest extends PantherTestCase
     {
-        /**
-         * @runInSeparateProcess
-         */
+        #[RunInSeparateProcess]
         public function testMyApp(): void
         {
             $pantherClient = static::createPantherClient([
