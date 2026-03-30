@@ -78,62 +78,6 @@ readable. These are the main advantages and disadvantages of each format:
   arrays, and benefits from auto completion and static analysis using
   array shapes.
 
-When using the PHP format, you can wrap your configuration arrays with
-:class:`Symfony\\Config\\ServicesConfig` or :class:`Symfony\\Config\\RoutesConfig`.
-These wrappers are entirely optional but provide
-`psalm array-shape <https://psalm.dev/docs/annotating_code/type_syntax/array_types/#array-shapes>`_
-type definitions that enable autocompletion and static analysis in IDEs.
-
-For service configuration (``config/services.php``)::
-
-    // config/services.php
-    use App\Service\MyService;
-    use Symfony\Config\ServicesConfig;
-
-    return new ServicesConfig(
-        defaults: [
-            'autowire' => true,
-            'autoconfigure' => true,
-        ],
-        services: [
-            'App\\' => ['resource' => '../src/'],
-            MyService::class => null,
-        ],
-    );
-
-For routing configuration (``config/routes.php``)::
-
-    // config/routes.php
-    use Symfony\Config\RoutesConfig;
-
-    return new RoutesConfig([
-        'controllers' => [
-            'resource' => '../src/Controller/',
-            'type' => 'attribute',
-        ],
-    ]);
-
-.. tip::
-
-    The ``ServicesConfig`` constructor also accepts ``imports``, ``parameters``
-    and ``instanceof`` arguments. The ``_defaults`` and ``_instanceof`` keys
-    should not be included in the ``services`` array; use the dedicated
-    ``defaults`` and ``instanceof`` parameters instead.
-
-These wrappers also work with environment-specific configuration using
-``when@env``::
-
-    // config/services.php
-    use Symfony\Config\ServicesConfig;
-
-    return [
-        'when@dev' => new ServicesConfig(
-            services: [
-                'App\\' => ['resource' => '../src/', 'exclude' => '../src/{Entity,Kernel.php}'],
-            ],
-        ),
-    ];
-
 Importing Configuration Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -445,6 +389,22 @@ files directly in the ``config/packages/`` directory.
                     ],
                 ],
             ],
+
+.. tip::
+
+    The optional :ref:`PHP configuration wrappers <service-container-configuration-wrappers>`
+    also work with environment-specific configuration::
+
+        // config/services.php
+        use Symfony\Config\ServicesConfig;
+
+        return [
+            'when@dev' => new ServicesConfig(
+                services: [
+                    'App\\' => ['resource' => '../src/', 'exclude' => '../src/{Entity,Kernel.php}'],
+                ],
+            ),
+        ];
 
 .. seealso::
 
