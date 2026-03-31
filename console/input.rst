@@ -645,25 +645,6 @@ When the ``username`` argument is not provided, the user is prompted:
     Enter the username:
     > johndoe
 
-The ``#[Ask]`` attribute supports the following options:
-
-=============== ================================ ============ =============================================
-Option          Type                             Default      Description
-=============== ================================ ============ =============================================
-``question``    ``string``                       *(required)* The prompt text
-``default``     ``string|bool|int|float|null``   ``null``     Default value if user presses Enter
-``hidden``      ``bool``                         ``false``    Hide input (for passwords)
-``multiline``   ``bool``                         ``false``    Allow newlines in the response
-``trimmable``   ``bool``                         ``true``     Trim whitespace from the response
-``timeout``     ``int|null``                     ``null``     Max seconds to wait for an answer
-``normalizer``  ``callable|null``                ``null``     Normalize the input before validation
-``validator``   ``callable|null``                ``null``     Custom validator
-``maxAttempts`` ``int|null``                     ``null``     Max retry attempts (``null`` = unlimited)
-=============== ================================ ============ =============================================
-
-Asking for Hidden Input
-~~~~~~~~~~~~~~~~~~~~~~~
-
 Use the ``hidden`` option to mask the user's input (e.g. for passwords)::
 
     public function __invoke(
@@ -674,11 +655,9 @@ Use the ``hidden`` option to mask the user's input (e.g. for passwords)::
         // ...
     }
 
-Asking for Confirmation
-~~~~~~~~~~~~~~~~~~~~~~~
 
 When the parameter type is ``bool``, the ``#[Ask]`` attribute automatically
-uses a confirmation question::
+uses a yes/no confirmation question::
 
     public function __invoke(
         #[Argument]
@@ -687,6 +666,12 @@ uses a confirmation question::
     ): int {
         // ...
     }
+
+.. tip::
+
+    The ``#[Ask]`` attribute defines many options: ``timeout`` (int, default ``null``)
+    (set the max. seconds to wait for an answer), ``maxAttempts`` (int, default: ``null``,
+    means unlimited), ``multiline`` (bool, default: ``false`` to allow newlines in responses), etc.
 
 .. note::
 
@@ -799,10 +784,7 @@ logic related to the DTO's own properties::
         }
     }
 
-Execution Order
-~~~~~~~~~~~~~~~
-
-When both ``#[Ask]`` and ``#[Interact]`` are used, they are executed in the
+When both ``#[Ask]`` and ``#[Interact]`` are used, they run in the
 following order during the interactive phase:
 
 #. ``#[Ask]`` on ``__invoke()`` parameters
