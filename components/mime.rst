@@ -39,7 +39,7 @@ methods to compose the entire email message::
 
     use Symfony\Component\Mime\Email;
 
-    $email = (new Email())
+    $email = new Email()
         ->from('fabien@symfony.com')
         ->to('foo@example.com')
         ->cc('bar@example.com')
@@ -150,7 +150,7 @@ different parts of the email by hand::
     use Symfony\Component\Mime\Part\Multipart\AlternativePart;
     use Symfony\Component\Mime\Part\TextPart;
 
-    $headers = (new Headers())
+    $headers = new Headers()
         ->addMailboxListHeader('From', ['fabien@symfony.com'])
         ->addMailboxListHeader('To', ['foo@example.com'])
         ->addTextHeader('Subject', 'Important Notification')
@@ -193,7 +193,7 @@ Serializing Email Messages
 Email messages created with either the ``Email`` or ``Message`` classes can be
 serialized because they are simple data objects::
 
-    $email = (new Email())
+    $email = new Email()
         ->from('fabien@symfony.com')
         // ...
     ;

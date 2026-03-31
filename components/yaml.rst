@@ -507,7 +507,7 @@ Create a console application with ``lint:yaml`` as its only command::
     use Symfony\Component\Console\Application;
     use Symfony\Component\Yaml\Command\LintCommand;
 
-    (new Application('yaml/lint'))
+    new Application('yaml/lint')
         ->add(new LintCommand())
         ->getApplication()
         ->setDefaultCommand('lint:yaml', true)

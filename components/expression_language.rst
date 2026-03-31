@@ -249,7 +249,7 @@ method after parsing any expression to get its AST::
 
     use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-    $ast = (new ExpressionLanguage())
+    $ast = new ExpressionLanguage()
         ->parse('1 + 2', [])
         ->getNodes()
     ;
@@ -269,7 +269,7 @@ method to turn the AST into an array::
 
     // ...
 
-    $astAsArray = (new ExpressionLanguage())
+    $astAsArray = new ExpressionLanguage()
         ->parse('1 + 2', [])
         ->getNodes()
         ->toArray()

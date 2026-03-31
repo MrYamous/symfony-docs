@@ -511,7 +511,7 @@ made. To do that, you create a new class::
         {
             $happyMessage = $this->messageGenerator->getHappyMessage();
 
-            $email = (new Email())
+            $email = new Email()
                 ->from('admin@example.com')
                 ->to('manager@example.com')
                 ->subject('Site update just happened!')
@@ -582,7 +582,7 @@ example, suppose you want to make the admin email configurable:
           {
               // ...
 
-              $email = (new Email())
+              $email = new Email()
                   // ...
     -            ->to('manager@example.com')
     +            ->to($this->adminEmail)
