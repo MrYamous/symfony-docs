@@ -16,7 +16,9 @@ Command
 
 * :ref:`Argument <console-input-arguments>`
 * :ref:`AsCommand <console_creating-command>`
+* :ref:`Ask <console-interactive-input>`
 * :ref:`AskChoice <console-input-ask-choice>`
+* :ref:`Interact <console-interact-attribute>`
 * :ref:`MapInput <console-input-map-input>`
 * :ref:`Option <console-input-options>`
 
