@@ -1584,10 +1584,10 @@ You can log in a user programmatically using the ``login()`` method of the
             $security->login($user, 'form_login', 'other_firewall');
 
             // ... add badges...
-            $security->login($user, 'form_login', 'other_firewall', [(new RememberMeBadge())->enable()]);
+            $security->login($user, 'form_login', 'other_firewall', [new RememberMeBadge()->enable()]);
 
             // ... and also add passport attributes
-            $security->login($user, 'form_login', 'other_firewall', [(new RememberMeBadge())->enable()], ['referer' => 'https://oauth.example.com']);
+            $security->login($user, 'form_login', 'other_firewall', [new RememberMeBadge()->enable()], ['referer' => 'https://oauth.example.com']);
 
             // use the redirection logic applied to regular login
             $redirectResponse = $security->login($user);

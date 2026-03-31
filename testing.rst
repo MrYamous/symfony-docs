@@ -205,7 +205,7 @@ method::
         // ...
 
         // ensure a fresh cache when debug mode is disabled
-        (new \Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
+        new \Symfony\Component\Filesystem\Filesystem()->remove(__DIR__.'/../var/cache/test');
 
 Customizing Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

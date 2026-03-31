@@ -726,9 +726,9 @@ file or stream::
     $email = new Email()
         // ...
         // get the image contents from a PHP resource
-        ->addPart((new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png'))->asInline())
+        ->addPart(new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png')->asInline())
         // get the image contents from an existing file
-        ->addPart((new DataPart(new File('/path/to/images/signature.gif'), 'footer-signature', 'image/gif'))->asInline())
+        ->addPart(new DataPart(new File('/path/to/images/signature.gif'), 'footer-signature', 'image/gif')->asInline())
     ;
 
 Use the ``asInline()`` method to embed the content instead of attaching it.
@@ -739,8 +739,8 @@ email message and is used later to reference the images inside the HTML contents
 
     $email = new Email()
         // ...
-        ->addPart((new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png'))->asInline())
-        ->addPart((new DataPart(new File('/path/to/images/signature.gif'), 'footer-signature', 'image/gif'))->asInline())
+        ->addPart(new DataPart(fopen('/path/to/images/logo.png', 'r'), 'logo', 'image/png')->asInline())
+        ->addPart(new DataPart(new File('/path/to/images/signature.gif'), 'footer-signature', 'image/gif')->asInline())
 
         // reference images using the syntax 'cid:' + "image embed name"
         ->html('<img src="cid:logo"> ... <img src="cid:footer-signature"> ...')

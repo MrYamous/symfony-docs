@@ -3107,7 +3107,7 @@ using the ``DispatchAfterCurrentBusMiddleware`` and adding a
 
             $event = new UserRegistered($command->getUuid());
             $this->eventBus->dispatch(
-                (new Envelope($event))
+                new Envelope($event)
                     ->with(new DispatchAfterCurrentBusStamp())
             );
 

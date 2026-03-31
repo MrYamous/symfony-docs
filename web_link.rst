@@ -166,8 +166,8 @@ method::
         {
             $response = $this->sendEarlyHints([
                 new Link(rel: 'preconnect', href: 'https://fonts.google.com'),
-                (new Link(href: '/style.css'))->withAttribute('as', 'style'),
-                (new Link(href: '/script.js'))->withAttribute('as', 'script'),
+                new Link(href: '/style.css')->withAttribute('as', 'style'),
+                new Link(href: '/script.js')->withAttribute('as', 'script'),
             ]);
 
             // prepare the contents of the response...
@@ -200,7 +200,7 @@ must use to create the full response sent from the controller action.
             public function index(AssetMapperInterface $assetMapper): Response
             {
                 $response = $this->sendEarlyHints([
-                    (new Link(href: $assetMapper->getAsset('styles/app.css')->publicPath))
+                    new Link(href: $assetMapper->getAsset('styles/app.css')->publicPath)
                         ->withAttribute('as', 'style'),
                 ]);
 
@@ -263,12 +263,12 @@ You can also add links to the HTTP response directly from controllers and servic
         public function index(Request $request): Response
         {
             // using the addLink() shortcut provided by AbstractController
-            $this->addLink($request, (new Link('preload', '/app.css'))->withAttribute('as', 'style'));
+            $this->addLink($request, new Link('preload', '/app.css')->withAttribute('as', 'style'));
 
             // alternative if you don't want to use the addLink() shortcut
             $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
             $request->attributes->set('_links', $linkProvider->withLink(
-                (new Link('preload', '/app.css'))->withAttribute('as', 'style')
+                new Link('preload', '/app.css')->withAttribute('as', 'style')
             ));
 
             return $this->render('...');

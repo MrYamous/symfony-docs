@@ -133,7 +133,7 @@ through the transport layer, use the ``SerializerStamp`` stamp::
     use Symfony\Component\Messenger\Stamp\SerializerStamp;
 
     $bus->dispatch(
-        (new Envelope($message))->with(new SerializerStamp([
+        new Envelope($message)->with(new SerializerStamp([
             // groups are applied to the whole message, so make sure
             // to define the group for every embedded object
             'groups' => ['my_serialization_groups'],
@@ -269,7 +269,7 @@ you can create your own message sender::
             }
 
             $this->mailer->send(
-                (new Email())
+                new Email()
                     ->to($this->toEmail)
                     ->subject('Important action made')
                     ->html('<h1>Important action</h1><p>Made by '.$message->getUsername().'</p>')

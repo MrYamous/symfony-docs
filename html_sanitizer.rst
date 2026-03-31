@@ -65,7 +65,7 @@ automatically when type-hinting for
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $htmlSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())->allowSafeElements()
+            new HtmlSanitizerConfig()->allowSafeElements()
         );
 
         // unsafe HTML (e.g. from a WYSIWYG editor in the browser)
@@ -191,7 +191,7 @@ You can do this by defining a new HTML sanitizer in the configuration:
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 ->blockElement('h1')
         );
 
@@ -268,7 +268,7 @@ Safe elements
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // enable either of these
                 ->allowSafeElements()
                 ->allowStaticElements()
@@ -333,7 +333,7 @@ attributes from the `W3C Standard Proposal`_ are allowed.
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // allow the <article> element and 2 attributes
                 ->allowElement('article', ['class', 'data-attr'])
 
@@ -398,7 +398,7 @@ This can also be used to remove elements from the allow list.
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // remove <div>, but process the children
                 ->blockElement('div')
                 // remove <figure> and its children
@@ -457,7 +457,7 @@ on all elements allowed *before this setting*.
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // allow "src' on <iframe> elements
                 ->allowAttribute('src', ['iframe'])
 
@@ -522,7 +522,7 @@ This option allows you to disallow attributes that were allowed before.
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // allow the "data-attr" on all safe elements...
                 ->allowAttribute('data-attr', '*')
 
@@ -581,7 +581,7 @@ element (even if the original one didn't contain a ``rel`` attribute):
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 ->forceAttribute('a', 'rel', 'noopener noreferrer')
         );
 
@@ -657,7 +657,7 @@ URLs of ``<a>`` elements:
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // if `true`, all URLs using the `http://` scheme will be converted to
                 // use the `https://` scheme instead. `http` still needs to be
                 // allowed in `allowLinkSchemes`
@@ -746,7 +746,7 @@ the HTML sanitizer: ``src``, ``href``, ``lowsrc``, ``background`` and ``ping``.
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // if `true`, all URLs using the `http://` scheme will be converted to
                 // use the `https://` scheme instead. `http` still needs to be
                 // allowed in `allowMediaSchemes`
@@ -810,7 +810,7 @@ increase or decrease this limit:
         use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 // inputs longer (in characters) than this value will be truncated (default: 20000)
                 ->withMaxInputLength(20000)
         );
@@ -879,7 +879,7 @@ to enable it for an HTML sanitizer:
 
         $customAttributeSanitizer = new CustomAttributeSanitizer();
         $postSanitizer = new HtmlSanitizer(
-            (new HtmlSanitizerConfig())
+            new HtmlSanitizerConfig()
                 ->withAttributeSanitizer($customAttributeSanitizer)
 
                 // you can also disable previously enabled attribute sanitizers

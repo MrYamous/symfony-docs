@@ -54,7 +54,7 @@ their arguments and then use the object-oriented API to work with those strings:
 
     use Symfony\Component\String\UnicodeString;
 
-    $text = (new UnicodeString('This is a déjà-vu situation.'))
+    $text = new UnicodeString('This is a déjà-vu situation.')
         ->trimEnd('.')
         ->replace('déjà-vu', 'jamais-vu')
         ->append('!');
@@ -138,13 +138,13 @@ Methods to Transform String Objects
 Each string object can be transformed into the other two types of objects::
 
     $foo = ByteString::fromRandom(12)->toCodePointString();
-    $foo = (new CodePointString('hello'))->toUnicodeString();
+    $foo = new CodePointString('hello')->toUnicodeString();
     $foo = UnicodeString::fromCodePoints(0x68, 0x65, 0x6C, 0x6C, 0x6F)->toByteString();
 
     // the optional $toEncoding argument defines the encoding of the target string
-    $foo = (new CodePointString('hello'))->toByteString('Windows-1252');
+    $foo = new CodePointString('hello')->toByteString('Windows-1252');
     // the optional $fromEncoding argument defines the encoding of the original string
-    $foo = (new ByteString('さよなら'))->toCodePointString('ISO-2022-JP');
+    $foo = new ByteString('さよなら')->toCodePointString('ISO-2022-JP');
 
 If the conversion is not possible for any reason, you'll get an
 :class:`Symfony\\Component\\String\\Exception\\InvalidArgumentException`.
@@ -168,17 +168,17 @@ Methods Related to Length and Whitespace Characters
 
     // returns the number of graphemes, code points or bytes of the given string
     $word = 'नमस्ते';
-    (new ByteString($word))->length();      // 18 (bytes)
-    (new CodePointString($word))->length(); // 6 (code points)
-    (new UnicodeString($word))->length();   // 4 (graphemes)
+    new ByteString($word)->length();      // 18 (bytes)
+    new CodePointString($word)->length(); // 6 (code points)
+    new UnicodeString($word)->length();   // 4 (graphemes)
 
     // some symbols require double the width of others to represent them when using
     // a monospaced font (e.g. in a console). This method returns the total width
     // needed to represent the entire word
     $word = 'नमस्ते';
-    (new ByteString($word))->width();      // 18
-    (new CodePointString($word))->width(); // 4
-    (new UnicodeString($word))->width();   // 4
+    new ByteString($word)->width();      // 18
+    new CodePointString($word)->width(); // 4
+    new UnicodeString($word)->width();   // 4
     // if the text contains multiple lines, it returns the max width of all lines
     $text = "<<<END
     This is a

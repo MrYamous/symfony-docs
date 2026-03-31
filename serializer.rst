@@ -374,7 +374,7 @@ validation, and documentation of context options::
 
     use Symfony\Component\Serializer\Context\Normalizer\DateTimeNormalizerContextBuilder;
 
-    $contextBuilder = (new DateTimeNormalizerContextBuilder())
+    $contextBuilder = new DateTimeNormalizerContextBuilder()
         ->withFormat('Y-m-d H:i:s');
     $serializer->serialize($something, 'json', $contextBuilder->toArray());
 
@@ -389,11 +389,11 @@ complex (de)serialization context, you can chain them using the
         'custom_key' => 'custom_value',
     ];
 
-    $contextBuilder = (new ObjectNormalizerContextBuilder())
+    $contextBuilder = new ObjectNormalizerContextBuilder()
         ->withContext($initialContext)
         ->withGroups(['group1', 'group2']);
 
-    $contextBuilder = (new CsvEncoderContextBuilder())
+    $contextBuilder = new CsvEncoderContextBuilder()
         ->withContext($contextBuilder)
         ->withDelimiter(';');
 

@@ -379,7 +379,7 @@ Finally, the recurring messages has to be attached to a schedule::
     {
         public function getSchedule(): Schedule
         {
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     RecurringMessage::trigger(
                         new ExcludeHolidaysTrigger(
@@ -423,7 +423,7 @@ checks for messages to be generated::
     {
         public function getSchedule(): Schedule
         {
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     RecurringMessage::trigger(
                         new ExcludeHolidaysTrigger(
@@ -598,7 +598,7 @@ In your handler, you can check a condition and, if affirmative, access the
         {
             $this->removeOldReports = RecurringMessage::cron('3 8 * * 1', new CleanUpOldSalesReport());
 
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     // ...
                     $this->removeOldReports;
@@ -685,7 +685,7 @@ being transferred and processed by its handler::
         {
             $this->removeOldReports = RecurringMessage::cron('3 8 * * 1', new CleanUpOldSalesReport());
 
-            return $this->schedule ??= (new Schedule($this->dispatcher))
+            return $this->schedule ??= new Schedule($this->dispatcher)
                 ->with(
                     // ...
                 )
@@ -850,7 +850,7 @@ code::
 
     use Symfony\Component\Scheduler\Scheduler;
 
-    $schedule = (new Schedule())
+    $schedule = new Schedule()
         ->with(
             RecurringMessage::trigger(
                 new ExcludeHolidaysTrigger(
@@ -896,7 +896,7 @@ This enables dynamic control of scheduled tasks at runtime::
 
         public function getSchedule(): Schedule
         {
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     // ...
                 )
@@ -973,7 +973,7 @@ worker is restarted, it resumes from the point it left off::
         {
             $this->removeOldReports = RecurringMessage::cron('3 8 * * 1', new CleanUpOldSalesReport());
 
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     // ...
                 )
@@ -994,7 +994,7 @@ handle a message only once, you can use the ``processOnlyLastMissedRun`` option:
         {
             $this->removeOldReports = RecurringMessage::cron('3 8 * * 1', new CleanUpOldSalesReport());
 
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     // ...
                 )
@@ -1017,7 +1017,7 @@ same task running more than once::
         {
             $this->removeOldReports = RecurringMessage::cron('3 8 * * 1', new CleanUpOldSalesReport());
 
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     // ...
                 )
@@ -1044,7 +1044,7 @@ before being further redispatched to its corresponding handler::
     {
         public function getSchedule(): Schedule
         {
-            return $this->schedule ??= (new Schedule())
+            return $this->schedule ??= new Schedule()
                 ->with(
                     RecurringMessage::every('5 seconds', new RedispatchMessage(new Message(), 'async'))
                 );
