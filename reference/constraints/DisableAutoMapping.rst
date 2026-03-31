@@ -1,11 +1,11 @@
 DisableAutoMapping
 ==================
 
-This constraint allows you to disable :ref:`Doctrine's auto mapping <doctrine_auto-mapping>`
-on a class or a property. Automapping allows you to determine validation rules based
-on Doctrine's attributes. You may use this constraint when
-automapping is globally enabled, but you still want to disable this feature for
-a class or a property specifically.
+This constraint allows you to disable Doctrine's auto mapping (see
+`Doctrine configuration reference`_) on a class or a property. Automapping
+allows you to determine validation rules based on Doctrine's attributes. You
+may use this constraint when automapping is globally enabled, but you still
+want to disable this feature for a class or a property specifically.
 
 ==========  ===================================================================
 Applies to  :ref:`property or method <validation-property-target>`
@@ -88,3 +88,5 @@ Options
 The ``groups`` option is not available for this constraint.
 
 .. include:: /reference/constraints/_payload-option.rst.inc
+
+.. _`Doctrine configuration reference`: https://symfony.com/bundles/DoctrineBundle/current/configuration.html
