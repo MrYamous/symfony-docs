@@ -584,6 +584,206 @@ they are assigned to the DTO::
 With this setup, when the command input is resolved, the email is lowercased
 and trimmed, and roles are uppercased.
 
+.. _console-interactive-input:
+
+Interactive Input
+-----------------
+
+.. versionadded:: 7.4
+
+    The ``#[Ask]`` and ``#[Interact]`` attributes were introduced in Symfony 7.4.
+
+In :ref:`invokable commands <console_creating-command>`, you can use the
+:class:`Symfony\\Component\\Console\\Attribute\\Ask` attribute to prompt
+users for missing values during the interactive phase, without writing a
+custom ``interact()`` method.
+
+Asking for Simple Values
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add the ``#[Ask]`` attribute to an ``__invoke()`` parameter alongside
+``#[Argument]``::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\Ask;
+    use Symfony\Component\Console\Command\Command;
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        public function __invoke(
+            #[Argument]
+            #[Ask('Enter the username')]
+            string $username,
+        ): int {
+            // ...
+
+            return Command::SUCCESS;
+        }
+    }
+
+When the ``username`` argument is not provided, the user is prompted:
+
+.. code-block:: terminal
+
+    $ php bin/console app:create-user
+
+    Enter the username:
+    > johndoe
+
+Use the ``hidden`` option to mask the user's input (e.g. for passwords)::
+
+    public function __invoke(
+        #[Argument]
+        #[Ask('Enter the password', hidden: true)]
+        string $password,
+    ): int {
+        // ...
+    }
+
+
+When the parameter type is ``bool``, the ``#[Ask]`` attribute automatically
+uses a yes/no confirmation question::
+
+    public function __invoke(
+        #[Argument]
+        #[Ask('Do you want to activate the user?')]
+        bool $active,
+    ): int {
+        // ...
+    }
+
+.. tip::
+
+    The ``#[Ask]`` attribute defines many options: ``timeout`` (int, default ``null``)
+    (set the max. seconds to wait for an answer), ``maxAttempts`` (int, default: ``null``,
+    means unlimited), ``multiline`` (bool, default: ``false`` to allow newlines in responses), etc.
+
+.. note::
+
+    Interactive attributes (``#[Ask]``, ``#[Interact]``) can only be used
+    with required console arguments. Using them with options or optional
+    arguments is not supported and will raise an exception.
+
+Using ``#[Ask]`` on DTO Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``#[Ask]`` attribute also works on properties of
+:ref:`input DTOs <console-input-map-input>`::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\Ask;
+
+    class CreateUserInput
+    {
+        #[Argument]
+        #[Ask('Enter the username')]
+        public string $username;
+
+        #[Argument]
+        #[Ask('Enter the password', hidden: true)]
+        public string $password;
+    }
+
+Then use it in your command with ``#[MapInput]``::
+
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\MapInput;
+    use Symfony\Component\Console\Command\Command;
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        public function __invoke(#[MapInput] CreateUserInput $input): int
+        {
+            // use $input->username and $input->password
+
+            return Command::SUCCESS;
+        }
+    }
+
+.. _console-interact-attribute:
+
+Custom Interactive Logic with ``#[Interact]``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For scenarios that go beyond simple prompts, use the
+:class:`Symfony\\Component\\Console\\Attribute\\Interact` attribute to mark
+a method that will be called during the interactive phase::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\AsCommand;
+    use Symfony\Component\Console\Attribute\Ask;
+    use Symfony\Component\Console\Attribute\Interact;
+    use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Style\SymfonyStyle;
+
+    #[AsCommand(name: 'app:create-user')]
+    class CreateUserCommand
+    {
+        #[Interact]
+        public function prompt(SymfonyStyle $io): void
+        {
+            // custom interactive logic
+        }
+
+        public function __invoke(
+            #[Argument]
+            #[Ask('Enter the username')]
+            string $username,
+        ): int {
+            // ...
+
+            return Command::SUCCESS;
+        }
+    }
+
+The method marked with ``#[Interact]`` must be public and non-static. It
+supports the same dependency-injected parameters as ``__invoke()`` (e.g.
+``SymfonyStyle``, ``InputInterface``).
+
+You can also use ``#[Interact]`` on a DTO class to handle interaction
+logic related to the DTO's own properties::
+
+    use Symfony\Component\Console\Attribute\Argument;
+    use Symfony\Component\Console\Attribute\Ask;
+    use Symfony\Component\Console\Attribute\Interact;
+    use Symfony\Component\Console\Style\SymfonyStyle;
+
+    class CreateUserInput
+    {
+        #[Argument]
+        #[Ask('Enter the username')]
+        public string $username;
+
+        #[Argument]
+        #[Ask('Enter the password (or press Enter for a random one)', hidden: true)]
+        public string $password;
+
+        #[Interact]
+        public function prompt(SymfonyStyle $io): void
+        {
+            if (!isset($this->password)) {
+                $this->password = bin2hex(random_bytes(10));
+                $io->writeln('Password generated: '.$this->password);
+            }
+        }
+    }
+
+When both ``#[Ask]`` and ``#[Interact]`` are used, they run in the
+following order during the interactive phase:
+
+#. ``#[Ask]`` on ``__invoke()`` parameters
+#. ``#[Ask]`` on DTO properties
+#. ``#[Interact]`` on the DTO class
+#. ``#[Interact]`` on the command class
+
+.. note::
+
+    Interactive prompts only run when the command is executed in interactive
+    mode. They are skipped when using the ``--no-interaction`` (``-n``) option.
+
 Options with optional arguments
 -------------------------------
 
