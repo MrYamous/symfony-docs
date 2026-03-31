@@ -486,6 +486,31 @@ as arguments of other services:
             ],
         ]);
 
+.. note::
+
+    In XML service definitions, collection argument keys can use the ``key-type``
+    attribute to specify how the key value is interpreted. The supported types
+    are ``constant`` (resolves the key as a PHP constant) and ``binary``
+    (decodes the key from a base64-encoded string):
+
+    .. code-block:: xml
+
+        <!-- config/services.xml -->
+        <service id="App\Service\SomeService">
+            <argument type="collection">
+                <!-- key resolved as the value of PHP_INT_MAX constant -->
+                <argument key-type="constant" key="PHP_INT_MAX">Value 1</argument>
+                <!-- key used as a literal string 'PHP_INT_MAX' -->
+                <argument key="PHP_INT_MAX">Value 2</argument>
+                <!-- key decoded from base64 to binary string -->
+                <argument key-type="binary" key="AQID">Value 3</argument>
+            </argument>
+        </service>
+
+    .. versionadded:: 7.2
+
+        The ``key-type`` attribute for XML service argument keys was introduced in Symfony 7.2.
+
 Handling Multiple Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
