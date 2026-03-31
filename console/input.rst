@@ -589,10 +589,6 @@ and trimmed, and roles are uppercased.
 Interactive Input
 -----------------
 
-.. versionadded:: 7.4
-
-    The ``#[Ask]`` and ``#[Interact]`` attributes were introduced in Symfony 7.4.
-
 In :ref:`invokable commands <console_creating-command>`, you can use the
 :class:`Symfony\\Component\\Console\\Attribute\\Ask` attribute to prompt
 users for missing values during the interactive phase, without writing a
