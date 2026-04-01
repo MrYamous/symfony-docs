@@ -357,6 +357,8 @@ By default, only the RFC 4122 format is accepted.
     The ``$format`` parameter of the :method:`Symfony\\Component\\Uid\\Uuid::isValid`
     method and the related constants were introduced in Symfony 7.2.
 
+.. _uid-uuid-doctrine:
+
 Storing UUIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -616,6 +618,8 @@ ULID objects created with the ``Ulid`` class can use the following methods::
     $ulid1->equals($ulid2); // false
     // this method returns $ulid1 <=> $ulid2
     $ulid1->compare($ulid2); // e.g. int(-1)
+
+.. _uid-ulid-doctrine:
 
 Storing ULIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
