@@ -222,12 +222,6 @@ the ``#[ORM\Column(...)]`` comments that you see above each property:
 The ``make:entity`` command is a tool to make life easier. But this is *your* code:
 add/remove fields, add/remove methods or update configuration.
 
-Doctrine supports a wide variety of field types, each with their own options.
-Check out the `list of Doctrine mapping types`_ in the Doctrine documentation.
-If you want to use XML instead of attributes, add ``type: xml`` and
-``dir: '%kernel.project_dir%/config/doctrine'`` to the entity mappings in your
-``config/packages/doctrine.yaml`` file.
-
 .. warning::
 
     Be careful not to use reserved SQL keywords as your table or column names
@@ -235,6 +229,118 @@ If you want to use XML instead of attributes, add ``type: xml`` and
     for details on how to escape these. Or, change the table name with
     ``#[ORM\Table(name: 'groups')]`` above the class or configure the column name with
     the ``name: 'group_name'`` option.
+
+Entity Field Types
+~~~~~~~~~~~~~~~~~~
+
+Doctrine supports a wide variety of **field types** (numbers, strings, enums,
+binary, dates, JSON, etc.), each with their own options. Check out the
+`list of Doctrine mapping types`_ in the Doctrine documentation.
+
+Symfony also provides the following **additional field types**:
+
+``uuid``
+........
+
+**Class:** :class:`Symfony\\Bridge\\Doctrine\\Types\\UuidType`
+
+Stores a :doc:`UUID </components/uid>` as a native GUID type if available, or
+as a 16-byte binary otherwise::
+
+    // src/Entity/Product.php
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Bridge\Doctrine\Types\UuidType;
+    use Symfony\Component\Uid\Uuid;
+
+    #[ORM\Entity]
+    class Product
+    {
+        #[ORM\Column(type: UuidType::NAME)]
+        private Uuid $sku;
+
+        // ...
+    }
+
+See :ref:`Storing UUIDs in Databases <uid-uuid-doctrine>` in the UID component
+documentation for more details, including how to use UUIDs as primary keys.
+
+``ulid``
+........
+
+**Class:** :class:`Symfony\\Bridge\\Doctrine\\Types\\UlidType`
+
+Stores a :ref:`ULID <ulid>` as a native GUID type if available, or as a
+16-byte binary otherwise::
+
+    // src/Entity/Product.php
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Bridge\Doctrine\Types\UlidType;
+    use Symfony\Component\Uid\Ulid;
+
+    #[ORM\Entity]
+    class Product
+    {
+        #[ORM\Column(type: UlidType::NAME)]
+        private Ulid $identifier;
+
+        // ...
+    }
+
+See :ref:`Storing ULIDs in Databases <uid-ulid-doctrine>` in the UID component
+documentation for more details, including how to use ULIDs as primary keys.
+
+DatePoint Types
+...............
+
+These types allow storing :class:`Symfony\\Component\\Clock\\DatePoint` objects
+from the :doc:`Clock component </components/clock>`. They convert to/from
+``DatePoint`` objects automatically.
+
+====================  ==========================  =========================================================
+Type                  Extends Doctrine type       Class
+====================  ==========================  =========================================================
+``date_point``        ``datetime_immutable``      :class:`Symfony\\Bridge\\Doctrine\\Types\\DatePointType`
+``day_point``         ``date_immutable``          :class:`Symfony\\Bridge\\Doctrine\\Types\\DayPointType`
+``time_point``        ``time_immutable``          :class:`Symfony\\Bridge\\Doctrine\\Types\\TimePointType`
+====================  ==========================  =========================================================
+
+Example usage::
+
+    // src/Entity/Product.php
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+    use Symfony\Component\Clock\DatePoint;
+
+    #[ORM\Entity]
+    class Product
+    {
+        // Symfony autodetects the 'date_point' type when type-hinting with DatePoint
+        #[ORM\Column]
+        private DatePoint $createdAt;
+
+        // you can also set the type explicitly
+        #[ORM\Column(type: 'date_point')]
+        private DatePoint $updatedAt;
+
+        #[ORM\Column(type: 'day_point')]
+        public DatePoint $releaseDate;
+
+        #[ORM\Column(type: 'time_point')]
+        public DatePoint $openingTime;
+
+        // ...
+    }
+
+.. tip::
+
+    Use ``date_point`` when you want to work with :class:`Symfony\\Component\\Clock\\DatePoint`
+    objects, which makes your code easier to test with the :doc:`Clock component </components/clock>`.
+    Use ``datetime_immutable`` if you don't need the Clock component features.
 
 .. _doctrine-creating-the-database-tables-schema:
 

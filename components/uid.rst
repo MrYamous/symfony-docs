@@ -305,6 +305,8 @@ The following constants are available:
 You can also use the ``Uuid::FORMAT_ALL`` constant to accept any UUID format.
 By default, only the RFC 4122 format is accepted.
 
+.. _uid-uuid-doctrine:
+
 Storing UUIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -564,6 +566,8 @@ ULID objects created with the ``Ulid`` class can use the following methods::
     $ulid1->equals($ulid2); // false
     // this method returns $ulid1 <=> $ulid2
     $ulid1->compare($ulid2); // e.g. int(-1)
+
+.. _uid-ulid-doctrine:
 
 Storing ULIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
