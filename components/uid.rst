@@ -368,6 +368,8 @@ By default, only the RFC 4122 format is accepted.
         The ``$invalidValue`` property on ``InvalidArgumentException``
         was introduced in Symfony 8.1.
 
+.. _uid-uuid-doctrine:
+
 Storing UUIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -637,6 +639,8 @@ ULID objects created with the ``Ulid`` class can use the following methods::
 .. versionadded:: 8.1
 
     Support for validating ULIDs in different formats was introduced in Symfony 8.1.
+
+.. _uid-ulid-doctrine:
 
 Storing ULIDs in Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
