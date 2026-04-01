@@ -30,11 +30,6 @@ Format Specifications
 * :doc:`ICU MessageFormat </reference/formats/message_format>`
 * :doc:`Expression Language </reference/formats/expression_language>`
 
-Doctrine
---------
-
-* :doc:`Doctrine Field Types Reference </reference/doctrine_field_types>`
-
 Others
 ------
 
