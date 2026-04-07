@@ -514,7 +514,7 @@ in container parameters <service-container-parameters>`:
         return static function (TwigConfig $twig): void {
             // ...
 
-            $twig->global('uuid')->value(service('App\Generator\UuidGenerator'));
+            $twig->global('uuid')->value('@App\Generator\UuidGenerator');
         };
 
 Now you can use the ``uuid`` variable in any Twig template to access to the
