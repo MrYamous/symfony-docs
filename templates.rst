@@ -448,7 +448,7 @@ variable:
             'twig' => [
                 // ...
                 'globals' => [
-                    'uuid' => service('App\Generator\UuidGenerator'),
+                    'uuid' => '@App\Generator\UuidGenerator',
                 ],
             ],
         ]);
