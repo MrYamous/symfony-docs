@@ -36,10 +36,7 @@ between all of the rows in your user table:
         namespace App\Entity;
 
         use Doctrine\ORM\Mapping as ORM;
-
-        // DON'T forget the following use statement!!!
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
         use Symfony\Component\Validator\Constraints as Assert;
 
         #[ORM\Entity]
@@ -85,9 +82,7 @@ between all of the rows in your user table:
         // src/Entity/User.php
         namespace App\Entity;
 
-        // DON'T forget the following use statement!!!
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
         use Symfony\Component\Validator\Constraints as Assert;
 
         class User
@@ -147,6 +142,115 @@ between all of the rows in your user table:
     This constraint cannot deal with duplicates found in a collection of items
     that haven't been persisted as entities yet. You'll need to create your own
     validator to handle that case.
+
+.. _reference-constraints-unique-entity-php-class:
+
+Using a PHP class
+-----------------
+
+Instead of applying the ``UniqueEntity`` constraint directly to a Doctrine
+entity, you can apply it to any PHP class (such as a DTO) and use the
+`entityClass`_ option to specify which Doctrine entity table to check against.
+
+Consider the following Doctrine entity::
+
+    // src/Entity/User.php
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+
+    #[ORM\Entity]
+    class User
+    {
+        #[ORM\Id]
+        #[ORM\GeneratedValue]
+        #[ORM\Column]
+        public int $id;
+
+        #[ORM\Column]
+        public string $email;
+
+        // ...
+    }
+
+You can check for uniqueness in a DTO that creates ``User`` entities by
+defining the following:
+
+.. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Dto/UserDto.php
+        namespace App\Dto;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Constraints as Assert;
+
+        #[UniqueEntity(
+            fields: 'email',
+            entityClass: User::class,
+        )]
+        class UserDto
+        {
+            #[Assert\Email]
+            public ?string $email = null;
+        }
+
+    .. code-block:: yaml
+
+        # config/validator/validation.yaml
+        App\Dto\UserDto:
+            constraints:
+                - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+                    fields: email
+                    entityClass: App\Entity\User
+            properties:
+                email:
+                    - Email: ~
+
+    .. code-block:: xml
+
+        <!-- config/validator/validation.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+            <class name="App\Dto\UserDto">
+                <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+                    <option name="fields">email</option>
+                    <option name="entityClass">App\Entity\User</option>
+                </constraint>
+                <property name="email">
+                    <constraint name="Email"/>
+                </property>
+            </class>
+        </constraint-mapping>
+
+    .. code-block:: php
+
+        // src/Dto/UserDto.php
+        namespace App\Dto;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Constraints as Assert;
+
+        class UserDto
+        {
+            public ?string $email = null;
+
+            public static function loadValidatorMetadata(ClassMetadata $metadata): void
+            {
+                $metadata->addConstraint(new UniqueEntity(
+                    fields: 'email',
+                    entityClass: User::class,
+                ));
+
+                $metadata->addPropertyConstraint('email', new Assert\Email());
+            }
+        }
 
 Options
 -------
@@ -283,42 +387,47 @@ If you need to require two fields to be individually unique (e.g. a unique
 ``email`` and a unique ``username``), you use two ``UniqueEntity`` entries,
 each with a single field.
 
-When the validated object is not an entity (i.e. ``entityClass`` is set and
-the object itself is not a Doctrine-managed entity), if any property names
-on the validated object differ from those on the entity, pass a key-value
-array where each key is the object property name and the value is the
-corresponding entity property name:
+When :ref:`using a PHP class <reference-constraints-unique-entity-php-class>`
+(i.e. ``entityClass`` is set and the object itself is not a Doctrine-managed entity),
+if any property names on the validated object differ from those on the entity,
+pass a key-value array where each key is the object property name and the value
+is the corresponding entity property name:
 
 .. configuration-block::
 
     .. code-block:: php-attributes
 
-        // src/Message/CreateUser.php
-        namespace App\Message;
+        // src/Dto/UserDto.php
+        namespace App\Dto;
 
         use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Constraints as Assert;
 
         #[UniqueEntity(
-            // 'name' is the property on this class; 'username' is the property on User
-            fields: ['name' => 'username'],
+            // 'userIdentifier' is the field name in the PHP class and
+            // 'email' is the field name in the Doctrine entity
+            fields: ['userIdentifier' => 'email'],
             entityClass: User::class,
         )]
-        class CreateUser
+        class UserDto
         {
-            public function __construct(public string $name)
-            {
-            }
+            // ...
+
+            public ?string $userIdentifier = null;
         }
 
     .. code-block:: yaml
 
         # config/validator/validation.yaml
-        App\Message\CreateUser:
+        App\Dto\UserDto:
             constraints:
                 - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
-                    fields: { name: username }
-                    entityClass: 'App\Entity\User'
+                    # 'userIdentifier' is the field name in the PHP class and
+                    # 'email' is the field name in the Doctrine entity
+                    fields: {'userIdentifier': 'email'}
+                    entityClass: App\Entity\User
+            # ...
 
     .. code-block:: xml
 
@@ -328,35 +437,43 @@ corresponding entity property name:
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-            <class name="App\Message\CreateUser">
+            <class name="App\Dto\UserDto">
                 <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
                     <option name="fields">
-                        <value key="name">username</value>
+                        <!--
+                            'userIdentifier' is the field name in the PHP class and
+                            'email' is the field name in the Doctrine entity
+                        -->
+                        <value key="userIdentifier">email</value>
                     </option>
                     <option name="entityClass">App\Entity\User</option>
                 </constraint>
+                <!-- ... -->
             </class>
         </constraint-mapping>
 
     .. code-block:: php
 
-        // src/Message/CreateUser.php
-        namespace App\Message;
+        // src/Dto/UserDto.php
+        namespace App\Dto;
 
         use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-        use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-        class CreateUser
+        class UserDto
         {
-            public string $name;
+            public string $userIdentifier;
 
             public static function loadValidatorMetadata(ClassMetadata $metadata): void
             {
                 $metadata->addConstraint(new UniqueEntity(
-                    fields: ['name' => 'username'],
+                    // 'userIdentifier' is the field name in the PHP class and
+                    // 'email' is the field name in the Doctrine entity
+                    fields: ['userIdentifier' => 'email'],
                     entityClass: User::class,
                 ));
+
+                // ...
             }
         }
 
@@ -367,15 +484,96 @@ corresponding entity property name:
 
 **type**: ``array`` | ``string``
 
-When the validated object is not a Doctrine entity and represents an update
-operation on an existing entity, use this option to specify which properties
-of the object hold the entity's primary key (or composite key). The validator
-uses these to identify the entity being updated and avoid a false uniqueness
-violation when the only conflicting record is the entity itself.
+When :ref:`using a PHP class <reference-constraints-unique-entity-php-class>` to
+update an existing entity, use this option to specify the field (or fields) that
+identify the corresponding Doctrine entity (defined via the ``entityClass`` option).
+The matching entity is then excluded from the uniqueness check, so its own values
+do not trigger a violation.
 
-If the identifier property names on the validated object differ from those on
-the entity, pass a key-value array where each key is the object property name
-and the value is the corresponding entity property name.
+.. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Dto/UserDto.php
+        namespace App\Dto;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+        #[UniqueEntity(
+            fields: 'email',
+            entityClass: User::class,
+            // 'id' is the name of the Doctrine entity field used as the primary key
+            identifierFieldNames: ['id']
+        )]
+        class UserDto
+        {
+            public int $id;
+
+            public string $email;
+        }
+
+    .. code-block:: yaml
+
+        # config/validator/validation.yaml
+        App\Dto\UserDto:
+            constraints:
+                - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+                    fields: 'email'
+                    entityClass: 'App\Entity\User'
+                    # 'id' is the name of the Doctrine entity field used as the primary key
+                    identifierFieldNames: ['id']
+            properties:
+                # ...
+
+    .. code-block:: xml
+
+        <!-- config/validator/validation.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+            <class name="App\Dto\UserDto">
+                <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+                    <option name="fields">email</option>
+                    <option name="entityClass">App\Entity\User</option>
+                    <!-- 'id' is the name of the Doctrine entity field used as the primary key -->
+                    <option name="identifierFieldNames">id</option>
+                </constraint>
+                <!-- ... -->
+            </class>
+        </constraint-mapping>
+
+    .. code-block:: php
+
+        // src/Dto/UserDto.php
+        namespace App\Dto;
+
+        use App\Entity\User;
+        use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+        class UserDto
+        {
+            public int $id;
+
+            public string $email;
+
+            public static function loadValidatorMetadata(ClassMetadata $metadata)
+            {
+                $metadata->addConstraint(new UniqueEntity([
+                    'fields' => 'email',
+                    'entityClass' => User::class,
+                    // 'id' is the name of the Doctrine entity field used as the primary key
+                    'identifierFieldNames' => ['id']
+                ]));
+
+                // ...
+            }
+        }
+
+If the identifier field name in the PHP class differs from the one in the
+entity, you can map them using a key-value pair.
 
 Consider the following Doctrine entity::
 
