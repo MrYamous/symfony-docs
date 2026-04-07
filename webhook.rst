@@ -218,9 +218,9 @@ The ``doParse()`` method receives the request and the secret. You should:
 Testing Your Parser
 ...................
 
-Test your custom parser by extending :class:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest`.
-This base class runs :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::testParse`
-with data from :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getPayloads`,
+Test your custom parser by extending :class:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase`.
+This base class runs :method:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase::testParse`
+with data from :method:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase::getPayloads`,
 which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expectation file::
 
     // tests/Webhook/AcmeWebhookRequestParserTest.php
@@ -228,9 +228,9 @@ which loads files from ``Fixtures/*.json`` and pairs each with a ``.php`` expect
 
     use App\Webhook\AcmeWebhookRequestParser;
     use Symfony\Component\HttpFoundation\Request;
-    use Symfony\Component\Webhook\Client\Tests\AbstractRequestParserTest;
+    use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-    class AcmeWebhookRequestParserTest extends AbstractRequestParserTest
+    class AcmeWebhookRequestParserTest extends AbstractRequestParserTestCase
     {
         protected function createRequestParser(): AcmeWebhookRequestParser
         {
@@ -276,15 +276,15 @@ and::
         ]
     );
 
-Your test must implement :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::createRequestParser`
+Your test must implement :method:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase::createRequestParser`
 to return an instance of your :class:`Symfony\\Component\\Webhook\\Client\\RequestParserInterface`
 implementation.
 
 You can also override the following methods in your test:
 
-* :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getSecret`
+* :method:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase::getSecret`
   if your parser validates signatures
-* :method:`Symfony\\Component\\Webhook\\Client\\Tests\\AbstractRequestParserTest::getFixtureExtension`
+* :method:`Symfony\\Component\\Webhook\\Test\\AbstractRequestParserTestCase::getFixtureExtension`
   if your fixtures are not ``.json`` (e.g., ``.txt`` for form-encoded payloads)
 
 Handling Complex Payload Transformations
