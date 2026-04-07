@@ -617,6 +617,63 @@ from the OpenID Connect Discovery), and configure the ``discovery`` option:
             ],
         ]);
 
+By default, when using OpenID Connect Discovery, only keys explicitly designated
+for signature verification (i.e. keys with ``"use": "sig"`` or ``"key_ops"``
+containing ``"sign"`` or ``"verify"`` per `RFC 7517`_) are accepted. If your
+identity provider serves keys without any usage designation (no ``use`` or
+``key_ops`` field), you can disable this strict filtering by setting the
+``enforce_key_usage_verification`` option to ``false``:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        security:
+            firewalls:
+                main:
+                    access_token:
+                        token_handler:
+                            oidc:
+                                # ...
+                                discovery:
+                                    base_uri: https://www.example.com/realms/demo/
+                                    cache:
+                                        id: cache.app
+                                    enforce_key_usage_verification: false
+
+    .. code-block:: php
+
+        return App::config([
+            'security' => [
+                'firewalls' => [
+                    'main' => [
+                        'access_token' => [
+                            'token_handler' => [
+                                'oidc' => [
+                                    // ...
+                                    'discovery' => [
+                                        'base_uri' => 'https://www.example.com/realms/demo/',
+                                        'cache' => [
+                                            'id' => 'cache.app',
+                                        ],
+                                        'enforce_key_usage_verification' => false,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+When disabled, keys are still filtered: those explicitly marked for encryption
+only (``"use": "enc"`` or ``"key_ops"`` containing only encryption operations)
+are excluded. Keys without any usage designation are included.
+
+.. versionadded:: 8.1
+
+    The ``enforce_key_usage_verification`` option was introduced in Symfony 8.1.
+
 Following the `OpenID Connect Specification`_, the ``sub`` claim is used by
 default as user identifier. To use another claim, specify it on the
 configuration:
@@ -931,6 +988,7 @@ for :ref:`stateless firewalls <reference-security-stateless>`.
 .. _`OpenID Connect (OIDC)`: https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC)
 .. _`OpenID Connect Specification`: https://openid.net/specs/openid-connect-core-1_0.html
 .. _`OpenID Connect Discovery`: https://openid.net/specs/openid-connect-discovery-1_0.html
+.. _`RFC 7517`: https://datatracker.ietf.org/doc/html/rfc7517
 .. _`RFC6750`: https://datatracker.ietf.org/doc/html/rfc6750
 .. _`SAML2 (XML structures)`: https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html
 .. _`key operation flags`: https://www.iana.org/assignments/jose/jose.xhtml#web-key-operations
