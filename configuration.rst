@@ -1172,35 +1172,28 @@ use the ``getParameter()`` helper::
         }
     }
 
-In services and controllers not extending from ``AbstractController``, inject
-the parameters as arguments of their constructors. The recommended way is to
-use the ``#[Autowire]`` attribute::
-
-    // src/Service/MessageGenerator.php
-    namespace App\Service;
-
-    use Symfony\Component\DependencyInjection\Attribute\Autowire;
-
-    class MessageGenerator
-    {
-        public function __construct(
-            #[Autowire(param: 'app.contents_dir')]
-            private string $contentsDir,
-        ) {
-        }
-
-        // ...
-    }
-
-.. seealso::
-
-    Read the :ref:`#[Autowire] attribute documentation <autowire-attribute>`
-    for more details on injecting parameters, expressions, environment
-    variables and more.
-
-Alternatively, you can inject parameters using the service configuration:
+In services and controllers not extending ``AbstractController``, inject the
+parameters as arguments of their constructors:
 
 .. configuration-block::
+
+    .. code-block:: php-attributes
+
+        // src/Service/MessageGenerator.php
+        namespace App\Service;
+
+        use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+        class MessageGenerator
+        {
+            public function __construct(
+                #[Autowire(param: 'app.contents_dir')]
+                private string $contentsDir,
+            ) {
+            }
+
+            // ...
+        }
 
     .. code-block:: yaml
 
@@ -1248,6 +1241,8 @@ Alternatively, you can inject parameters using the service configuration:
                 ->get(MessageGenerator::class)
                     ->arg('$contentsDir', '%app.contents_dir%');
         };
+
+The recommended way is to use the :ref:`#[Autowire] attribute <autowire-attribute>`.
 
 If you inject the same parameters over and over again, use the
 ``services._defaults.bind`` option instead. The arguments defined in that option are
