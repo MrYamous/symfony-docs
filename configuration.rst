@@ -1173,9 +1173,32 @@ use the ``getParameter()`` helper::
     }
 
 In services and controllers not extending from ``AbstractController``, inject
-the parameters as arguments of their constructors. You must inject them
-explicitly because :doc:`service autowiring </service_container/autowiring>`
-doesn't work for parameters:
+the parameters as arguments of their constructors. The recommended way is to
+use the ``#[Autowire]`` attribute::
+
+    // src/Service/MessageGenerator.php
+    namespace App\Service;
+
+    use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+    class MessageGenerator
+    {
+        public function __construct(
+            #[Autowire(param: 'app.contents_dir')]
+            private string $contentsDir,
+        ) {
+        }
+
+        // ...
+    }
+
+.. seealso::
+
+    Read the :ref:`#[Autowire] attribute documentation <autowire-attribute>`
+    for more details on injecting parameters, expressions, environment
+    variables and more.
+
+Alternatively, you can inject parameters using the service configuration:
 
 .. configuration-block::
 
