@@ -82,12 +82,15 @@ between all of the rows in your user table:
         // src/Entity/User.php
         namespace App\Entity;
 
+        use Doctrine\ORM\Mapping as ORM;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         use Symfony\Component\Validator\Constraints as Assert;
+        use Symfony\Component\Validator\Mapping\ClassMetadata;
 
         class User
         {
-            // ...
+            #[ORM\Column(name: 'email', type: 'string', length: 255, unique: true)]
+            protected string $email;
 
             public static function loadValidatorMetadata(ClassMetadata $metadata): void
             {
@@ -102,9 +105,10 @@ between all of the rows in your user table:
         // src/Form/Type/UserType.php
         namespace App\Form\Type;
 
-        // ...
-        // DON'T forget the following use statement!!!
+        use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Form\AbstractType;
+        use Symfony\Component\OptionsResolver\OptionsResolver;
 
         class UserType extends AbstractType
         {
@@ -384,7 +388,7 @@ the combination value is unique (e.g. two users could have the same email,
 as long as they don't have the same name also).
 
 If you need to require two fields to be individually unique (e.g. a unique
-``email`` and a unique ``username``), you use two ``UniqueEntity`` entries,
+``email`` and a unique ``username``), you must use two ``UniqueEntity`` entries,
 each with a single field.
 
 When :ref:`using a PHP class <reference-constraints-unique-entity-php-class>`
@@ -459,6 +463,7 @@ is the corresponding entity property name:
 
         use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+        use Symfony\Component\Validator\Mapping\ClassMetadata;
 
         class UserDto
         {
@@ -482,7 +487,7 @@ is the corresponding entity property name:
 ``identifierFieldNames``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-**type**: ``array`` | ``string``
+**type**: ``array`` **default**: ``[]``
 
 When :ref:`using a PHP class <reference-constraints-unique-entity-php-class>` to
 update an existing entity, use this option to specify the field (or fields) that
@@ -601,10 +606,11 @@ You can configure the ``UniqueEntity`` constraint as follows:
         // src/Message/UpdateEmployeeProfile.php
         namespace App\Message;
 
+        use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
         #[UniqueEntity(
-            entityClass: 'App\Entity\User',
+            entityClass: User::class,
             // 'name' maps to 'username' on the User entity
             fields: ['name' => 'username'],
             // 'uid' holds the entity's primary key, mapped to 'id' on User
@@ -656,6 +662,7 @@ You can configure the ``UniqueEntity`` constraint as follows:
         // src/Message/UpdateEmployeeProfile.php
         namespace App\Message;
 
+        use App\Entity\User;
         use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -668,11 +675,15 @@ You can configure the ``UniqueEntity`` constraint as follows:
             {
                 $metadata->addConstraint(new UniqueEntity([
                     'fields' => ['name' => 'username'],
-                    'entityClass' => 'App\Entity\User',
+                    'entityClass' => User::class,
                     'identifierFieldNames' => ['uid' => 'id'],
                 ]));
             }
         }
+
+.. note::
+
+    This option has no effect when the constraint is applied to an entity.
 
 ``ignoreNull``
 ~~~~~~~~~~~~~~
@@ -757,7 +768,7 @@ this option to specify one or more fields to only ignore ``null`` values on them
 
 .. warning::
 
-    If you ``ignoreNull`` on fields that are part of a unique index in your
+    If you set ``ignoreNull`` on fields that are part of a unique index in your
     database, you might see insertion errors when your application attempts to
     persist entities that the ``UniqueEntity`` constraint considers valid.
 
