@@ -64,7 +64,13 @@ Topics
 Components
 ----------
 
-Read the :doc:`Components </components/>` documentation.
+Symfony provides a set of decoupled and reusable PHP components that can be
+used independently in any project:
+
+.. toctree::
+    :maxdepth: 1
+
+    components/index
 
 Reference Documents
 -------------------
