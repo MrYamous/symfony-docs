@@ -232,6 +232,26 @@ same hierarchy)::
 class and property names, typically producing a smaller payload than
 ``serialize($value)`` itself.
 
+The ``toArray()`` method exports the cloner state as a pure array (only scalars
+and nested arrays, no objects), making it suitable for any encoder that handles
+plain PHP arrays (``json_encode()``, ``var_export()``, etc.). Use ``fromArray()``
+to restore the cloner from a previously exported array::
+
+    use Symfony\Component\VarExporter\DeepCloner;
+
+    $cloner = new DeepCloner($originalObject);
+
+    // export to a pure array
+    $data = $cloner->toArray();
+
+    // store as JSON, in a cache, or as a PHP array file
+    file_put_contents('cloner.json', json_encode($data));
+
+    // later, restore the cloner and produce clones without re-analyzing the object graph
+    $data = json_decode(file_get_contents('cloner.json'), true);
+    $cloner = DeepCloner::fromArray($data);
+    $clone = $cloner->clone();
+
 Creating Lazy Objects
 ---------------------
 
