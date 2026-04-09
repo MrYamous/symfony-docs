@@ -231,35 +231,6 @@ each time you ask for it.
     If you'd prefer to manually wire your service, you can
     :ref:`use explicit configuration <services-explicitly-configure-wire-services>`.
 
-.. _service-container-configuration-wrappers:
-
-When using the PHP format, you can wrap your configuration arrays with
-:class:`Symfony\\Config\\ServicesConfig`. This wrapper, which is entirely optional,
-provides `psalm array-shape`_ type definitions that enable autocompletion and
-static analysis in IDEs::
-
-    // config/services.php
-    use App\Service\MyService;
-    use Symfony\Config\ServicesConfig;
-
-    return new ServicesConfig(
-        defaults: [
-            'autowire' => true,
-            'autoconfigure' => true,
-        ],
-        services: [
-            'App\\' => ['resource' => '../src/'],
-            MyService::class => null,
-        ],
-    );
-
-.. tip::
-
-    The ``ServicesConfig`` constructor also accepts ``imports``, ``parameters``
-    and ``instanceof`` arguments. The ``_defaults`` and ``_instanceof`` keys
-    should not be included in the ``services`` array; use the dedicated
-    ``defaults`` and ``instanceof`` parameters instead.
-
 .. _service-container_limiting-to-env:
 
 Limiting Services to a specific Symfony Environment
@@ -1453,4 +1424,3 @@ Learn more
 
 .. _`glob pattern`: https://en.wikipedia.org/wiki/Glob_(programming)
 .. _`Symfony Fundamentals screencast series`: https://symfonycasts.com/screencast/symfony-fundamentals
-.. _`psalm array-shape`: https://psalm.dev/docs/annotating_code/type_syntax/array_types/#array-shapes
