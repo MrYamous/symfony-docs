@@ -252,6 +252,10 @@ to restore the cloner from a previously exported array::
     $cloner = DeepCloner::fromArray($data);
     $clone = $cloner->clone();
 
+.. versionadded:: 8.1
+
+    The ``toArray()`` and ``fromArray()`` methods were introduced in Symfony 8.1.
+
 Creating Lazy Objects
 ---------------------
 
