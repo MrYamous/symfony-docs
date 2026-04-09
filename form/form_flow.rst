@@ -167,14 +167,14 @@ Navigation is handled via special submit button types:
 * ``ResetFlowType``: clears all stored data and returns to the first step
 
 Symfony provides a default navigator that includes previous, next, and
-finish buttons:
+finish buttons::
 
     use Symfony\Component\Form\Flow\Type\NavigatorFlowType;
 
     $builder->add('navigator', NavigatorFlowType::class);
 
 Buttons are automatically shown or hidden depending on the current step.
-To also include a reset button, use the ``with_reset`` option:
+To also include a reset button, use the ``with_reset`` option::
 
     $builder->add('navigator', NavigatorFlowType::class, [
         'with_reset' => true,
