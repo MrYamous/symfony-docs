@@ -351,6 +351,8 @@ The following options are supported by the ``SymfonyRuntime``:
     To tell Dotenv to set env vars using ``putenv()`` (NOT RECOMMENDED).
 ``prod_envs`` (default: ``["prod"]``)
     To define the names of the production envs.
+``project_dir`` (default: ``null``)
+    To define the project directory relative to the parent directory of your ``composer.json`` file.
 ``test_envs`` (default: ``["test"]``)
     To define the names of the test envs.
 
