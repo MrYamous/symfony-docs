@@ -356,6 +356,10 @@ The following options are supported by the ``SymfonyRuntime``:
 ``test_envs`` (default: ``["test"]``)
     To define the names of the test envs.
 
+.. versionadded:: 7.4
+
+    The ``project_dir`` option was introduced in Symfony 7.4.
+
 Besides these, the ``GenericRuntime`` and ``SymfonyRuntime`` also support
 these options:
 
