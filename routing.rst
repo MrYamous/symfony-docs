@@ -130,21 +130,6 @@ the ``BlogController``:
             ],
         ]);
 
-When using the PHP format, you can wrap your configuration arrays with
-:class:`Symfony\\Config\\RoutesConfig`. This wrapper, which is entirely optional,
-provides `psalm array-shape`_ type definitions that enable autocompletion and
-static analysis in IDEs::
-
-    // config/routes.php
-    use Symfony\Config\RoutesConfig;
-
-    return new RoutesConfig([
-        'controllers' => [
-            'resource' => '../src/Controller/',
-            'type' => 'attribute',
-        ],
-    ]);
-
 .. _routing-matching-http-methods:
 
 Matching HTTP Methods
@@ -2788,4 +2773,3 @@ Learn more about Routing
 .. _`PCRE Unicode properties`: https://www.php.net/manual/en/regexp.reference.unicode.php
 .. _`FOSJsRoutingBundle`: https://github.com/FriendsOfSymfony/FOSJsRoutingBundle
 .. _`backed enumerations`: https://www.php.net/manual/en/language.enumerations.backed.php
-.. _`psalm array-shape`: https://psalm.dev/docs/annotating_code/type_syntax/array_types/#array-shapes
