@@ -161,8 +161,8 @@ Type Information
 ~~~~~~~~~~~~~~~~
 
 Extractors that implement :class:`Symfony\\Component\\PropertyInfo\\PropertyTypeExtractorInterface`
-provide :ref:`extensive data type information <components-property-info-type>`
-for a property::
+provide :doc:`extensive data type information <components/type_info>` for a
+property::
 
     $types = $propertyInfo->getType($class, $property);
     /*
@@ -177,7 +177,7 @@ for a property::
             }
     */
 
-See :ref:`components-property-info-type` for info about the ``Type`` class.
+See :doc:`TypeInfo component <components/type_info>` for info about the ``Type`` class.
 
 .. deprecated:: 7.3
 
@@ -557,7 +557,7 @@ on the constructor arguments::
     use Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor;
 
     $constructorExtractor = new ConstructorExtractor([new ReflectionExtractor()]);
-    (string) $constructorExtractor->getType(Foo::class, 'bar')[0]; // returns 'string'
+    $constructorExtractor->getType(Foo::class, 'bar')[0]; // returns a Type object
 
 .. _`components-property-information-extractors-creation`:
 
