@@ -168,14 +168,13 @@ for a property::
     /*
         Example Result
         --------------
-        class Symfony\Component\TypeInfo\Type (6) {
-            private $builtinType          => string(6) "string"
-            private $nullable             => bool(false)
-            private $class                => NULL
-            private $collection           => bool(false)
-            private $collectionKeyType    => NULL
-            private $collectionValueType  => NULL
-        }
+            NullableType {
+                - type: BuiltinType(string)
+                - types: [
+                    BuiltinType(null),
+                    BuiltinType(string),
+                ]
+            }
     */
 
 See :ref:`components-property-info-type` for info about the ``Type`` class.
@@ -282,21 +281,11 @@ given property name.
 Type Objects
 ------------
 
-Compared to the other extractors, type information extractors provide much
-more information than can be represented as simple scalar values. Because
-of this, type extractors return an array of :class:`Symfony\\Component\\TypeInfo\\Type`
-objects for each type that the property supports.
+.. deprecated:: 7.3
 
-For example, if a property supports both ``integer`` and ``string`` (via
-the ``@return int|string`` annotation),
-:method:`PropertyInfoExtractor::getType() <Symfony\\Component\\PropertyInfo\\PropertyInfoExtractor::getType>`
-will return an instance of the :class:`Symfony\\Component\\TypeInfo\\Type` class.
-
-.. note::
-
-    Most extractors will return only one :class:`Symfony\\Component\\TypeInfo\\Type`
-    instance. The :class:`Symfony\\Component\\PropertyInfo\\Extractor\\PhpDocExtractor`
-    is currently the only extractor that returns multiple instances in the array.
+    The :class:`Symfony\\Component\\PropertyInfo\\Type` class is
+    deprecated since Symfony 7.3. Use the :class:`Symfony\\Component\\TypeInfo\\Type`
+    class instead.
 
 Each object will provide 6 attributes, available in the 6 methods:
 
@@ -305,18 +294,15 @@ Each object will provide 6 attributes, available in the 6 methods:
 ``Type::getBuiltInType()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::getBuiltinType() <Symfony\\Component\\TypeInfo\\Type::getBuiltinType>`
+The :method:`Type::getBuiltinType() <Symfony\\Component\\PropertyInfo\\Type::getBuiltinType>`
 method returns the built-in PHP data type, which can be one of these
 string values: ``array``, ``bool``, ``callable``, ``float``, ``int``,
 ``iterable``, ``null``, ``object``, ``resource`` or ``string``.
 
-Constants inside the :class:`Symfony\\Component\\TypeInfo\\Type`
-class, in the form ``Type::BUILTIN_TYPE_*``, are provided for convenience.
-
 ``Type::isNullable()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::isNullable() <Symfony\\Component\\TypeInfo\\Type::isNullable>`
+The :method:`Type::isNullable() <Symfony\\Component\\PropertyInfo\\Type::isNullable>`
 method will return a boolean value indicating whether the property parameter
 can be set to ``null``.
 
@@ -324,13 +310,13 @@ can be set to ``null``.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the :ref:`built-in PHP data type <components-property-info-type-builtin>`
-is ``object``, the :method:`Type::getClassName() <Symfony\\Component\\TypeInfo\\Type::getClassName>`
+is ``object``, the :method:`Type::getClassName() <Symfony\\Component\\PropertyInfo\\Type::getClassName>`
 method will return the fully-qualified class or interface name accepted.
 
 ``Type::isCollection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :method:`Type::isCollection() <Symfony\\Component\\TypeInfo\\Type::isCollection>`
+The :method:`Type::isCollection() <Symfony\\Component\\PropertyInfo\\Type::isCollection>`
 method will return a boolean value indicating if the property parameter is
 a collection - a non-scalar value capable of containing other values. Currently
 this returns ``true`` if:
@@ -348,8 +334,8 @@ this returns ``true`` if:
 
 If the property is a collection, additional type objects may be returned
 for both the key and value types of the collection (if the information is
-available), via the :method:`Type::getCollectionKeyTypes() <Symfony\\Component\\TypeInfo\\Type::getCollectionKeyTypes>`
-and :method:`Type::getCollectionValueTypes() <Symfony\\Component\\TypeInfo\\Type::getCollectionValueTypes>`
+available), via the :method:`Type::getCollectionKeyTypes() <Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyTypes>`
+and :method:`Type::getCollectionValueTypes() <Symfony\\Component\\PropertyInfo\\Type::getCollectionValueTypes>`
 methods.
 
 .. note::
