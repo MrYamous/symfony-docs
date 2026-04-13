@@ -159,8 +159,8 @@ The easiest way is using the maker command:
 
 .. tip::
 
-    Starting in `MakerBundle`_ ``v1.58.0``, the ``make:webhook`` command generates
-    both the parser and consumer classes and updates your configuration automatically.
+    The ``make:webhook`` command generates both the parser and consumer classes
+    and updates your configuration automatically.
 
 When extending :class:`Symfony\\Component\\Webhook\\Client\\AbstractRequestParser`,
 you need to implement two methods:
@@ -664,5 +664,4 @@ For advanced use cases, you can implement custom sending logic using
 :class:`Symfony\\Component\\Webhook\\Server\\TransportInterface` to control
 header generation, signing, and HTTP transport.
 
-.. _`MakerBundle`: https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html
 .. _`Webhook Component for Email Events screencast`: https://symfonycasts.com/screencast/mailtrap/email-event-webhook
