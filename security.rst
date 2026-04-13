@@ -211,10 +211,10 @@ from the `MakerBundle`_:
 
 .. tip::
 
-    Starting in `MakerBundle`_: v1.57.0 - You can pass either ``--with-uuid`` or
-    ``--with-ulid`` to ``make:user``. Leveraging Symfony's :doc:`Uid Component </components/uid>`,
-    this generates a ``User`` entity with the ``id`` type as :ref:`Uuid <uuid>`
-    or :ref:`Ulid <ulid>` instead of ``int``.
+    You can pass either ``--with-uuid`` or ``--with-ulid`` to ``make:user``.
+    Leveraging Symfony's :doc:`Uid Component </components/uid>`, this
+    generates a ``User`` entity with the ``id`` type as :ref:`Uuid <uuid>` or
+    :ref:`Ulid <ulid>` instead of ``int``.
 
 If your user is a Doctrine entity, like in the example above, don't forget
 to create the tables by :ref:`creating and running a migration <doctrine-creating-the-database-tables-schema>`:
@@ -226,8 +226,8 @@ to create the tables by :ref:`creating and running a migration <doctrine-creatin
 
 .. tip::
 
-    Starting in `MakerBundle`_: v1.56.0 - Passing ``--formatted`` to ``make:migration``
-    generates a nice and tidy migration file.
+    Passing ``--formatted`` to ``make:migration`` generates a nice and tidy
+    migration file.
 
 .. _where-do-users-come-from-user-providers:
 .. _security-user-providers:

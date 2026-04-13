@@ -23,7 +23,7 @@ Installing Doctrine
 -------------------
 
 First, install Doctrine support via the ``orm`` :ref:`Symfony pack <symfony-packs>`,
-as well as the MakerBundle, which will help generate some code:
+as well as the `MakerBundle`_, which will help generate some code:
 
 .. code-block:: terminal
 
@@ -184,14 +184,10 @@ Whoa! You now have a new ``src/Entity/Product.php`` file::
 
 .. tip::
 
-    Starting in `MakerBundle`_: v1.57.0 - You can pass either ``--with-uuid`` or
-    ``--with-ulid`` to ``make:entity``. Leveraging Symfony's :doc:`Uid Component </components/uid>`,
-    this generates an entity with the ``id`` type as :ref:`Uuid <uuid>`
-    or :ref:`Ulid <ulid>` instead of ``int``.
-
-.. note::
-
-    Starting in v1.44.0 - `MakerBundle`_: only supports entities using PHP attributes.
+    You can pass either ``--with-uuid`` or ``--with-ulid`` to ``make:entity``.
+    Leveraging Symfony's :doc:`Uid Component </components/uid>`, this generates
+    an entity with the ``id`` type as :ref:`Uuid <uuid>` or :ref:`Ulid <ulid>`
+    instead of ``int``.
 
 .. note::
 
@@ -358,8 +354,8 @@ already installed:
 
 .. tip::
 
-    Starting in `MakerBundle`_: v1.56.0 - Passing ``--formatted`` to ``make:migration``
-    generates a nice and tidy migration file.
+    Passing ``--formatted`` to ``make:migration`` generates a nice and tidy
+    migration file.
 
 If everything worked, you should see something like this:
 
