@@ -767,10 +767,9 @@ reload the next page (even if that page doesn't use this service).
 
 .. tip::
 
-    Instead of configuring scalar arguments in YAML/XML, you can use the
-    ``#[Autowire]`` attribute directly in your class to inject parameters,
-    environment variables, expressions and even specific services. See
-    :ref:`autowire-attribute` for details.
+    In addition to configuring scalar arguments in YAML/XML, you can use
+    :ref:`the #[Autowire] attribute <autowire-attribute>` to inject them
+    directly into the services that need them.
 
 .. _service-container-parameters:
 
@@ -1272,8 +1271,8 @@ able to type-hint arguments in the ``__construct()`` method of your services and
 the container will automatically pass you the correct arguments. This entire entry
 has been written around autowiring.
 
-For more details, check out :doc:`/service_container/autowiring`, which covers
-how autowiring works, how to handle
+For more details, check out :doc:`service autowiring documentation </service_container/autowiring>`,
+which covers how autowiring works, how to handle
 :ref:`multiple implementations of the same type <autowiring-multiple-implementations-same-type>`,
 the :ref:`#[Autowire] attribute <autowire-attribute>` for non-service
 arguments, and :ref:`generating closures <autowiring_closures>` from services.
