@@ -1290,6 +1290,8 @@ which authenticates them.
 
 You can learn all about this authenticator in :doc:`/security/access_token`.
 
+.. _security-x509-client-certificates:
+
 X.509 Client Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1419,6 +1421,8 @@ ways:
 You can customize the name of some parameters under the ``x509`` key.
 See :ref:`the x509 configuration reference <reference-security-firewall-x509>`
 for more details.
+
+.. _security-remote-users:
 
 Remote Users
 ~~~~~~~~~~~~
