@@ -344,7 +344,8 @@ placeholders are not enough. For example, you might need to adjust a message:
 * based on a count: *"There is one apple"* vs *"There are 5 apples"*
 * based on gender: *"He accepted the invitation"* vs *"She accepted the invitation"*
   vs *"They accepted the invitation"*
-* based on the user's locale: *"Published at Jan 25, 2026"* vs *"Published at 25 January 2026"*
+* based on the user's locale: e.g. different date formats, such as
+  *"Published on January 25, 2026"* (English) vs *"Publicado el 25 de Enero de 2026"* (Spanish)
 
 Symfony handles all these cases through the :doc:`ICU MessageFormat </reference/formats/message_format>`
 syntax, using PHP's :phpclass:`MessageFormatter` class. ICU placeholders use ``{name}``
