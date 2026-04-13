@@ -43,6 +43,8 @@ service's class or interface name. Want to :doc:`log </logging>` something? No p
         }
     }
 
+.. _services-debug-container-types:
+
 What other services are available? Find out by running:
 
 .. code-block:: terminal
@@ -371,28 +373,10 @@ suggestion.
 By the way, this method of adding dependencies to your ``__construct()`` method is
 called *dependency injection*.
 
-.. _services-debug-container-types:
-
 How should you know to use ``LoggerInterface`` for the type-hint? You can either
-read the docs for whatever feature you're using, or get a list of autowireable
-type-hints by running:
-
-.. code-block:: terminal
-
-    $ php bin/console debug:autowiring
-
-      # this is just a *small* sample of the output...
-
-      Describes a logger instance.
-      Psr\Log\LoggerInterface - alias:monolog.logger
-
-      Request stack that controls the lifecycle of requests.
-      Symfony\Component\HttpFoundation\RequestStack - alias:request_stack
-
-      RouterInterface is the interface that all Router classes must implement.
-      Symfony\Component\Routing\RouterInterface - alias:router.default
-
-      [...]
+read the docs for whatever feature you're using, or use the ``debug:autowiring``
+command :ref:`shown earlier <services-debug-container-types>` to get a list of
+all autowireable type-hints in your application.
 
 In addition to injecting services, you can also pass scalar values and collections
 as arguments of other services:
@@ -615,6 +599,12 @@ But, isn't this fragile? Fortunately, no! If you rename the ``$adminEmail`` argu
 to something else - e.g. ``$mainEmail`` - you will get a clear exception when you
 reload the next page (even if that page doesn't use this service).
 
+.. tip::
+
+    In addition to configuring scalar arguments in YAML/XML, you can use
+    :ref:`the #[Autowire] attribute <autowire-attribute>` to inject them
+    directly into the services that need them.
+
 .. _service-container-parameters:
 
 Service Parameters
@@ -735,6 +725,13 @@ But, you can control this and pass in a different logger:
 
 This tells the container that the ``$logger`` argument to ``__construct`` should use
 service whose id is ``monolog.logger.request``.
+
+.. tip::
+
+    If you need to choose between multiple implementations of the same type
+    across your application, you can use
+    :ref:`named autowiring aliases <autowiring-multiple-implementations-same-type>`
+    instead of manually wiring each injection point.
 
 For a list of possible logger services that can be used with autowiring, run:
 
@@ -983,7 +980,11 @@ able to type-hint arguments in the ``__construct()`` method of your services and
 the container will automatically pass you the correct arguments. This entire entry
 has been written around autowiring.
 
-For more details about autowiring, check out :doc:`/service_container/autowiring`.
+For more details, check out :doc:`service autowiring documentation </service_container/autowiring>`,
+which covers how autowiring works, how to handle
+:ref:`multiple implementations of the same type <autowiring-multiple-implementations-same-type>`,
+the :ref:`#[Autowire] attribute <autowire-attribute>` for non-service
+arguments, and :ref:`generating closures <autowiring_closures>` from services.
 
 .. _services-autoconfigure:
 
