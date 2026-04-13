@@ -601,7 +601,7 @@ reload the next page (even if that page doesn't use this service).
 
 .. tip::
 
-    In addition to configuring scalar arguments in YAML/XML, you can use
+    In addition to configuring scalar arguments in YAML, you can use
     :ref:`the #[Autowire] attribute <autowire-attribute>` to inject them
     directly into the services that need them.
 
