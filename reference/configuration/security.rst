@@ -13,24 +13,6 @@ key in your application configuration.
     # displays the actual config values used by your application
     $ php bin/console debug:config security
 
-**Basic Options**:
-
-* `access_denied_url`_
-* `expose_security_errors`_
-* `session_fixation_strategy`_
-
-**Advanced Options**:
-
-Some of these options define tens of sub-options and they are explained in
-separate articles:
-
-* `access_decision_manager`_
-* `access_control`_
-* `password_hashers`_
-* `firewalls`_
-* `providers`_
-* `role_hierarchy`_
-
 access_denied_url
 -----------------
 
@@ -133,7 +115,7 @@ authorization decisions (e.g. when ``is_granted()`` is called):
     voters, see :doc:`/security/voters`.
 
 strategy
-........
+~~~~~~~~
 
 **type**: ``string`` **default**: ``affirmative``
 
@@ -141,7 +123,7 @@ Defines the strategy used by the access decision manager to decide whether
 access should be granted. Read about :ref:`all the available strategies <security-voters-change-strategy>`.
 
 allow_if_all_abstain
-....................
+~~~~~~~~~~~~~~~~~~~~
 
 **type**: ``boolean`` **default**: ``false``
 
@@ -150,7 +132,7 @@ abstain (no voter explicitly grants or denies access). If ``false``
 (the default), access is denied when all voters abstain.
 
 allow_if_equal_granted_denied
-.............................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **type**: ``boolean`` **default**: ``true``
 
@@ -160,7 +142,7 @@ voters denying access, this option determines the final decision. If ``true``
 (the default), access is granted in case of a tie.
 
 service
-.......
+~~~~~~~
 
 **type**: ``string`` **default**: ``null``
 
@@ -172,7 +154,7 @@ When this option is set, the ``strategy``, ``allow_if_all_abstain`` and
 ``allow_if_equal_granted_denied`` options are ignored.
 
 strategy_service
-................
+~~~~~~~~~~~~~~~~
 
 **type**: ``string`` **default**: ``null``
 
@@ -294,8 +276,8 @@ the ``debug:firewall`` command:
 
 .. _reference-security-firewall-form-login:
 
-``form_login`` Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+form_login
+~~~~~~~~~~
 
 When using the ``form_login`` authentication listener beneath a firewall,
 there are several common options for configuring the "form login" experience.
@@ -551,8 +533,8 @@ The ``invalidate_session`` option allows you to redefine this behavior. Set this
 option to ``false`` in every firewall and the user will only be logged out from
 the current firewall and not the other ones.
 
-``path``
-........
+path
+....
 
 **type**: ``string`` **default**: ``/logout``
 
@@ -604,8 +586,12 @@ An arbitrary string used to identify the token (and check its validity afterward
 
 .. _reference-security-firewall-json-login:
 
-JSON Login Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~
+json_login
+~~~~~~~~~~
+
+Use it to create an endpoint in your application that provides tokens to access
+APIs based on a username (or email) and password. Read more about
+:ref:`JSON login authentication <security-json-login>`.
 
 check_path
 ..........
@@ -684,12 +670,12 @@ Use this option to modify the expected request body structure. See
 
 .. _reference-security-ldap:
 
-LDAP Authentication
-~~~~~~~~~~~~~~~~~~~
+form_login_ldap
+~~~~~~~~~~~~~~~
 
-There are several options for connecting against an LDAP server,
-using the ``form_login_ldap``, ``http_basic_ldap`` and ``json_login_ldap`` authentication
-providers or the ``ldap`` user provider.
+This section shows the LDAP authentication options when using a login form, but
+the same options work when using HTTP basic (``http_basic_ldap``) or JSON login
+(``json_login_ldap``) with LDAP.
 
 For even more details, see :doc:`/security/ldap`.
 
@@ -740,8 +726,13 @@ providers: ``form_login_ldap`` or ``http_basic_ldap`` or ``json_login_ldap``.
 
 .. _reference-security-firewall-x509:
 
-X.509 Authentication
-~~~~~~~~~~~~~~~~~~~~
+x509
+~~~~
+
+The :ref:`X.509 authenticator <security-x509-client-certificates>` provided by
+Symfony lets your web server handle the entire authentication process. Symfony
+then extracts the user's email address from the client certificate and uses it
+as the user identifier.
 
 .. configuration-block::
 
@@ -814,8 +805,13 @@ and the value of this option is ``'CN'``, the user identifier will be ``'user1'`
 
 .. _reference-security-firewall-remote-user:
 
-Remote User Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+remote_user
+~~~~~~~~~~~
+
+In addition to :ref:`X.509 authentication <reference-security-firewall-x509>`
+based on client certificates, Symfony also supports :ref:`pre-authentication <security-remote-users>`
+performed by web servers (e.g. Kerberos) that store the authenticated user
+identifier in the ``REMOTE_USER`` environment variable.
 
 .. configuration-block::
 
@@ -863,8 +859,8 @@ user
 
 The name of the ``$_SERVER`` parameter holding the user identifier.
 
-``access_token`` Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+access_token
+~~~~~~~~~~~~
 
 When using the ``access_token`` authentication mechanism beneath a firewall,
 the application authenticates users based on an API token sent with the request.
@@ -917,9 +913,8 @@ failure_handler
 The service id of a service that implements
 :class:`Symfony\\Component\\Security\\Http\\Authentication\\AuthenticationFailureHandlerInterface`.
 
-
-``login_link`` Authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+login_link
+~~~~~~~~~~
 
 When using the ``login_link`` authentication mechanism beneath a firewall,
 users are authenticated via a unique, signed URL sent to them (e.g. by email).
@@ -1001,8 +996,8 @@ The service id of a service that implements
 
 .. _reference-security-firewall-login-throttling:
 
-``login_throttling``
-~~~~~~~~~~~~~~~~~~~~
+login_throttling
+~~~~~~~~~~~~~~~~
 
 Login throttling limits the number of failed login attempts over a given period of
 time. This helps protect against brute-force attacks. For even more details, see
@@ -1058,8 +1053,8 @@ takes precedence over ``cache_pool``.
 
 .. _reference-security-firewall-remember-me:
 
-``remember_me``
-~~~~~~~~~~~~~~~
+remember_me
+~~~~~~~~~~~
 
 The "remember me" authentication mechanism allows users to stay authenticated
 across browser sessions by storing a special cookie. For even more details, see
@@ -1190,8 +1185,8 @@ the "remember me" feature should be activated.
 
 .. _reference-security-firewall-context:
 
-Firewall Context
-~~~~~~~~~~~~~~~~
+context
+~~~~~~~
 
 If your application uses multiple :ref:`firewalls <firewalls-authentication>`, you'll notice that
 if you're authenticated in one firewall, you're not automatically authenticated
@@ -1317,8 +1312,8 @@ session only if the application actually accesses the User object, (e.g. calling
             ],
         ]);
 
-User Checkers
-~~~~~~~~~~~~~
+user_checker
+~~~~~~~~~~~~
 
 During the authentication of a user, additional checks might be required to
 verify if the identified user is allowed to log in. Each firewall can include
@@ -1326,7 +1321,7 @@ a ``user_checker`` option to define the service used to perform those checks.
 
 Learn more about user checkers in :doc:`/security/user_checkers`.
 
-Required Badges
+required_badges
 ~~~~~~~~~~~~~~~
 
 Firewalls can configure a list of required badges that must be present on the authenticated passport:
