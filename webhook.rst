@@ -47,7 +47,7 @@ can customize this prefix in your routing configuration:
 
         # config/routes/webhook.yaml
         webhook:
-            resource: '@FrameworkBundle/Resources/config/routing/webhook.xml'
+            resource: '@FrameworkBundle/Resources/config/routing/webhook.php'
             prefix: /webhook  # customize as needed
 
     .. code-block:: php
@@ -56,7 +56,7 @@ can customize this prefix in your routing configuration:
         use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
         return static function (RoutingConfigurator $routes): void {
-            $routes->import('@FrameworkBundle/Resources/config/routing/webhook.xml')
+            $routes->import('@FrameworkBundle/Resources/config/routing/webhook.php')
                 ->prefix('/webhook');
         };
 
