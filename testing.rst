@@ -966,21 +966,20 @@ input::
 End to End Tests (E2E)
 ~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to test the application as a whole, including the JavaScript
-code, you can use a real browser instead of the test client. This is
-called an end-to-end test and it's a great way to test the application.
+If you need to test the application as a whole, including its JavaScript code,
+you can use a real browser instead of the test client. This is called an
+**end-to-end test**, and it is an effective way to test the application.
 
-This can be achieved thanks to the Panther component. You can learn more
-about it in :doc:`the dedicated page </testing/end_to_end>`.
+You can achieve this using the Panther component. Learn more about
+:doc:`E2E testing in Symfony </testing/end_to_end>`.
 
 .. _testing-application-assertions:
 
-Using built-in assertions
--------------------------
+Test Assertions Defined by Symfony
+----------------------------------
 
-If your tests are based on PHPUnit, you can use any `PHPUnit Assertion`_ in
-your tests. However, Symfony provides useful shortcut methods for the most
-common cases:
+If your tests are based on PHPUnit, you can use any `PHPUnit assertion`_ in
+your tests. Symfony also provides many additional assertions.
 
 Response Assertions
 ~~~~~~~~~~~~~~~~~~~
