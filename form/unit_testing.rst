@@ -254,4 +254,4 @@ the :method:`Symfony\\Bridge\\Twig\\Test\\FormLayoutTestCase::getThemes` methods
     The :class:`Symfony\\Bridge\\Twig\\Test\\FormLayoutTestCase` class was
     introduced in Symfony 6.4.
 
-.. _`PHPUnit data providers`: https://docs.phpunit.de/en/9.6/writing-tests-for-phpunit.html#data-providers
+.. _`PHPUnit data providers`: https://docs.phpunit.de/en/10.5/writing-tests-for-phpunit.html#data-providers
