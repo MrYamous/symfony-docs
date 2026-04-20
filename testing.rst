@@ -963,22 +963,27 @@ input::
         $client->submit($form, [], ['HTTP_ACCEPT_LANGUAGE' => 'es']);
         $client->submitForm($button, [], 'POST', ['HTTP_ACCEPT_LANGUAGE' => 'es']);
 
+End to End Tests (E2E)
+~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to test the application as a whole, including the JavaScript
+code, you can use a real browser instead of the test client. This is
+called an end-to-end test and it's a great way to test the application.
+
+This can be achieved thanks to the Panther component. You can learn more
+about it in :doc:`the dedicated page </testing/end_to_end>`.
+
 .. _testing-application-assertions:
 
-Testing the Response (Assertions)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using built-in assertions
+-------------------------
 
-Now that the tests have visited a page and interacted with it (e.g. filled
-in a form), it is time to verify that the expected output is shown.
-
-As all tests are based on PHPUnit, you can use any `PHPUnit Assertion`_ in
-your tests. Combined with test Client and the Crawler, this allows you to
-check anything you want.
-
-However, Symfony provides useful shortcut methods for the most common cases:
+If your tests are based on PHPUnit, you can use any `PHPUnit Assertion`_ in
+your tests. However, Symfony provides useful shortcut methods for the most
+common cases:
 
 Response Assertions
-...................
+~~~~~~~~~~~~~~~~~~~
 
 ``assertResponseIsSuccessful(string $message = '')``
     Asserts that the response was successful (HTTP status is 2xx).
@@ -1011,7 +1016,7 @@ Response Assertions
     in Symfony 6.4.
 
 Request Assertions
-..................
+~~~~~~~~~~~~~~~~~~
 
 ``assertRequestAttributeValueSame(string $name, string $expectedValue, string $message = '')``
     Asserts the given :ref:`request attribute <component-foundation-attributes>`
@@ -1020,7 +1025,7 @@ Request Assertions
     Asserts the request matches the given route and optionally route parameters.
 
 Browser Assertions
-..................
+~~~~~~~~~~~~~~~~~~
 
 ``assertBrowserHasCookie(string $name, string $path = '/', ?string $domain = null, string $message = '')``/``assertBrowserNotHasCookie(string $name, string $path = '/', ?string $domain = null, string $message = '')``
     Asserts that the test Client does (not) have the given cookie set
@@ -1039,7 +1044,7 @@ Browser Assertions
         }
 
 Crawler Assertions
-..................
+~~~~~~~~~~~~~~~~~~
 
 ``assertSelectorExists(string $selector, string $message = '')``/``assertSelectorNotExists(string $selector, string $message = '')``
     Asserts that the given selector does (not) match at least one element
@@ -1083,7 +1088,7 @@ Crawler Assertions
 .. _mailer-assertions:
 
 Mailer Assertions
-.................
+~~~~~~~~~~~~~~~~~
 
 ``assertEmailCount(int $count, ?string $transport = null, string $message = '')``
     Asserts that the expected number of emails was sent.
@@ -1123,7 +1128,7 @@ Mailer Assertions
     assertions were introduced in Symfony 6.4.
 
 Notifier Assertions
-...................
+~~~~~~~~~~~~~~~~~~~
 
 ``assertNotificationCount(int $count, string $transportName = null, string $message = '')``
     Asserts that the given number of notifications has been created
@@ -1153,7 +1158,7 @@ Notifier Assertions
     The Notifier assertions were introduced in Symfony 6.2.
 
 HttpClient Assertions
-.....................
+~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
@@ -1178,16 +1183,6 @@ HttpClient Assertions
 .. versionadded:: 6.4
 
     The HttpClient assertions were introduced in Symfony 6.4.
-
-End to End Tests (E2E)
-~~~~~~~~~~~~~~~~~~~~~~
-
-If you need to test the application as a whole, including the JavaScript
-code, you can use a real browser instead of the test client. This is
-called an end-to-end test and it's a great way to test the application.
-
-This can be achieved thanks to the Panther component. You can learn more
-about it in :doc:`the dedicated page </testing/end_to_end>`.
 
 Learn more
 ----------
