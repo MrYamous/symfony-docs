@@ -2215,8 +2215,8 @@ The transport has a number of options:
 .. warning::
 
     AWS SQS message deduplication is time-based, not queue-based. Once a
-    ``Message deduplication ID`` is used, SQS will reject any message sent with
-    the same ID for the next 5 minutes, regardless of whether the original
+    ``Message deduplication ID`` has been used, SQS rejects any message sent
+    with the same ID for the next 5 minutes, regardless of whether the original
     message has already been consumed or deleted from the queue. See the
     `SQS message deduplication`_ documentation for details.
 
