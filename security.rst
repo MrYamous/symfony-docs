@@ -1952,7 +1952,7 @@ you have imported the logout route loader in your routes:
 Logout programmatically
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-You can logout user programmatically using the ``logout()`` method of the
+You can logout the user programmatically using the ``logout()`` method of the
 :class:`Symfony\\Bundle\\SecurityBundle\\Security` helper::
 
     // src/Controller/SecurityController.php
@@ -1964,10 +1964,10 @@ You can logout user programmatically using the ``logout()`` method of the
     {
         public function someAction(Security $security): Response
         {
-            // logout the user in on the current firewall
+            // logout the user on the current firewall
             $response = $security->logout();
 
-            // you can also disable the csrf logout
+            // you can also disable the CSRF protection
             $response = $security->logout(false);
 
             // ... return $response (if set) or e.g. redirect to the homepage
