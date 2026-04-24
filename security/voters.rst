@@ -131,11 +131,10 @@ decides this using whatever logic you want.
 
     The ``#[IsGranted]`` attribute was introduced in Symfony 6.2.
 
-Creating the custom Voter
+Creating the Custom Voter
 -------------------------
 
-Suppose the logic to decide if a user can "view" or "edit" a ``Post`` object is
-pretty complex. For example, a ``User`` can always edit or view a ``Post`` they created.
+Suppose a ``User`` can always edit or view a ``Post`` they created.
 And if a ``Post`` is marked as "public", anyone can view it. A voter for this situation
 would look like this::
 
@@ -149,7 +148,7 @@ would look like this::
 
     class PostVoter extends Voter
     {
-        // these strings are just invented: you can use anything
+        // these are just arbitrary strings; you can use anything
         const VIEW = 'view';
         const EDIT = 'edit';
 
