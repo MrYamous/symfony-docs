@@ -1063,12 +1063,12 @@ functionality).
 
 Using Enums
 -----------
+.. _`enumerations`: https://php.net/enumerations
+PHP provides native `enumerations`_, which allow you to define a closed set of
+possible values for a given type. This makes them a good fit for modeling entity
+properties that should only accept a predefined set of values.
 
-PHP 8.1 added native Enumerations, which can be used to define a custom type
-and its possible values. Those can be used in association with Doctrine in
-order to define a limited set of values availables for an entity property.
-
-First step is to create an enum::
+The first step is to create an enum::
 
     // src/Enum/Suit.php
     namespace App\Enum;
@@ -1082,11 +1082,11 @@ First step is to create an enum::
 
 .. note::
 
-    Only backed enums can be used with properties as Doctrine use the scalar
-    equivalent of each value for storing.
+    You can only use backed enums for entity properties, as Doctrine uses their
+    scalar values for persistence.
 
-When the enum is created, you can use the ``enumType`` parameter of
-``#[ORM\Column]`` attribute::
+Once the enum is defined, use the ``enumType`` option of the ``#[ORM\Column]``
+attribute to associate the property with the enum::
 
     // src/Entity/Card.php
     namespace App\Entity;
