@@ -198,9 +198,7 @@ everything for you:
     .. code-block:: terminal
 
         $ explorer.exe `wslpath -w $HOME/.config/symfony-cli/certs`
-
-        # In symfony-cli before v5.17, use this path
-        $ explorer.exe `wslpath -w $HOME/.symfony5/certs`
+        # in legacy Symfony CLI versions, the path was $HOME/.symfony5/certs
 
     In the file explorer window that just opened, double-click on the file
     called ``default.p12``.
