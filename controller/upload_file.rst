@@ -94,6 +94,11 @@ so Symfony doesn't try to get/set its value from the related entity::
         }
     }
 
+.. note::
+
+    If you set ``multiple`` to ``true`` for multi-file selection, make sure to wrap the :doc:`File </reference/constraints/File>`
+    constraint in :doc:`All </reference/constraints/All>` so validation works correctly.
+
 Now, update the template that renders the form to display the new ``brochure``
 field (the exact template code to add depends on the method used by your application
 to :doc:`customize form rendering </form/form_customization>`):
