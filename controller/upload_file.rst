@@ -94,11 +94,6 @@ so Symfony doesn't try to get/set its value from the related entity::
         }
     }
 
-.. note::
-
-    If you set ``multiple`` to ``true`` for multi-file selection, make sure to wrap the :doc:`File </reference/constraints/File>`
-    constraint in :doc:`All </reference/constraints/All>` so validation works correctly.
-
 Now, update the template that renders the form to display the new ``brochure``
 field (the exact template code to add depends on the method used by your application
 to :doc:`customize form rendering </form/form_customization>`):
@@ -218,6 +213,61 @@ You can use the following code to link to the PDF brochure of a product:
         if ($form->isSubmitted() && $form->isValid()) {
             // ...
         }
+
+Uploading Multiple Files
+------------------------
+
+If you want to allow multiple files to be uploaded at once, set the ``multiple``
+option of ``FileType`` to ``true``. The form field's data is then an array of
+:class:`Symfony\Component\HttpFoundation\File\UploadedFile` instances instead of
+a single one, so you must wrap the ``File`` constraint inside the
+:doc:`All </reference/constraints/All>` constraint to validate each uploaded file::
+
+    // src/Form/ProductType.php
+    // ...
+
+    use Symfony\Component\Validator\Constraints as Assert;
+
+    $builder
+        ->add('brochures', FileType::class, [
+            'label' => 'Brochures (PDF files)',
+            'mapped' => false,
+            'required' => false,
+            'multiple' => true,
+            'constraints' => [
+                new Assert\All([
+                    new Assert\File(
+                        maxSize: '1024k',
+                        extensions: ['pdf'],
+                        extensionsMessage: 'Please upload a valid PDF document',
+                    ),
+                ]),
+            ],
+        ])
+    ;
+
+.. note::
+
+    The ``multiple`` option automatically adds the ``multiple`` HTML attribute
+    to the ``<input type="file">`` element, so no template changes are required.
+
+In the controller, the field returns an array of uploaded files, so iterate over
+them and process each file individually::
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        /** @var UploadedFile[] $brochureFiles */
+        $brochureFiles = $form->get('brochures')->getData();
+
+        $filenames = [];
+        foreach ($brochureFiles as $brochureFile) {
+            // $fileUploader is a custom service explained in the next section
+            $filenames[] = $fileUploader->upload($brochureFile);
+        }
+
+        // store the list of filenames as you prefer (e.g. a JSON column on the
+        // Product entity, a related ``ProductBrochure`` entity, etc.)
+        // ...
+     }
 
 Creating an Uploader Service
 ----------------------------
