@@ -511,6 +511,129 @@ Now you can use the ``uuid`` variable in any Twig template to access to the
 
     UUID: {{ uuid.generate }}
 
+.. _template_inheritance-layouts:
+
+Template Inheritance and Layouts
+--------------------------------
+
+As your application grows you'll find more and more repeated elements between
+pages, such as headers, footers, sidebars, etc. :ref:`Including templates <templates-include>`
+and :ref:`embedding controllers <templates-embed-controllers>` can help, but
+when pages share a common structure, it's better to use **inheritance**.
+
+The concept of `Twig template inheritance`_ is similar to PHP class inheritance.
+You define a parent template that other templates can extend from and child
+templates can override parts of the parent template.
+
+Symfony recommends the following three-level template inheritance for medium and
+complex applications:
+
+* ``templates/base.html.twig``, defines the common elements of all application
+  templates, such as ``<head>``, ``<header>``, ``<footer>``, etc.;
+* ``templates/layout.html.twig``, extends from ``base.html.twig`` and defines
+  the content structure used in all or most of the pages, such as a two-column
+  content + sidebar layout. Some sections of the application can define their
+  own layouts (e.g. ``templates/blog/layout.html.twig``);
+* ``templates/*.html.twig``, the application pages which extend from the main
+  ``layout.html.twig`` template or any other section layout.
+
+In practice, the ``base.html.twig`` template would look like this:
+
+.. code-block:: html+twig
+
+    {# templates/base.html.twig #}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>{% block title %}My Application{% endblock %}</title>
+            {% block stylesheets %}
+                <link rel="stylesheet" type="text/css" href="/css/base.css">
+            {% endblock %}
+        </head>
+        <body>
+            {% block body %}
+                <div id="sidebar">
+                    {% block sidebar %}
+                        <ul>
+                            <li><a href="{{ path('homepage') }}">Home</a></li>
+                            <li><a href="{{ path('blog_index') }}">Blog</a></li>
+                        </ul>
+                    {% endblock %}
+                </div>
+
+                <div id="content">
+                    {% block content %}{% endblock %}
+                </div>
+            {% endblock %}
+        </body>
+    </html>
+
+The `Twig block tag`_ defines the page sections that can be overridden in the
+child templates. They can be empty, like the ``content`` block or define a default
+content, like the ``title`` block, which is displayed when child templates don't
+override them.
+
+The ``blog/layout.html.twig`` template could be like this:
+
+.. code-block:: html+twig
+
+    {# templates/blog/layout.html.twig #}
+    {% extends 'base.html.twig' %}
+
+    {% block content %}
+        <h1>Blog</h1>
+
+        {% block page_contents %}{% endblock %}
+    {% endblock %}
+
+The template extends from ``base.html.twig`` and only defines the contents of
+the ``content`` block. The rest of the parent template blocks will display their
+default contents. However, they can be overridden by the third-level inheritance
+template, such as ``blog/index.html.twig``, which displays the blog index:
+
+.. code-block:: html+twig
+
+    {# templates/blog/index.html.twig #}
+    {% extends 'blog/layout.html.twig' %}
+
+    {% block title %}Blog Index{% endblock %}
+
+    {% block page_contents %}
+        {% for article in articles %}
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.body }}</p>
+        {% endfor %}
+    {% endblock %}
+
+This template extends from the second-level template (``blog/layout.html.twig``)
+but overrides blocks of different parent templates: ``page_contents`` from
+``blog/layout.html.twig`` and ``title`` from ``base.html.twig``.
+
+When you render the ``blog/index.html.twig`` template, Symfony uses three
+different templates to create the final contents. This inheritance mechanism
+boosts your productivity because each template includes only its unique contents
+and leaves the repeated contents and HTML structure to some parent templates.
+
+.. warning::
+
+    When using ``extends``, a child template is forbidden to define template
+    parts outside of a block. The following code throws a ``SyntaxError``:
+
+    .. code-block:: html+twig
+
+        {# templates/blog/index.html.twig #}
+        {% extends 'base.html.twig' %}
+
+        {# the line below is not captured by a "block" tag #}
+        <div class="alert">Some Alert</div>
+
+        {# the following is valid #}
+        {% block content %}My cool blog posts{% endblock %}
+
+Read the `Twig template inheritance`_ docs to learn more about how to reuse
+parent block contents when overriding templates and other advanced features.
+
 Twig Components
 ---------------
 
@@ -1218,129 +1341,6 @@ Use the ``attributes`` option to define the value of hinclude.js options:
     {# by default, the JavaScript code included in the loaded contents is not run;
        set this option to 'true' to run that JavaScript code #}
     {{ render_hinclude(controller('...'), {attributes: {evaljs: 'true'}}) }}
-
-.. _template_inheritance-layouts:
-
-Template Inheritance and Layouts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As your application grows you'll find more and more repeated elements between
-pages, such as headers, footers, sidebars, etc. :ref:`Including templates <templates-include>`
-and :ref:`embedding controllers <templates-embed-controllers>` can help, but
-when pages share a common structure, it's better to use **inheritance**.
-
-The concept of `Twig template inheritance`_ is similar to PHP class inheritance.
-You define a parent template that other templates can extend from and child
-templates can override parts of the parent template.
-
-Symfony recommends the following three-level template inheritance for medium and
-complex applications:
-
-* ``templates/base.html.twig``, defines the common elements of all application
-  templates, such as ``<head>``, ``<header>``, ``<footer>``, etc.;
-* ``templates/layout.html.twig``, extends from ``base.html.twig`` and defines
-  the content structure used in all or most of the pages, such as a two-column
-  content + sidebar layout. Some sections of the application can define their
-  own layouts (e.g. ``templates/blog/layout.html.twig``);
-* ``templates/*.html.twig``, the application pages which extend from the main
-  ``layout.html.twig`` template or any other section layout.
-
-In practice, the ``base.html.twig`` template would look like this:
-
-.. code-block:: html+twig
-
-    {# templates/base.html.twig #}
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>{% block title %}My Application{% endblock %}</title>
-            {% block stylesheets %}
-                <link rel="stylesheet" type="text/css" href="/css/base.css">
-            {% endblock %}
-        </head>
-        <body>
-            {% block body %}
-                <div id="sidebar">
-                    {% block sidebar %}
-                        <ul>
-                            <li><a href="{{ path('homepage') }}">Home</a></li>
-                            <li><a href="{{ path('blog_index') }}">Blog</a></li>
-                        </ul>
-                    {% endblock %}
-                </div>
-
-                <div id="content">
-                    {% block content %}{% endblock %}
-                </div>
-            {% endblock %}
-        </body>
-    </html>
-
-The `Twig block tag`_ defines the page sections that can be overridden in the
-child templates. They can be empty, like the ``content`` block or define a default
-content, like the ``title`` block, which is displayed when child templates don't
-override them.
-
-The ``blog/layout.html.twig`` template could be like this:
-
-.. code-block:: html+twig
-
-    {# templates/blog/layout.html.twig #}
-    {% extends 'base.html.twig' %}
-
-    {% block content %}
-        <h1>Blog</h1>
-
-        {% block page_contents %}{% endblock %}
-    {% endblock %}
-
-The template extends from ``base.html.twig`` and only defines the contents of
-the ``content`` block. The rest of the parent template blocks will display their
-default contents. However, they can be overridden by the third-level inheritance
-template, such as ``blog/index.html.twig``, which displays the blog index:
-
-.. code-block:: html+twig
-
-    {# templates/blog/index.html.twig #}
-    {% extends 'blog/layout.html.twig' %}
-
-    {% block title %}Blog Index{% endblock %}
-
-    {% block page_contents %}
-        {% for article in articles %}
-            <h2>{{ article.title }}</h2>
-            <p>{{ article.body }}</p>
-        {% endfor %}
-    {% endblock %}
-
-This template extends from the second-level template (``blog/layout.html.twig``)
-but overrides blocks of different parent templates: ``page_contents`` from
-``blog/layout.html.twig`` and ``title`` from ``base.html.twig``.
-
-When you render the ``blog/index.html.twig`` template, Symfony uses three
-different templates to create the final contents. This inheritance mechanism
-boosts your productivity because each template includes only its unique contents
-and leaves the repeated contents and HTML structure to some parent templates.
-
-.. warning::
-
-    When using ``extends``, a child template is forbidden to define template
-    parts outside of a block. The following code throws a ``SyntaxError``:
-
-    .. code-block:: html+twig
-
-        {# templates/blog/index.html.twig #}
-        {% extends 'base.html.twig' %}
-
-        {# the line below is not captured by a "block" tag #}
-        <div class="alert">Some Alert</div>
-
-        {# the following is valid #}
-        {% block content %}My cool blog posts{% endblock %}
-
-Read the `Twig template inheritance`_ docs to learn more about how to reuse
-parent block contents when overriding templates and other advanced features.
 
 .. _output-escaping:
 .. _xss-attacks:
