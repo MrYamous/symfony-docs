@@ -113,10 +113,10 @@ Now browse the given URL or run the following command to open it in the browser:
 
     $ symfony open:local
 
-.. versionadded:: 5.16
+.. tip::
 
-    Starting from Symfony CLI 5.16, you can add ``--open`` option when you
-    start the local server to open your project directly in the browser:
+    You can also start the local server and open the given URL in your browser
+    in a single command:
 
     .. code-block:: terminal
 
