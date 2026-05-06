@@ -1,9 +1,9 @@
 Asset Preloading and Resource Hints with WebLink
 ================================================
 
-Symfony provides native support (via the `WebLink`_ component)
-for managing ``Link`` HTTP headers, which are the key to improve the application
-performance when using preloading capabilities of modern web browsers.
+Symfony provides native support for managing ``Link`` HTTP headers, which are
+the key to improve the application performance when using preloading
+capabilities of modern web browsers.
 
 ``Link`` headers are used to hint resources (e.g. CSS and JavaScript files) to
 clients before they even know that they need them. WebLink enables several
@@ -305,7 +305,6 @@ instances::
 
     The ``HttpHeaderParser`` class was introduced in Symfony 7.4.
 
-.. _`WebLink`: https://github.com/symfony/web-link
 .. _`Docker installer and runtime for Symfony`: https://github.com/dunglas/symfony-docker
 .. _`Resource Hints`: https://www.w3.org/TR/resource-hints/
 .. _`Cloudflare`: https://blog.cloudflare.com/announcing-support-for-http-2-server-push-2/
