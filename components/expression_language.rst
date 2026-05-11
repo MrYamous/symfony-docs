@@ -46,12 +46,6 @@ to external injections because you must explicitly declare which variables are
 available in an expression (but you should still sanitize any data given by end
 users and passed to expressions).
 
-.. warning::
-
-    By default, expressions have access to all PHP constants via the
-    ``constant()`` function. Be careful when exposing constants defined
-    by your application to end users through expressions.
-
 Usage
 -----
 
