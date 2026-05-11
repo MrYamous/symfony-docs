@@ -166,9 +166,6 @@ with the ``doctrine.orm.entity_listener`` tag as follows:
 
                         # these are other options that you may define if needed
 
-                        # set the 'lazy' option to TRUE to only instantiate listeners when they are used
-                        # lazy: true
-
                         # set the 'entity_manager' option if the listener is not associated to the default manager
                         # entity_manager: 'custom'
 
@@ -194,7 +191,6 @@ with the ``doctrine.orm.entity_listener`` tag as follows:
                         *   * entity
                         *
                         * These are other options that you may define if needed:
-                        *   * lazy: if TRUE, listeners are only instantiated when they are used
                         *   * entity_manager: define it if the listener is not associated to the default manager
                         *   * method: by default, Symfony looks for a method called after the event (e.g. postUpdate())
                         *           if it doesn't exist, it tries to execute the '__invoke()' method, but
@@ -203,7 +199,6 @@ with the ``doctrine.orm.entity_listener`` tag as follows:
                     <tag name="doctrine.orm.entity_listener"
                         event="postUpdate"
                         entity="App\Entity\User"
-                        lazy="true"
                         entity_manager="custom"
                         method="checkUserChanges"/>
                 </service>
@@ -228,9 +223,6 @@ with the ``doctrine.orm.entity_listener`` tag as follows:
                     'entity' => User::class,
 
                     // These are other options that you may define if needed:
-
-                    // set the 'lazy' option to TRUE to only instantiate listeners when they are used
-                    // 'lazy' => true,
 
                     // set the 'entity_manager' option if the listener is not associated to the default manager
                     // 'entity_manager' => 'custom',
