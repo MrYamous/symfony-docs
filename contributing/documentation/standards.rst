@@ -10,7 +10,7 @@ rest of the Symfony documentation:
   * level 1: ``=`` (equal sign),
   * level 2: ``-`` (dash),
   * level 3: ``~`` (tilde),
-  * level 4: ``.`` (dot),
+  * level 4: ``_`` (underscore),
   * level 5: ``"`` (double quote);
 * Break each line at the 80th character whenever possible (e.g. you can ignore
   this rule for tables);

@@ -35,7 +35,7 @@ from Symfony (AssetMapper, Webpack Encore, etc.). All changes to these docs
 Level 1  =====
 Level 2  -----
 Level 3  ~~~~~
-Level 4  .....
+Level 4  _____
 Level 5  """""
 ```
 
